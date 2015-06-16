@@ -11,7 +11,7 @@ namespace org\majkel\dbase;
 use ArrayObject;
 
 /**
- * Description of Record
+ * Stores record data and status
  *
  * @author majkel
  */
@@ -34,12 +34,12 @@ class Record extends ArrayObject {
      * @return boolean;
      */
     public function isDeleted() {
-        return $this->flags & self::FLAG_DELETED;
+        return ($this->flags & self::FLAG_DELETED) !== 0;
     }
 
     /**
      * @param boolean $deleted
-     * @return Record
+     * @return \org\majkel\dbase\Record
      */
     public function setDeleted($deleted) {
         if ($deleted) {

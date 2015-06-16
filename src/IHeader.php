@@ -9,12 +9,14 @@
 namespace org\majkel\dbase;
 
 /**
+ * Interface to access header information
+ *
  * @author majkel
  */
 interface IHeader {
 
     /**
-     * @return Field[]
+     * @return \org\majkel\dbase\Field[]
      */
     public function getFields();
 
@@ -58,4 +60,8 @@ interface IHeader {
      */
     public function getHeaderSize();
 
+    /**
+     * @return \org\majkel\dbase\Field
+     */
+    public function getField($indexOrName);
 }

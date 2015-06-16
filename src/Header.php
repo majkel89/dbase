@@ -14,7 +14,7 @@ use ArrayAccess;
 use DateTime;
 
 /**
- * Description of Header
+ * Stores header information
  *
  * @author majkel
  */
@@ -23,16 +23,13 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     const FLAG_VALID = 1;
     const FLAG_TRANSACTION = 2;
 
-    const VERSION_5 = 3;
-    const VERSION_7 = 4;
-
     /** @var integer */
     protected $flags = 0;
     /** @var Field[] */
     protected $fields;
     /** @var integer; */
     protected $version;
-    /** @var DateTime; */
+    /** @var \DateTime; */
     protected $lastUpdate;
     /** @var integer */
     protected $recordsCount;
@@ -49,10 +46,23 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
+     * @param \org\majkel\dbase\Field $field
+     * @return \org\majkel\dbase\Header
+     */
+    public function addField(Field $field) {
+        $this->fields[] = $field;
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFieldsNames() {
-        return array_keys($this->fields);
+        $fieldsNames = [];
+        foreach ($this->getFields() as $field) {
+            $fieldsNames[] = $field->getName();
+        }
+        return $fieldsNames;
     }
 
     /**
@@ -63,10 +73,28 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
+     * @param integer $version
+     * @return \org\majkel\dbase\Header
+     */
+    public function setVersion($version) {
+        $this->version = (integer)$version;
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getLastUpdate() {
         return $this->lastUpdate;
+    }
+
+    /**
+     * @param \DateTime $lastUpdateDate
+     * @return \org\majkel\dbase\Header
+     */
+    public function setLastUpdate(DateTime $lastUpdateDate) {
+        $this->lastUpdate = $lastUpdateDate;
+        return $this;
     }
 
     /**
@@ -84,10 +112,32 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
+     * @param boolean $isPendingTransaction
+     * @return \org\majkel\dbase\Header
+     */
+    public function setPendingTransaction($isPendingTransaction) {
+        if ($isPendingTransaction) {
+            $this->flags |= self::FLAG_TRANSACTION;
+        } else {
+            $this->flags &= ~self::FLAG_TRANSACTION;
+        }
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getRecordsCount() {
         return $this->recordsCount;
+    }
+
+    /**
+     * @param integer $recordsCount
+     * @return \org\majkel\dbase\Header
+     */
+    public function setRecordsCount($recordsCount) {
+        $this->recordsCount = (integer)$recordsCount;
+        return $this;
     }
 
     /**
@@ -98,10 +148,28 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
+     * @param integer $recordSize
+     * @return \org\majkel\dbase\Header
+     */
+    public function setRecordSize($recordSize) {
+        $this->recordSize = (integer)$recordSize;
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getHeaderSize() {
         return $this->headerSize;
+    }
+
+    /**
+     * @param integer $headerSize
+     * @return \org\majkel\dbase\Header
+     */
+    public function setHeaderSize($headerSize) {
+        $this->headerSize = (integer)$headerSize;
+        return $this;
     }
 
     /**
@@ -112,45 +180,16 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
-     * @param \SplFileObject $file
+     * @param boolean $valid
+     * @return \org\majkel\dbase\Header
      */
-    public function loadFromFile($file) {
-        $file->fseek(0);
-        $this->flags = 0;
-
-        $data = unpack('Cv/c3d/Vn/vhs/vrs/vr1/Ct', $file->fread(32));
-
-        // load version
-        $this->version = $data['v'] & 7;
-        if ($this->version !== self::VERSION_5 && $this->version !== self::VERSION_7) {
-            Exception::raise(Exception::UNSUPPORTED_VERSION);
+    public function setValid($valid) {
+        if ($valid) {
+            $this->flags |= self::FLAG_VALID;
+        } else {
+            $this->flags &= ~self::FLAG_VALID;
         }
-
-        // load last modfied date
-        $date = new DateTime;
-        $date->setDate(($data['d1']) + 1900, $data['d2'], $data['d3']);
-        $this->lastUpdate = $date;
-
-        // total number of recors
-        $this->recordsCount = $data['n'];
-        $this->recordSize = $data['rs'];
-        $this->headerSize = $data['hs'];
-
-        // transaction bit
-        if ($data['t']) {
-            $this->flags |= self::FLAG_TRANSACTION;
-        }
-
-        // load fields
-        $this->fields = [];
-        for ($fc = ($this->headerSize - 34) / 32; $fc > 0; --$fc) {
-            $field = new Field();
-            $field->loadFromFile($file);
-            $this->fields[$field->getName()] = $field;
-        }
-
-        // done
-        $this->flags |= self::FLAG_VALID;
+        return $this;
     }
 
     /**
@@ -161,7 +200,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
-     * @return Field
+     * @return org\majkel\dbase\Field
      */
     public function current() {
         current($this->fields);
@@ -195,20 +234,54 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
         return $this->key() !== null;
     }
 
+    /**
+     * @param integer $offset
+     * @return boolean
+     */
     public function offsetExists($offset) {
         return isset($this->fields[$offset]);
     }
 
+    /**
+     * @param integer $offset
+     * @return org\majkel\dbase\Field
+     */
     public function offsetGet($offset) {
         return $this->fields[$offset];
     }
 
+    /**
+     * @param integer $offset
+     * @param \org\majkel\dbase\Field $value
+     * @throws Exception
+     */
     public function offsetSet($offset, $value) {
+        if (!$value instanceof Field) {
+            throw new Exception("Header can contain only Field elements");
+        }
         $this->fields[$offset] = $value;
     }
 
+    /**
+     * @param integer $offset
+     */
     public function offsetUnset($offset) {
         unset($this->fields[$offset]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getField($indexOrName) {
+        if ($this->offsetExists($indexOrName)) {
+            return $this->offsetGet($indexOrName);
+        }
+        foreach ($this->fields as $field) {
+            if ($field->getName() === $indexOrName) {
+                return $field;
+            }
+        }
+        throw new Exception("Field `$indexOrName` does not exists");
     }
 
 }
