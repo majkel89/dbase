@@ -25,7 +25,7 @@ class FieldTest extends TestBase {
      * @covers ::getFilters
      */
     public function testAddFilter() {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         $filter = $this->mock(self::CLS_FILTER)
             ->supportsType([$field->getType()], true, self::once())
             ->new();
@@ -38,7 +38,7 @@ class FieldTest extends TestBase {
      * @covers ::addFilter
      */
     public function testAddFilterDoesNotSupport() {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         $filter = $this->mock(self::CLS_FILTER)
             ->supportsType([$field->getType()], false, self::once())
             ->new();
@@ -50,8 +50,8 @@ class FieldTest extends TestBase {
      * @return array
      */
     public function dataAddFilters() {
-        $fA = $this->getFilter();
-        $fB = $this->getFilter();
+        $fA = $this->getFilterMock();
+        $fB = $this->getFilterMock();
         return [
             [[$fA, $fB, $fA], [$fA, $fB, $fA]],
             [new \ArrayIterator([$fA, $fB, $fA]), [$fA, $fB, $fA]],
@@ -67,7 +67,7 @@ class FieldTest extends TestBase {
      * @dataProvider dataAddFilters
      */
     public function testAddFilters($filters, $excepted) {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         self::assertSame($field, $field->addFilters($filters));
         self::assertSame($excepted, $field->getFilters());
     }
@@ -76,8 +76,8 @@ class FieldTest extends TestBase {
      * @covers ::removeFilter
      */
     public function testRemoveFilterByIndex() {
-        $field = $this->getField();
-        $filter = $this->getFilter();
+        $field = $this->getFieldMock();
+        $filter = $this->getFilterMock();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter(0));
         self::assertSame([], $field->getFilters());
@@ -87,8 +87,8 @@ class FieldTest extends TestBase {
      * @covers ::removeFilter
      */
     public function testRemoveFilterByIndexDoesNotExists() {
-        $field = $this->getField();
-        $filter = $this->getFilter();
+        $field = $this->getFieldMock();
+        $filter = $this->getFilterMock();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter(66));
         self::assertSame([$filter], $field->getFilters());
@@ -98,8 +98,8 @@ class FieldTest extends TestBase {
      * @covers ::removeFilter
      */
     public function testRemoveFilterByObject() {
-        $field = $this->getField();
-        $filter = $this->getFilter();
+        $field = $this->getFieldMock();
+        $filter = $this->getFilterMock();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter($filter));
         self::assertSame([], $field->getFilters());
@@ -109,9 +109,9 @@ class FieldTest extends TestBase {
      * @covers ::removeFilter
      */
     public function testRemoveFilterByObjectDoestNotExists() {
-        $field = $this->getField();
-        $fA = $this->getFilter();
-        $fB = $this->getFilter();
+        $field = $this->getFieldMock();
+        $fA = $this->getFilterMock();
+        $fB = $this->getFilterMock();
         $field->addFilter($fA);
         self::assertSame($field, $field->removeFilter($fB));
         self::assertSame([$fA], $field->getFilters());
@@ -122,7 +122,7 @@ class FieldTest extends TestBase {
      * @covers ::getName
      */
     public function testSetName() {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         self::assertSame($field, $field->setName('NAME'));
         self::assertSame('NAME', $field->getName());
     }
@@ -133,7 +133,7 @@ class FieldTest extends TestBase {
      * @expectedExceptionMessage Field name cannot be longer than 10 characters
      */
     public function testSetNameTooLarge() {
-        $this->getField()->setName('VERY_LARGE_NAME');
+        $this->getFieldMock()->setName('VERY_LARGE_NAME');
     }
 
     /**
@@ -141,7 +141,7 @@ class FieldTest extends TestBase {
      * @covers ::getLength
      */
     public function testSetLength() {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         self::assertSame($field, $field->setLength('123'));
         self::assertSame(123, $field->getLength());
     }
@@ -151,7 +151,7 @@ class FieldTest extends TestBase {
      * @covers ::isLoad
      */
     public function testSetLoad() {
-        $field = $this->getField();
+        $field = $this->getFieldMock();
         self::assertTrue($field->isLoad());
         self::assertSame($field, $field->setLoad(''));
         self::assertFalse($field->isLoad());
