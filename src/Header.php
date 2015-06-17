@@ -26,7 +26,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     /** @var integer */
     protected $flags = 0;
     /** @var Field[] */
-    protected $fields;
+    protected $fields = [];
     /** @var integer; */
     protected $version;
     /** @var \DateTime; */
@@ -108,7 +108,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * {@inheritdoc}
      */
     public function isPendingTransaction() {
-        return $this->flags & self::FLAG_TRANSACTION;
+        return ($this->flags & self::FLAG_TRANSACTION) !== 0;
     }
 
     /**
@@ -176,7 +176,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return boolean
      */
     public function isValid() {
-        return $this->flags & self::FLAG_VALID;
+        return ($this->flags & self::FLAG_VALID) !== 0;
     }
 
     /**
@@ -203,7 +203,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return org\majkel\dbase\Field
      */
     public function current() {
-        current($this->fields);
+        return current($this->fields);
     }
 
     /**

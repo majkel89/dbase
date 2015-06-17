@@ -50,7 +50,7 @@ class RecordTest extends TestBase {
     public function testToArray() {
         $record = new Record();
         $record->a = 1;
-        $record->b = 2;
+        $record['b'] = 2;
         self::assertSame([
             'a' => 1,
             'b' => 2,

@@ -34,6 +34,9 @@ abstract class Field {
     /** @var \org\majkel\dbase\IFilter[] */
     protected $filters = [];
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function __construct() {
     }
 
@@ -50,11 +53,12 @@ abstract class Field {
     }
 
     /**
+     * Adds filters
      * @param \org\majkel\dbase\IFilter[] $filters
      * @return \org\majkel\dbase\Field
      */
     public function addFilters($filters) {
-        if (!is_array($filters) || !$filters instanceof Traversable) {
+        if (!is_array($filters) && !$filters instanceof Traversable) {
             return $this;
         }
         foreach ($filters as $filter) {
@@ -72,12 +76,20 @@ abstract class Field {
     }
 
     /**
-     * Removes filter at index
-     * @param integer $index
+     * Removes filter at index or by object
+     * @param integer $indexOrFilter
      * @return \org\majkel\dbase\Field
      */
-    public function removeFilter($index) {
-        unset($this->filters[$index]);
+    public function removeFilter($indexOrFilter) {
+        if (is_scalar($indexOrFilter)) {
+            unset($this->filters[$indexOrFilter]);
+        } else if ($indexOrFilter instanceof IFilter) {
+            foreach ($this->filters as $i => $filter) {
+                if ($filter === $indexOrFilter) {
+                    unset($this->filters[$i]);
+                }
+            }
+        }
         return $this;
     }
 

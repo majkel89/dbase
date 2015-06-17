@@ -26,7 +26,7 @@ class Exception extends StdException {
      * @var string[]
      */
     protected static $messages = [
-        self::INVALID_OFFSET => "Offset %1 does not exists",
+        self::INVALID_OFFSET => "Offset %s does not exists",
         self::FILE_NOT_OPENED => "File is not opened",
         self::READ_ONLY => "Table is opened in read only mode",
         self::UNSUPPORTED_VERSION => "Only version 5 and 7 are supported",
@@ -40,7 +40,7 @@ class Exception extends StdException {
         $arguments = func_get_args();
         $arguments[0] = self::$messages[$code];
         $message = call_user_func_array('sprintf', $arguments);
-        throw new Exception($message, $code);
+        throw new self($message, $code);
     }
 
 }
