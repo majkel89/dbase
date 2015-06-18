@@ -227,4 +227,17 @@ abstract class Field {
         }
     }
 
+    /**
+     * Returns all supported types
+     * @return integer[]
+     */
+    public static function getTypes() {
+        return [
+            self::TYPE_CHARACTER,
+            self::TYPE_LOGICAL,
+            self::TYPE_DATE ,
+            self::TYPE_NUMERIC,
+            self::TYPE_MEMO,
+        ];
+    }
 }

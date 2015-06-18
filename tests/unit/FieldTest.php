@@ -10,6 +10,8 @@ namespace org\majkel\dbase;
 
 use org\majkel\dbase\tests\utils\TestBase;
 
+use ReflectionClass;
+
 /**
  * Record class tests
  *
@@ -242,5 +244,22 @@ class FieldTest extends TestBase {
      */
     public function testCreateUnknown() {
         Field::create('UNKNOWN');
+    }
+
+    /**
+     * @covers ::getTypes
+     */
+    public function testGetTypes() {
+        $reflection = new ReflectionClass(self::CLS_FIELD);
+        $types = Field::getTypes();
+        $constants = $reflection->getConstants();
+        foreach ($constants as $name => $value) {
+            if (strpos($name, 'TYPE_') === 0) {
+                if (!in_array($value, $types)) {
+                    self::fail("Does not return `$name` => `$value`");
+                }
+            }
+        }
+        self::assertTrue(true);
     }
 }
