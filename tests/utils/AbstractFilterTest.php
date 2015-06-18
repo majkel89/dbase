@@ -8,8 +8,6 @@
 
 namespace org\majkel\dbase\tests\utils;
 
-use org\majkel\dbase\Field;
-
 /**
  * Record class tests
  *
@@ -17,9 +15,9 @@ use org\majkel\dbase\Field;
  */
 abstract class AbstractFilterTest extends TestBase {
 
-   /**
-    * @return \org\majkel\dbase\IFilter
-    */
+    /**
+     * @return \org\majkel\dbase\IFilter
+     */
     abstract protected function getFilterObject();
 
     /**

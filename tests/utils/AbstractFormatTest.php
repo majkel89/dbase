@@ -15,19 +15,19 @@ namespace org\majkel\dbase\tests\utils;
  */
 abstract class AbstractFormatTest extends TestBase {
 
-   /**
-    * @return \org\majkel\dbase\Format
-    */
+    /**
+     * @return \org\majkel\dbase\Format
+     */
     abstract protected function getFormatMock();
 
-   /**
-    * @return integer[]
-    */
+    /**
+     * @return integer[]
+     */
     abstract protected function getSupportedTypes();
 
-   /**
-    * @return array
-    */
+    /**
+     * @return array
+     */
     public function dataSupportsType() {
         return $this->genSupportsTypeDataSet($this->getSupportedTypes());
     }

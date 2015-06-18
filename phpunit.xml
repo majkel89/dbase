@@ -12,7 +12,8 @@
          verbose="true">
     <testsuites>
         <testsuite name="Test suite">
-            <directory>tests/src</directory>
+            <directory>tests/unit</directory>
+            <directory>tests/integration</directory>
         </testsuite>
     </testsuites>
     <filter>

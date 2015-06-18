@@ -15,7 +15,7 @@ $ composer install -o --no-dev
 ## CodeSniffer
 
 ```sh
-$ vendor/bin/phpcs --standard=style/ruleset.xml  src/ tests/src/ tests/utils/
+$ vendor/bin/phpcs --standard=style/ruleset.xml  src/ tests/utils/ tests/unit/ tests/integration/
 ```
 
 ## PHPUnit

@@ -139,7 +139,7 @@
          is intentional in a non-empty case body. -->
     <rule ref="PSR2.ControlStructures.SwitchDeclaration" >
         <properties>
-            <property name="indent" value="1" />
+            <property name="indent" value="4" />
         </properties>
     </rule>
 

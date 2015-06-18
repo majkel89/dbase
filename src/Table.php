@@ -176,7 +176,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
     public function getField($indexOrName) {
         return $this->getHeader()->getField($indexOrName);
     }
-    
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Iterator implementation">
