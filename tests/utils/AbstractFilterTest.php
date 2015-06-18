@@ -61,14 +61,7 @@ abstract class AbstractFilterTest extends TestBase {
      * @return array
      */
     public function dataSupportsType() {
-        $supportedTypes = array_flip($this->getSupportedTypes());
-        $dataSet = [];
-        foreach (Field::getTypes() as $type) {
-            $dataSet[] = [
-                $type, isset($supportedTypes[$type])
-            ];
-        }
-        return $dataSet;
+        return $this->genSupportsTypeDataSet($this->getSupportedTypes());
     }
 
     /**

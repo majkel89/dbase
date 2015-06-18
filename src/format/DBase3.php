@@ -25,15 +25,14 @@ class DBase3 extends Format {
      */
     protected function createHeader($data) {
         $header = parent::createHeader($data);
-        $header->setValid($header->getVersion() & 3);
-        return $header;
+        return $header->setValid($header->getVersion() & 3);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function supportsField($field) {
-        return in_array($field, [Field::TYPE_CHARACTER, Field::TYPE_DATE,
+    public function supportsType($type) {
+        return in_array($type, [Field::TYPE_CHARACTER, Field::TYPE_DATE,
             Field::TYPE_LOGICAL, Field::TYPE_MEMO, Field::TYPE_NUMERIC]);
     }
 

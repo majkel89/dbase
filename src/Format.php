@@ -131,10 +131,10 @@ abstract class Format {
     }
 
     /**
-     * @param integer $field
+     * @param string $field
      * @return boolean
      */
-    abstract protected function supportsField($field);
+    abstract public function supportsType($type);
 
     /**
      * @return \SplFileObject
@@ -248,10 +248,10 @@ abstract class Format {
      * @return Field
      */
     protected function createField($data) {
-        $field = Field::create($data['t']);
-        if (!$this->supportsField($data['t'])) {
+        if (!$this->supportsType($data['t'])) {
             throw new Exception("Format `{$this->getName()}` does not support field `{$data['t']}`");
         }
+        $field = Field::create($data['t']);
         $field->setName(rtrim($data['n']));
         $field->setLength($data['ll']);
         return $field;

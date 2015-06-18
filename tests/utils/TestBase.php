@@ -69,4 +69,19 @@ class TestBase extends PHPUnit_Framework_TestCase {
         self::assertSame($default, $obj->$getter());
     }
 
+    /**
+     * @param array $supportedTypes
+     * @return array
+     */
+    public function genSupportsTypeDataSet($supportedTypes) {
+        $supportedTypes = array_flip($supportedTypes);
+        $dataSet = [];
+        foreach (Field::getTypes() as $type) {
+            $dataSet[] = [
+                $type, isset($supportedTypes[$type])
+            ];
+        }
+        return $dataSet;
+    }
+
 }
