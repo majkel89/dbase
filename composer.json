@@ -24,14 +24,12 @@
     "autoload": {
         "psr-4": {
             "org\\majkel\\dbase\\": "src/",
-            "org\\majkel\\dbase\\tests\\utils\\": "tests/utils",
-            "org\\majkel\\dbase\\tests\\integration\\": "tests/integration",
-            "org\\majkel\\dbase\\tests\\unit\\": "tests/unit"
+            "org\\majkel\\dbase\\tests\\": "tests/"
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.6",
-        "ptrofimov/xpmock": "^1.1",
-        "squizlabs/php_codesniffer": "^2.3"
+        "phpunit/phpunit": "4.*",
+        "ptrofimov/xpmock": "1.*",
+        "squizlabs/php_codesniffer": "dev-master"
     }
 }

@@ -6,10 +6,9 @@
  * and open the template in the editor.
  */
 
-namespace org\majkel\dbase\tests\integration;
+namespace org\majkel\dbase;
 
 use org\majkel\dbase\tests\utils\TestBase;
-use org\majkel\dbase\Table;
 
 /**
  * Integration tests of dBase III Format
