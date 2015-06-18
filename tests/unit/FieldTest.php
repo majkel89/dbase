@@ -71,10 +71,10 @@ class FieldTest extends TestBase {
      * @covers ::getFilters
      * @dataProvider dataAddFilters
      */
-    public function testAddFilters($filters, $excepted) {
+    public function testAddFilters($filters, $expected) {
         $field = $this->getFieldMock();
         self::assertSame($field, $field->addFilters($filters));
-        self::assertSame($excepted, $field->getFilters());
+        self::assertSame($expected, $field->getFilters());
     }
 
     /**
