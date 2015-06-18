@@ -22,6 +22,7 @@ class HeaderTest extends TestBase {
     /**
      * @covers ::addField
      * @covers ::getFields
+     * @covers \org\majkel\dbase\Field::setName
      */
     public function testAddField() {
         $fA = $this->getFieldMock()->setName('A');
@@ -34,6 +35,10 @@ class HeaderTest extends TestBase {
 
     /**
      * @covers ::getField
+     * @covers ::addField
+     * @covers ::offsetExists
+     * @covers ::offsetGet
+     * @uses \org\majkel\dbase\Field
      */
     public function testGetField() {
         $fA = $this->getFieldMock()->setName('A');
@@ -49,6 +54,7 @@ class HeaderTest extends TestBase {
 
     /**
      * @covers ::getField
+     * @covers ::offsetExists
      * @expectedException \org\majkel\dbase\Exception
      * @expectedExceptionMessage Field `0` does not exists
      */
@@ -58,6 +64,9 @@ class HeaderTest extends TestBase {
 
     /**
      * @covers ::getFieldsNames
+     * @covers ::addField
+     * @covers ::getFields
+     * @uses \org\majkel\dbase\Field
      */
     public function testGetFieldsNames() {
         $fA = $this->getFieldMock()->setName('A');
@@ -91,6 +100,8 @@ class HeaderTest extends TestBase {
 
     /**
      * @covers ::getFieldsCount
+     * @covers ::addField
+     * @covers ::getFields
      * @covers ::count
      */
     public function testGetFieldsCount() {
@@ -163,6 +174,7 @@ class HeaderTest extends TestBase {
      * @covers ::rewind
      * @covers ::next
      * @covers ::valid
+     * @covers ::addField
      */
     public function testIterator() {
         $field = $this->getFieldMock();
@@ -179,6 +191,7 @@ class HeaderTest extends TestBase {
      * @covers ::offsetGet
      * @covers ::offsetSet
      * @covers ::offsetUnset
+     * @covers ::addField
      */
     public function testArrayAccess() {
         $fA = $this->getFieldMock();

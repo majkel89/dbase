@@ -35,6 +35,8 @@ class FieldTest extends TestBase {
 
     /**
      * @covers ::addFilter
+     * @covers ::getType
+     * @covers ::getFilters
      */
     public function testAddFilterDoesNotSupport() {
         $field = $this->getFieldMock();
@@ -63,6 +65,8 @@ class FieldTest extends TestBase {
 
     /**
      * @covers ::addFilters
+     * @covers ::addFilter
+     * @covers ::getFilters
      * @dataProvider dataAddFilters
      */
     public function testAddFilters($filters, $excepted) {
@@ -72,7 +76,9 @@ class FieldTest extends TestBase {
     }
 
     /**
+     * @covers ::addFilter
      * @covers ::removeFilter
+     * @covers ::getFilters
      */
     public function testRemoveFilterByIndex() {
         $field = $this->getFieldMock();
@@ -83,7 +89,9 @@ class FieldTest extends TestBase {
     }
 
     /**
+     * @covers ::addFilter
      * @covers ::removeFilter
+     * @covers ::getFilters
      */
     public function testRemoveFilterByIndexDoesNotExists() {
         $field = $this->getFieldMock();
@@ -94,7 +102,9 @@ class FieldTest extends TestBase {
     }
 
     /**
+     * @covers ::addFilter
      * @covers ::removeFilter
+     * @covers ::getFilters
      */
     public function testRemoveFilterByObject() {
         $field = $this->getFieldMock();
@@ -105,7 +115,9 @@ class FieldTest extends TestBase {
     }
 
     /**
+     * @covers ::addFilter
      * @covers ::removeFilter
+     * @covers ::getFilters
      */
     public function testRemoveFilterByObjectDoestNotExists() {
         $field = $this->getFieldMock();
@@ -215,6 +227,7 @@ class FieldTest extends TestBase {
      * @dataProvider dataCreate
      * @covers ::create
      * @covers ::isMemoEntry
+     * @covers \org\majkel\dbase\field\MemoField::isMemoEntry
      */
     public function testCreate($type, $class, $isMemoEntry) {
         $field = Field::create($type);

@@ -22,6 +22,8 @@ class RecordTest extends TestBase {
 
     /**
      * @covers ::__construct
+     * @covers ::isDeleted
+     * @covers ::getFlags
      */
     public function testConstruct() {
         $record = new Record();
@@ -32,6 +34,7 @@ class RecordTest extends TestBase {
     }
 
     /**
+     * @covers ::__construct
      * @covers ::setDeleted
      * @covers ::isDeleted
      */
@@ -44,6 +47,7 @@ class RecordTest extends TestBase {
     }
 
     /**
+     * @covers ::__construct
      * @covers ::toArray
      */
     public function testToArray() {

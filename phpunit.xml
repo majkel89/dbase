@@ -9,6 +9,7 @@
          checkForUnintentionallyCoveredCode="false"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTestSize="true"
+         strict="true"
          verbose="true">
     <testsuites>
         <testsuite name="Test suite">
