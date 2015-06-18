@@ -32,7 +32,7 @@ class TrimFilterTest extends AbstractFilterTest {
      */
     public function dataToValue() {
         return [
-            [' some text ', 'some text '],
+            [' some text ', 'some text'],
             ['some text', 'some text'],
             [false, ''],
             [123, '123'],
@@ -45,11 +45,11 @@ class TrimFilterTest extends AbstractFilterTest {
      */
     public function dataFromValue() {
         return [
-            [' some text ', ' some text '],
+            [' some text ', 'some text'],
             ['some text', 'some text'],
-            [false, false],
-            [123, 123],
-            [null, null],
+            [false, ''],
+            [123, '123'],
+            [null, ''],
         ];
     }
 
@@ -61,6 +61,26 @@ class TrimFilterTest extends AbstractFilterTest {
             Field::TYPE_CHARACTER,
             Field::TYPE_MEMO,
         ];
+    }
+
+    /**
+     * @covers ::setFilterInput
+     * @covers ::isFilterInput
+     * @covers ::__construct
+     */
+    public function testSetFilterInput() {
+        $this->boolGetterSetterTest($this->getFilterObject(),
+                'isFilterInput', 'setFilterInput', true);
+    }
+
+    /**
+     * @covers ::setFilterOutput
+     * @covers ::isFilterOutput
+     * @covers ::__construct
+     */
+    public function testSetFilterOutput() {
+        $this->boolGetterSetterTest($this->getFilterObject(),
+                'isFilterOutput', 'setFilterOutput', true);
     }
 
 }

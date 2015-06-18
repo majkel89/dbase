@@ -55,4 +55,18 @@ class TestBase extends PHPUnit_Framework_TestCase {
             ->new();
     }
 
+    /**
+     * @param \stdClass $obj
+     * @param string $getter
+     * @param string $setter
+     * @param boolean $default
+     */
+    protected function boolGetterSetterTest($obj, $getter, $setter, $default = false) {
+        self::assertSame($default, $obj->$getter());
+        self::assertSame($obj, $obj->$setter(!$default));
+        self::assertSame(!$default, $obj->$getter());
+        self::assertSame($obj, $obj->$setter($default));
+        self::assertSame($default, $obj->$getter());
+    }
+
 }

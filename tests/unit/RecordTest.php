@@ -39,11 +39,7 @@ class RecordTest extends TestBase {
      * @covers ::isDeleted
      */
     public function testSetDeleted() {
-        $record = new Record();
-        $record->setDeleted(true);
-        self::assertTrue($record->isDeleted());
-        $record->setDeleted(false);
-        self::assertFalse($record->isDeleted());
+        $this->boolGetterSetterTest(new Record(), 'isDeleted', 'setDeleted');
     }
 
     /**

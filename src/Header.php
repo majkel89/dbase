@@ -20,11 +20,11 @@ use DateTime;
  */
 class Header implements IHeader, Iterator, Countable, ArrayAccess {
 
+    use Flags;
+
     const FLAG_VALID = 1;
     const FLAG_TRANSACTION = 2;
 
-    /** @var integer */
-    protected $flags = 0;
     /** @var Field[] */
     protected $fields = [];
     /** @var integer; */
@@ -108,7 +108,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * {@inheritdoc}
      */
     public function isPendingTransaction() {
-        return ($this->flags & self::FLAG_TRANSACTION) !== 0;
+        return $this->flagEnabled(self::FLAG_TRANSACTION);
     }
 
     /**
@@ -116,12 +116,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return \org\majkel\dbase\Header
      */
     public function setPendingTransaction($isPendingTransaction) {
-        if ($isPendingTransaction) {
-            $this->flags |= self::FLAG_TRANSACTION;
-        } else {
-            $this->flags &= ~self::FLAG_TRANSACTION;
-        }
-        return $this;
+        return $this->enableFlag(self::FLAG_TRANSACTION, $isPendingTransaction);
     }
 
     /**
@@ -176,7 +171,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return boolean
      */
     public function isValid() {
-        return ($this->flags & self::FLAG_VALID) !== 0;
+        return $this->flagEnabled(self::FLAG_VALID);
     }
 
     /**
@@ -184,12 +179,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return \org\majkel\dbase\Header
      */
     public function setValid($valid) {
-        if ($valid) {
-            $this->flags |= self::FLAG_VALID;
-        } else {
-            $this->flags &= ~self::FLAG_VALID;
-        }
-        return $this;
+        return $this->enableFlag(self::FLAG_VALID, $valid);
     }
 
     /**

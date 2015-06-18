@@ -117,12 +117,8 @@ class HeaderTest extends TestBase {
      * @covers ::isPendingTransaction
      */
     public function testSetPendingTransaction() {
-        $header = $this->getHeaderMock();
-        self::assertFalse($header->isPendingTransaction());
-        self::assertSame($header, $header->setPendingTransaction(true));
-        self::assertTrue($header->isPendingTransaction());
-        self::assertSame($header, $header->setPendingTransaction(false));
-        self::assertFalse($header->isPendingTransaction());
+        $this->boolGetterSetterTest($this->getHeaderMock(),
+                'isPendingTransaction', 'setPendingTransaction');
     }
 
     /**
@@ -160,12 +156,8 @@ class HeaderTest extends TestBase {
      * @covers ::isValid
      */
     public function testSetValid() {
-        $header = $this->getHeaderMock();
-        self::assertFalse($header->isValid());
-        self::assertSame($header, $header->setValid(true));
-        self::assertTrue($header->isValid());
-        self::assertSame($header, $header->setValid(false));
-        self::assertFalse($header->isValid());
+        $this->boolGetterSetterTest($this->getHeaderMock(),
+                'isValid', 'setValid');
     }
 
     /**
