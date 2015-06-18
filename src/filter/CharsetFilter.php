@@ -87,7 +87,7 @@ class CharsetFilter extends Filter {
      * {@inheritdoc}
      */
     public function supportsType($type) {
-        return Field::TYPE_CHARACTER === $type;
+        return Field::TYPE_CHARACTER === $type || Field::TYPE_MEMO === $type;
     }
 
 }
