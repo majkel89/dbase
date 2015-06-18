@@ -23,7 +23,7 @@ class MemoField extends Field {
      * {@inheritdoc}
      */
     public function toData($value) {
-        return $value . "\x1A\x1A";
+        return $this->fromData($value) . "\x1A\x1A";
     }
 
     /**

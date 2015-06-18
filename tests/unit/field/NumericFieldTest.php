@@ -16,18 +16,18 @@ use org\majkel\dbase\Field;
  *
  * @author majkel
  *
- * @coversDefaultClass \org\majkel\dbase\field\CharacterField
+ * @coversDefaultClass \org\majkel\dbase\field\NumericField
  */
-class CharacterFieldTest extends AbstractFieldTest {
+class NumericFieldTest extends AbstractFieldTest {
 
-    const CLS = '\org\majkel\dbase\field\CharacterField';
-    const TYPE = Field::TYPE_CHARACTER;
+    const CLS = '\org\majkel\dbase\field\NumericField';
+    const TYPE = Field::TYPE_NUMERIC;
 
     /**
      * @return \org\majkel\dbase\Field
      */
     protected function getFieldObject() {
-        return parent::getFieldObject()->setLength(4);
+        return parent::getFieldObject()->setLength(3);
     }
 
     /**
@@ -35,7 +35,11 @@ class CharacterFieldTest extends AbstractFieldTest {
      */
     public function dataFromData() {
         return [
-            [" data \0\0\0\0\0", ' data'],
+            ['1234', 123],
+            ['123', 123],
+            [123, 123],
+            [' 2', 2],
+            [null, 0],
         ];
     }
 
@@ -44,7 +48,11 @@ class CharacterFieldTest extends AbstractFieldTest {
      */
     public function dataToData() {
         return [
-            ['dataSome', 'data'],
+            [123456, '123'],
+            [1,      '1'],
+            [null,   '0'],
+            [false,  '0'],
+            ['',     '0'],
         ];
     }
 

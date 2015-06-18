@@ -16,26 +16,25 @@ use org\majkel\dbase\Field;
  *
  * @author majkel
  *
- * @coversDefaultClass \org\majkel\dbase\field\CharacterField
+ * @coversDefaultClass \org\majkel\dbase\field\LogicalField
  */
-class CharacterFieldTest extends AbstractFieldTest {
+class LogicalFieldTest extends AbstractFieldTest {
 
-    const CLS = '\org\majkel\dbase\field\CharacterField';
-    const TYPE = Field::TYPE_CHARACTER;
-
-    /**
-     * @return \org\majkel\dbase\Field
-     */
-    protected function getFieldObject() {
-        return parent::getFieldObject()->setLength(4);
-    }
+    const CLS = '\org\majkel\dbase\field\LogicalField';
+    const TYPE = Field::TYPE_LOGICAL;
 
     /**
      * {@inheritdoc}
      */
     public function dataFromData() {
         return [
-            [" data \0\0\0\0\0", ' data'],
+            ['T', true],
+            ['F', false],
+            ['Y', true],
+            ['N', false],
+            ['?', null],
+            ['X', null],
+            [  1, null],
         ];
     }
 
@@ -44,7 +43,13 @@ class CharacterFieldTest extends AbstractFieldTest {
      */
     public function dataToData() {
         return [
-            ['dataSome', 'data'],
+            [true,  'T'],
+            [false, 'F'],
+            [null,  '?'],
+            [0,     'F'],
+            ['',    'F'],
+            [[],    'F'],
+            [123,   'T'],
         ];
     }
 

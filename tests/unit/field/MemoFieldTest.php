@@ -16,26 +16,19 @@ use org\majkel\dbase\Field;
  *
  * @author majkel
  *
- * @coversDefaultClass \org\majkel\dbase\field\CharacterField
+ * @coversDefaultClass \org\majkel\dbase\field\MemoField
  */
-class CharacterFieldTest extends AbstractFieldTest {
+class MemoFieldTest extends AbstractFieldTest {
 
-    const CLS = '\org\majkel\dbase\field\CharacterField';
-    const TYPE = Field::TYPE_CHARACTER;
-
-    /**
-     * @return \org\majkel\dbase\Field
-     */
-    protected function getFieldObject() {
-        return parent::getFieldObject()->setLength(4);
-    }
+    const CLS = '\org\majkel\dbase\field\MemoField';
+    const TYPE = Field::TYPE_MEMO;
 
     /**
      * {@inheritdoc}
      */
     public function dataFromData() {
         return [
-            [" data \0\0\0\0\0", ' data'],
+            [" some data\x1A\x1A\0\0\0\0", ' some data'],
         ];
     }
 
@@ -44,7 +37,9 @@ class CharacterFieldTest extends AbstractFieldTest {
      */
     public function dataToData() {
         return [
-            ['dataSome', 'data'],
+            ["some data", "some data\x1A\x1A"],
+            ["some data\x1A", "some data\x1A\x1A"],
+            ["some data\x1A\x1A", "some data\x1A\x1A"],
         ];
     }
 

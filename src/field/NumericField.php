@@ -21,14 +21,14 @@ class NumericField extends Field {
      * {@inheritdoc}
      */
     public function toData($value) {
-        return strval((integer)$value);
+        return substr(strval((integer)$value), 0, $this->getLength());
     }
 
     /**
      * {@inheritdoc}
      */
     public function fromData($data) {
-        return (integer)$data;
+        return (integer)substr($data, 0, $this->getLength());
     }
 
     /**
