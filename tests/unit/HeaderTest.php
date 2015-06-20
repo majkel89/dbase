@@ -25,9 +25,9 @@ class HeaderTest extends TestBase {
      * @covers \org\majkel\dbase\Field::setName
      */
     public function testAddField() {
-        $fA = $this->getFieldMock()->setName('A');
-        $fB = $this->getFieldMock()->setName('B');
-        $header = $this->getHeaderMock();
+        $fA = $this->getFieldStub()->setName('A');
+        $fB = $this->getFieldStub()->setName('B');
+        $header = $this->getHeaderStub();
         self::assertSame($header, $header->addField($fA));
         self::assertSame($header, $header->addField($fB));
         self::assertSame([$fA, $fB], $header->getFields());
@@ -41,9 +41,9 @@ class HeaderTest extends TestBase {
      * @uses \org\majkel\dbase\Field
      */
     public function testGetField() {
-        $fA = $this->getFieldMock()->setName('A');
-        $fB = $this->getFieldMock()->setName('B');
-        $header = $this->getHeaderMock()
+        $fA = $this->getFieldStub()->setName('A');
+        $fB = $this->getFieldStub()->setName('B');
+        $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
         self::assertSame($fA, $header->getField(0));
@@ -59,7 +59,7 @@ class HeaderTest extends TestBase {
      * @expectedExceptionMessage Field `0` does not exists
      */
     public function testGetFieldDoesNotExists() {
-        $this->getHeaderMock()->getField(0);
+        $this->getHeaderStub()->getField(0);
     }
 
     /**
@@ -69,9 +69,9 @@ class HeaderTest extends TestBase {
      * @uses \org\majkel\dbase\Field
      */
     public function testGetFieldsNames() {
-        $fA = $this->getFieldMock()->setName('A');
-        $fB = $this->getFieldMock()->setName('B');
-        $header = $this->getHeaderMock()
+        $fA = $this->getFieldStub()->setName('A');
+        $fB = $this->getFieldStub()->setName('B');
+        $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
         self::assertSame(['A', 'B'], $header->getFieldsNames());
@@ -82,7 +82,7 @@ class HeaderTest extends TestBase {
      * @covers ::getVersion
      */
     public function testSetVersion() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         self::assertSame($header, $header->setVersion('123'));
         self::assertSame(123, $header->getVersion());
     }
@@ -92,7 +92,7 @@ class HeaderTest extends TestBase {
      * @covers ::getLastUpdate
      */
     public function testSetLastUpdate() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         $data = new \DateTime;
         self::assertSame($header, $header->setLastUpdate($data));
         self::assertSame($data, $header->getLastUpdate());
@@ -105,8 +105,8 @@ class HeaderTest extends TestBase {
      * @covers ::count
      */
     public function testGetFieldsCount() {
-        $field = $this->getFieldMock();
-        $header = $this->getHeaderMock()->addField($field)->addField($field);
+        $field = $this->getFieldStub();
+        $header = $this->getHeaderStub()->addField($field)->addField($field);
         self::assertSame(2, $header->getFieldsCount());
         self::assertSame(2, $header->count());
         self::assertSame(2, count($header));
@@ -117,7 +117,7 @@ class HeaderTest extends TestBase {
      * @covers ::isPendingTransaction
      */
     public function testSetPendingTransaction() {
-        $this->boolGetterSetterTest($this->getHeaderMock(),
+        $this->boolGetterSetterTest($this->getHeaderStub(),
                 'isPendingTransaction', 'setPendingTransaction');
     }
 
@@ -126,7 +126,7 @@ class HeaderTest extends TestBase {
      * @covers ::getRecordsCount
      */
     public function testSetRecordsCount() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         self::assertSame($header, $header->setRecordsCount('123'));
         self::assertSame(123, $header->getRecordsCount());
     }
@@ -136,7 +136,7 @@ class HeaderTest extends TestBase {
      * @covers ::getRecordSize
      */
     public function testSetRecordSize() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         self::assertSame($header, $header->setRecordSize('123'));
         self::assertSame(123, $header->getRecordSize());
     }
@@ -146,7 +146,7 @@ class HeaderTest extends TestBase {
      * @covers ::getHeaderSize
      */
     public function testSetHeaderSize() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         self::assertSame($header, $header->setHeaderSize('123'));
         self::assertSame(123, $header->getHeaderSize());
     }
@@ -156,7 +156,7 @@ class HeaderTest extends TestBase {
      * @covers ::isValid
      */
     public function testSetValid() {
-        $this->boolGetterSetterTest($this->getHeaderMock(),
+        $this->boolGetterSetterTest($this->getHeaderStub(),
                 'isValid', 'setValid');
     }
 
@@ -169,8 +169,8 @@ class HeaderTest extends TestBase {
      * @covers ::addField
      */
     public function testIterator() {
-        $field = $this->getFieldMock();
-        $header = $this->getHeaderMock()
+        $field = $this->getFieldStub();
+        $header = $this->getHeaderStub()
             ->addField($field)
             ->addField($field);
         foreach ($header as $nextField) {
@@ -186,10 +186,10 @@ class HeaderTest extends TestBase {
      * @covers ::addField
      */
     public function testArrayAccess() {
-        $fA = $this->getFieldMock();
-        $fB = $this->getFieldMock();
-        $fC = $this->getFieldMock();
-        $header = $this->getHeaderMock()
+        $fA = $this->getFieldStub();
+        $fB = $this->getFieldStub();
+        $fC = $this->getFieldStub();
+        $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
         self::assertSame($fA, $header[0]);
@@ -207,7 +207,7 @@ class HeaderTest extends TestBase {
      * @expectedExceptionMessage Header can contain only Field elements
      */
     public function testOffsetSetInvalidType() {
-        $header = $this->getHeaderMock();
+        $header = $this->getHeaderStub();
         $header[] = new \stdClass();
     }
 }

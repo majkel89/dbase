@@ -29,7 +29,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
      * @param boolean $supports
      * @return \org\majkel\dbase\Filter
      */
-    protected function getFilterMock($supports = true) {
+    protected function getFilterStub($supports = true) {
         return $this->mock(self::CLS_FILTER)
             ->supportsType($supports)
             ->new();
@@ -39,7 +39,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
      * @param string $type
      * @return \org\majkel\dbase\Field
      */
-    protected function getFieldMock($type = Field::TYPE_CHARACTER) {
+    protected function getFieldStub($type = Field::TYPE_CHARACTER) {
         return $this->mock(self::CLS_FIELD)
             ->fromData()
             ->toData()
@@ -50,7 +50,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     /**
      * @return \org\majkel\dbase\Header
      */
-    protected function getHeaderMock() {
+    protected function getHeaderStub() {
         return $this->mock(self::CLS_HEADER)
             ->new();
     }

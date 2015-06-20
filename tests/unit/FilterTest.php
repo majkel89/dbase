@@ -23,13 +23,13 @@ class FilterTest extends TestBase {
      * @covers ::fromValue
      */
     public function testFromValue() {
-        self::assertSame('test', $this->getFilterMock()->fromValue('test'));
+        self::assertSame('test', $this->getFilterStub()->fromValue('test'));
     }
 
     /**
      * @covers ::toValue
      */
     public function testToValue() {
-        self::assertSame('test', $this->getFilterMock()->toValue('test'));
+        self::assertSame('test', $this->getFilterStub()->toValue('test'));
     }
 }
