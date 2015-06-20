@@ -25,6 +25,14 @@ class TestBase extends PHPUnit_Framework_TestCase {
     const CLS_FIELD = '\org\majkel\dbase\Field';
     const CLS_HEADER = '\org\majkel\dbase\Header';
     const CLS_FORMAT = '\org\majkel\dbase\Format';
+    const CLS_FORMAT_FACTORY = '\org\majkel\dbase\FormatFactory';
+
+    /**
+     * @return \org\majkel\dbase\FormatFactory
+     */
+    protected function getFormatFactoryMock() {
+        return $this->mock(self::CLS_FORMAT_FACTORY);
+    }
 
     /**
      * @param boolean $supports
@@ -75,6 +83,13 @@ class TestBase extends PHPUnit_Framework_TestCase {
     protected function getFormatMock() {
         return $this->mock(self::CLS_FORMAT)
             ->supportsType(true);
+    }
+
+    /**
+     * @return \org\majkel\dbase\Format
+     */
+    protected function getFormatStub() {
+        return $this->getFormatMock()->new();
     }
 
     /**

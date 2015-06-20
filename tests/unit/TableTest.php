@@ -22,7 +22,6 @@ use stdClass;
 class TableTest extends TestBase {
 
     const CLS = '\org\majkel\dbase\Table';
-    const CLS_FORMAT_FACTORY = '\org\majkel\dbase\FormatFactory';
 
     /**
      * @param string $methodName

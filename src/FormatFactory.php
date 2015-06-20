@@ -8,6 +8,8 @@
 
 namespace org\majkel\dbase;
 
+use Exception as StdException;
+
 /**
  * @author majkel
  */
@@ -29,10 +31,14 @@ class FormatFactory {
      */
     public function getFormat($name, $filePath, $mode) {
         $this->initializeFormats();
-        if (!isset($this->formats[$name])) {
+        $formats = $this->getFormats();
+        if (!isset($formats[$name])) {
             throw new Exception("Format `$name` is not registered");
         }
-        $format = $this->formats[$name]($filePath, $this->getMode($mode));
+        if (!is_callable($formats[$name])) {
+            throw new Exception("Cannot generate format `$name`");
+        }
+        $format = $formats[$name]($filePath, $this->getMode($mode));
         if (!$format instanceof Format) {
             throw new Exception("Cannot generate format `$name`");
         }
@@ -45,7 +51,7 @@ class FormatFactory {
      */
     public function getFormats() {
         $this->initializeFormats();
-        return array_keys($this->formats);
+        return $this->formats;
     }
 
     /**
@@ -90,15 +96,17 @@ class FormatFactory {
                 return new format\DBase3($filePath, $mode);
             });
             $this->registerFormat(Format::AUTO, function ($filePath, $mode) {
-                foreach ($this->formats as $generator) {
+                foreach ($this->formats as $name => $generator) {
                     try {
-                        $format = $generator($filePath, $this->getMode($mode));
-                        if ($format->isValid()) {
-                            return $format;
+                        if ($name != Format::AUTO) {
+                            $format = $generator($filePath, $this->getMode($mode));
+                            if ($format->isValid()) {
+                                return $format;
+                            }
                         }
                     }
-                    catch (\Exception $e) {
-
+                    catch (StdException $e) {
+                        new Exception("Unable detect format for file `$filePath`", 0, $e);
                     }
                 }
                 throw new Exception("Unable detect format for file `$filePath`");
