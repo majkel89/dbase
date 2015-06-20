@@ -22,25 +22,4 @@ class Exception extends StdException {
     const READ_ONLY = 3;
     const UNSUPPORTED_VERSION = 4;
 
-    /**
-     * @var string[]
-     */
-    protected static $messages = [
-        self::INVALID_OFFSET => "Offset %s does not exists",
-        self::FILE_NOT_OPENED => "File is not opened",
-        self::READ_ONLY => "Table is opened in read only mode",
-        self::UNSUPPORTED_VERSION => "Only version 5 and 7 are supported",
-    ];
-
-    /**
-     * @param integer $code
-     * @throws Exception
-     */
-    public static function raise($code) {
-        $arguments = func_get_args();
-        $arguments[0] = self::$messages[$code];
-        $message = call_user_func_array('sprintf', $arguments);
-        throw new self($message, $code);
-    }
-
 }

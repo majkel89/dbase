@@ -54,7 +54,8 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
      */
     public function setColumns($columns) {
         if (empty($columns) || !is_array($columns)) {
-            $columns = null;
+            $this->columns = null;
+            return $this;
         }
         $this->columns = $columns;
         foreach ($this->getFields() as $field) {
@@ -93,10 +94,10 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
      */
     public function getRecord($index) {
         if (!$this->isValid()) {
-            Exception::raise(Exception::FILE_NOT_OPENED);
+            throw new Exception('File is not opened', Exception::FILE_NOT_OPENED);
         }
         if (!$this->offsetExists($index)) {
-            Exception::raise(Exception::INVALID_OFFSET);
+            throw new Exception('Offset '.strval($index).' does not exists', Exception::INVALID_OFFSET);
         }
         if (isset($this->buffer[$index])) {
             return $this->buffer[$index];
@@ -252,14 +253,14 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
      * @param \org\majkel\dbase\Record $value
      */
     public function offsetSet($offset, $value) {
-        Exception::raise(Exception::READ_ONLY, $offset, $value);
+        throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);
     }
 
     /**
      * @param integer $offset
      */
     public function offsetUnset($offset) {
-        Exception::raise(Exception::READ_ONLY, $offset);
+        throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);
     }
 
     // </editor-fold>
@@ -281,7 +282,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
             $this->bufferSize = (integer)$size;
         } else {
             $recordSize = $this->getRecordSize();
-            $this->bufferSize = ceil($size / $recordSize);
+            $this->bufferSize = (integer)ceil($size / $recordSize);
         }
         if ($this->bufferSize < 1) {
             $this->bufferSize = 1;
@@ -291,6 +292,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
 
     /**
      * @return \org\majkel\dbase\FormatFactory
+     * @@codeCoverageIgnore
      */
     protected function getFormatFactory() {
         static $formatFactory = null;

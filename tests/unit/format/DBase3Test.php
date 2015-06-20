@@ -25,7 +25,7 @@ class DBase3Test extends AbstractFormatTest {
     /**
      * {@inheritdoc}
      */
-    protected function getFormatMock() {
+    protected function getFormatObject() {
         return $this->mock(self::CLS)->new();
     }
 
@@ -43,7 +43,7 @@ class DBase3Test extends AbstractFormatTest {
      * @covers ::createHeader
      */
     public function testCreateHeader() {
-        $format = $this->getFormatMock();
+        $format = $this->getFormatObject();
         $header = $this->reflect($format)->createHeader($this->getHeaderData([
             'v' => 3,
         ]));
@@ -54,7 +54,7 @@ class DBase3Test extends AbstractFormatTest {
      * @covers ::createHeader
      */
     public function testCreateHeaderUnknownFormat() {
-        $format = $this->getFormatMock();
+        $format = $this->getFormatObject();
         $header = $this->reflect($format)->createHeader($this->getHeaderData([
             'v' => 666,
         ]));
@@ -65,7 +65,7 @@ class DBase3Test extends AbstractFormatTest {
      * @covers ::getName
      */
     public function testGetName() {
-        self::assertSame('dBASE III PLUS', $this->getFormatMock()->getName());
+        self::assertSame('dBASE III PLUS', $this->getFormatObject()->getName());
     }
 
 }

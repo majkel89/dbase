@@ -24,6 +24,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     const CLS_FILTER = '\org\majkel\dbase\Filter';
     const CLS_FIELD = '\org\majkel\dbase\Field';
     const CLS_HEADER = '\org\majkel\dbase\Header';
+    const CLS_FORMAT = '\org\majkel\dbase\Format';
 
     /**
      * @param boolean $supports
@@ -39,20 +40,41 @@ class TestBase extends PHPUnit_Framework_TestCase {
      * @param string $type
      * @return \org\majkel\dbase\Field
      */
-    protected function getFieldStub($type = Field::TYPE_CHARACTER) {
+    protected function getFieldMock($type = Field::TYPE_CHARACTER) {
         return $this->mock(self::CLS_FIELD)
             ->fromData()
             ->toData()
-            ->getType($type)
-            ->new();
+            ->getType($type);
+    }
+
+    /**
+     * @param string $type
+     * @return \org\majkel\dbase\Field
+     */
+    protected function getFieldStub($type = Field::TYPE_CHARACTER) {
+        return $this->getFieldMock($type)->new();
+    }
+
+    /**
+     * @return \org\majkel\dbase\Header
+     */
+    protected function getHeaderMock() {
+        return $this->mock(self::CLS_HEADER);
     }
 
     /**
      * @return \org\majkel\dbase\Header
      */
     protected function getHeaderStub() {
-        return $this->mock(self::CLS_HEADER)
-            ->new();
+        return $this->getHeaderMock()->new();
+    }
+
+    /**
+     * @return \org\majkel\dbase\Format
+     */
+    protected function getFormatMock() {
+        return $this->mock(self::CLS_FORMAT)
+            ->supportsType(true);
     }
 
     /**

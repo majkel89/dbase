@@ -18,7 +18,7 @@ abstract class AbstractFormatTest extends TestBase {
     /**
      * @return \org\majkel\dbase\Format
      */
-    abstract protected function getFormatMock();
+    abstract protected function getFormatObject();
 
     /**
      * @return integer[]
@@ -39,7 +39,7 @@ abstract class AbstractFormatTest extends TestBase {
      * @covers ::supportsType
      */
     public function testSupportsType($type, $supports) {
-        $result = $this->getFormatMock()->supportsType($type);
+        $result = $this->getFormatObject()->supportsType($type);
         self::assertSame($supports, $result, "Invalid result for `$type`");
     }
 
