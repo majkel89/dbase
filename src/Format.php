@@ -8,7 +8,6 @@
 
 namespace org\majkel\dbase;
 
-use SplFileObject;
 use DateTime;
 
 /**
@@ -44,7 +43,7 @@ abstract class Format {
      */
     public function __construct($filePath, $mode) {
         $this->mode = $mode;
-        $this->file = new SplFileObject($filePath, $mode);
+        $this->file = File::getObject($filePath, $mode);
     }
 
     /**
@@ -180,7 +179,7 @@ abstract class Format {
      */
     protected function getMemoFile() {
         if (is_null($this->dbtFile)) {
-            $this->dbtFile = new SplFileObject($this->getMemoFilePath(),
+            $this->dbtFile = File::getObject($this->getMemoFilePath(),
                     $this->getMode());
         }
         return $this->dbtFile;
