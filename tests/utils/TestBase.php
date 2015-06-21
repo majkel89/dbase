@@ -35,6 +35,13 @@ class TestBase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @return \org\majkel\dbase\FormatFactory
+     */
+    protected function getFormatFactoryObject() {
+        return $this->getFormatFactoryMock()->new();
+    }
+
+    /**
      * @param boolean $supports
      * @return \org\majkel\dbase\Filter
      */

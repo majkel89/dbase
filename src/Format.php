@@ -303,4 +303,13 @@ abstract class Format {
         }
         return $record;
     }
+
+    /**
+     * @return string[]
+     */
+    public static function getSupportedFormats() {
+        return [
+            Format::DBASE3,
+        ];
+    }
 }

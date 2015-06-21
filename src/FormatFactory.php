@@ -98,15 +98,16 @@ class FormatFactory {
             $this->registerFormat(Format::AUTO, function ($filePath, $mode) {
                 foreach ($this->formats as $name => $generator) {
                     try {
-                        if ($name != Format::AUTO) {
-                            $format = $generator($filePath, $this->getMode($mode));
-                            if ($format->isValid()) {
-                                return $format;
-                            }
+                        if ($name === Format::AUTO) {
+                            continue;
+                        }
+                        $format = $generator($filePath, $this->getMode($mode));
+                        if ($format->isValid()) {
+                            return $format;
                         }
                     }
                     catch (StdException $e) {
-                        new Exception("Unable detect format for file `$filePath`", 0, $e);
+                        throw new Exception("Unable detect format for file `$filePath`", 0, $e);
                     }
                 }
                 throw new Exception("Unable detect format for file `$filePath`");
