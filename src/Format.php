@@ -91,7 +91,8 @@ abstract class Format {
      */
     public function getRecord($index) {
         $records = $this->getRecords($index, 1);
-        return $records[0];
+        reset($records);
+        return current($records);
     }
 
     /**
@@ -102,36 +103,23 @@ abstract class Format {
      * @throws Exception
      */
     public function getRecords($index, $length) {
-        $totalRecords = $this->getHeader()->getRecordsCount();
-        if ($index < 0) {
-            $index = 0;
-        }
-        if ($index >= $totalRecords) {
-            $index = $totalRecords - 1;
-        }
-        $stop = $index + $length;
-        if ($stop > $totalRecords) {
-            $stop -= $stop - $totalRecords;
-        }
-        if ($index < 0 || $stop < 1) {
-            throw new Exception("Cannot read any records becouse file is empty");
-        }
+        list($start, $stop) = $this->getReadBoudries($index, $length);
         $file = $this->getFile();
         $rSz = $this->getHeader()->getRecordSize();
-        $file->fseek($this->getHeader()->getHeaderSize() + $index * $rSz);
+        $file->fseek($this->getHeader()->getHeaderSize() + $start * $rSz);
         $format = $this->getRecordFormat();
         $allData = $file->fread($rSz * $length);
         $records = [];
-        for ($i = 0; $index < $stop; ++$index, ++$i) {
+        for ($i = 0; $start < $stop; ++$start, ++$i) {
             $data = unpack($format, strlen($allData) === $rSz
                 ? $allData : substr($allData, $i * $rSz, $rSz));
-            $records[$index] = $this->createRecord($data);
+            $records[$start] = $this->createRecord($data);
         }
         return $records;
     }
 
     /**
-     * @param string $field
+     * @param string $type
      * @return boolean
      */
     abstract public function supportsType($type);
@@ -144,13 +132,34 @@ abstract class Format {
     }
 
     /**
+     * @param integer $index
+     * @param integer $length
+     * @return [$index, $stop]
+     * @throws Exception
+     */
+    protected function getReadBoudries($index, $length) {
+        $totalRecords = $this->getHeader()->getRecordsCount();
+        if ($index < 0) {
+            $index = 0;
+        }
+        if ($index >= $totalRecords) {
+            throw new Exception("Trying to read outside of file");
+        }
+        $stop = $index + $length;
+        if ($stop > $totalRecords) {
+            $stop -= $stop - $totalRecords;
+        }
+        return [$index, $stop];
+    }
+
+    /**
      * @return string
      */
     protected function getMemoFilePath() {
         $fileInfo = $this->getFileInfo();
         $path = $fileInfo->getPath() . '/';
         $basename = $fileInfo->getBasename();
-        $index = strrpos($basename, '.'.$fileInfo->getExtension());
+        $index = stripos($basename, '.dbf');
         if ($index !== false) {
             $path .= substr($basename, 0, $index);
         } else {

@@ -17,7 +17,9 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "archive": {
-        "exclude": ["vendor", "tests"]
+        "exclude": ["vendor/", "tests/", "style/", "dumpContent.php",
+            "bootstrap.php", "DEVELOP.md", "phpunit.xml", ".gitignore",
+            "*.zip", "*.tar", "phpunit.xml"]
     },
     "require": {
     },

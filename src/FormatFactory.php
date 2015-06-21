@@ -47,7 +47,7 @@ class FormatFactory {
 
     /**
      * Returns all avileable formats
-     * @return string[]
+     * @return callable[]
      */
     public function getFormats() {
         $this->initializeFormats();

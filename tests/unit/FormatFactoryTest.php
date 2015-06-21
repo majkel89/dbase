@@ -173,7 +173,6 @@ class FormatFactoryTest extends TestBase {
         $formatFactory->getFormat(Format::AUTO, 'unknown_file', Table::MODE_READ);
     }
 
-
     /**
      * @covers ::initializeFormats
      */

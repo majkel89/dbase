@@ -26,6 +26,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     const CLS_HEADER = '\org\majkel\dbase\Header';
     const CLS_FORMAT = '\org\majkel\dbase\Format';
     const CLS_FORMAT_FACTORY = '\org\majkel\dbase\FormatFactory';
+    const CLS_SPLFILEOBJECT = '\org\majkel\dbase\tests\utils\SplFileObjectMock';
 
     /**
      * @return \org\majkel\dbase\FormatFactory
@@ -126,6 +127,13 @@ class TestBase extends PHPUnit_Framework_TestCase {
             ];
         }
         return $dataSet;
+    }
+
+    /**
+     * @return \SplFileObject
+     */
+    protected function getFileMock() {
+        return $this->mock(self::CLS_SPLFILEOBJECT);
     }
 
 }
