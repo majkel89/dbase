@@ -30,7 +30,7 @@ class HeaderTest extends TestBase {
         $header = $this->getHeaderStub();
         self::assertSame($header, $header->addField($fA));
         self::assertSame($header, $header->addField($fB));
-        self::assertSame([$fA, $fB], $header->getFields());
+        self::assertSame(['A' => $fA, 'B' => $fB], $header->getFields());
     }
 
     /**
@@ -46,8 +46,6 @@ class HeaderTest extends TestBase {
         $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
-        self::assertSame($fA, $header->getField(0));
-        self::assertSame($fB, $header->getField(1));
         self::assertSame($fA, $header->getField('A'));
         self::assertSame($fB, $header->getField('B'));
     }
@@ -56,10 +54,10 @@ class HeaderTest extends TestBase {
      * @covers ::getField
      * @covers ::offsetExists
      * @expectedException \org\majkel\dbase\Exception
-     * @expectedExceptionMessage Field `0` does not exists
+     * @expectedExceptionMessage Field `DOEST_NOT_EXISTS` does not exists
      */
     public function testGetFieldDoesNotExists() {
-        $this->getHeaderStub()->getField(0);
+        $this->getHeaderStub()->getField('DOEST_NOT_EXISTS');
     }
 
     /**
@@ -106,10 +104,12 @@ class HeaderTest extends TestBase {
      */
     public function testGetFieldsCount() {
         $field = $this->getFieldStub();
-        $header = $this->getHeaderStub()->addField($field)->addField($field);
-        self::assertSame(2, $header->getFieldsCount());
-        self::assertSame(2, $header->count());
-        self::assertSame(2, count($header));
+        $header = $this->getHeaderStub();
+        self::assertSame(0, $header->getFieldsCount());
+        $header->addField($field)->addField($field);
+        self::assertSame(1, $header->getFieldsCount());
+        self::assertSame(1, $header->count());
+        self::assertSame(1, count($header));
     }
 
     /**
@@ -184,21 +184,23 @@ class HeaderTest extends TestBase {
      * @covers ::offsetSet
      * @covers ::offsetUnset
      * @covers ::addField
+     * @covers ::removeField
      */
     public function testArrayAccess() {
-        $fA = $this->getFieldStub();
-        $fB = $this->getFieldStub();
-        $fC = $this->getFieldStub();
+        $fA = $this->getFieldStub()->setName('A');
+        $fB = $this->getFieldStub()->setName('B');
+        $fC = $this->getFieldStub()->setName('C');
         $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
-        self::assertSame($fA, $header[0]);
-        self::assertSame($fB, $header[1]);
-        self::assertTrue(isset($header[0]));
-        $header[0] = $fC;
-        self::assertSame($fC, $header[0]);
-        unset($header[1]);
-        self::assertFalse(isset($header[1]));
+        self::assertSame($fA, $header['A']);
+        self::assertSame($fB, $header['B']);
+        self::assertTrue(isset($header['A']));
+        $header['A'] = $fC;
+        self::assertSame($fC, $header['A']);
+        self::assertSame('A', $fC->getName());
+        unset($header['B']);
+        self::assertFalse(isset($header['B']));
     }
 
     /**

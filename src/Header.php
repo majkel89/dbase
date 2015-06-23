@@ -50,7 +50,16 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * @return \org\majkel\dbase\Header
      */
     public function addField(Field $field) {
-        $this->fields[] = $field;
+        $this->fields[$field->getName()] = $field;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return \org\majkel\dbase\Header
+     */
+    public function removeField($name) {
+        unset($this->fields[$name]);
         return $this;
     }
 
@@ -58,11 +67,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
      * {@inheritdoc}
      */
     public function getFieldsNames() {
-        $fieldsNames = [];
-        foreach ($this->getFields() as $field) {
-            $fieldsNames[] = $field->getName();
-        }
-        return $fieldsNames;
+        return array_keys($this->getFields());
     }
 
     /**
@@ -249,29 +254,24 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
         if (!$value instanceof Field) {
             throw new Exception("Header can contain only Field elements");
         }
-        $this->fields[$offset] = $value;
+        $this->fields[$offset] = $value->setName($offset);
     }
 
     /**
      * @param integer $offset
      */
     public function offsetUnset($offset) {
-        unset($this->fields[$offset]);
+        $this->removeField($offset);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getField($indexOrName) {
-        if ($this->offsetExists($indexOrName)) {
-            return $this->offsetGet($indexOrName);
+    public function getField($name) {
+        if ($this->offsetExists($name)) {
+            return $this->offsetGet($name);
         }
-        foreach ($this->fields as $field) {
-            if ($field->getName() === $indexOrName) {
-                return $field;
-            }
-        }
-        throw new Exception("Field `$indexOrName` does not exists");
+        throw new Exception("Field `$name` does not exists");
     }
 
 }

@@ -38,7 +38,7 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatUnknown() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats([], null, self::once())
+            ->initializeFormats(self::once())
             ->getFormats([], [], self::once())
             ->new();
         $formatFactory->getFormat('UNKNOWN', 'FILE', 'MODE');
@@ -50,7 +50,7 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatInvalidGenerator() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats([], null, self::once())
+            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => 'IMPL'], self::once())
             ->new();
         self::assertSame('IMPL', $formatFactory
@@ -63,7 +63,7 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatInvalidClass() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats([], null, self::once())
+            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => function () {
                 return 'IMPL';
             }], self::once())
@@ -78,7 +78,7 @@ class FormatFactoryTest extends TestBase {
     public function testGetFormat() {
         $format = $this->getFormatStub();
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats([], null, self::once())
+            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => function ($filePath, $mode) use ($format) {
                 if ($filePath != 'FILE' || $mode != 'rb') {
                     throw new \Exception("Generator invalid call $filePath, $mode");
@@ -97,7 +97,7 @@ class FormatFactoryTest extends TestBase {
      */
     public function testFormatRegisteration() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats([], null, self::once())
+            ->initializeFormats(self::exactly(4))
             ->new();
         $impl = function () {
         };

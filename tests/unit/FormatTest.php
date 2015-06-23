@@ -123,7 +123,7 @@ class FormatTest extends TestBase {
      */
     public function testGetReadBoudries($index, $length, $records, $expectedStart, $expectedStop) {
         $header = $this->getHeaderMock()
-            ->getRecordsCount([], $records, self::once())
+            ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
@@ -150,7 +150,7 @@ class FormatTest extends TestBase {
      */
     public function testGetReadBoudriesException($index, $length, $records) {
         $header = $this->getHeaderMock()
-            ->getRecordsCount([], $records, self::once())
+            ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
@@ -167,13 +167,13 @@ class FormatTest extends TestBase {
             ->fread([2 * 7], "DATA1\0\0DATA2\0\0", self::once())
             ->new();
         $header = $this->getHeaderMock()
-            ->getRecordSize([], 7, self::once())
-            ->getHeaderSize([], 12, self::once())
+            ->getRecordSize(7, self::once())
+            ->getHeaderSize(12, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getReadBoudries([2, 2], [2, 4], self::once())
-            ->getFile([], $file, self::once())
-            ->getRecordFormat([], 'a7x', self::once())
+            ->getFile($file, self::once())
+            ->getRecordFormat('a7x', self::once())
             ->getHeader($header)
             ->createRecord([self::anything()], 'R')
             ->new();
@@ -200,7 +200,7 @@ class FormatTest extends TestBase {
     public function testGetMemoFilePath($dbfPath, $memoPath) {
         $fileInfo = new SplFileInfo($dbfPath);
         $format = $this->getFormatMock()
-            ->getFileInfo([], $fileInfo, self::once())
+            ->getFileInfo($fileInfo, self::once())
             ->new();
         self::assertSame($memoPath, $this->reflect($format)->getMemoFilePath());
     }
@@ -210,8 +210,8 @@ class FormatTest extends TestBase {
      */
     public function testGetMemoFile() {
         $format = $this->getFormatMock()
-            ->getMemoFilePath([], __FILE__, self::once())
-            ->getMode([], 'rb', self::once())
+            ->getMemoFilePath(__FILE__, self::once())
+            ->getMode('rb', self::once())
             ->new();
         $file = $this->reflect($format)->getMemoFile();
         self::assertSame(__FILE__, $file->getPathname());
@@ -395,7 +395,7 @@ class FormatTest extends TestBase {
             ->new();
         $format = $this->getFormatMock()
             ->getFile($file)
-            ->createHeader([], $header, self::once())
+            ->createHeader($header, self::once())
             ->new();
         $headerRet = $this->reflect($format)->readHeader();
         self::assertTrue($header instanceof Header);
@@ -431,7 +431,7 @@ class FormatTest extends TestBase {
             ->new();
         $format = $this->getFormatMock()
             ->getFile($file)
-            ->createHeader([], $header, self::once())
+            ->createHeader($header, self::once())
             ->new();
         $headerRet = $this->reflect($format)->readHeader();
         self::assertTrue($header instanceof Header);

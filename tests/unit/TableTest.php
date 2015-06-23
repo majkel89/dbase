@@ -61,29 +61,34 @@ class TableTest extends TestBase {
     }
 
     /**
+     * @return \org\majkel\dbase\Table
+     */
+    protected function getTableWithColumns($F1, $F2, $F3, $times) {
+        $f1 = $this->getFieldMock()
+            ->setLoad($F1, self::exactly($times))
+            ->getName('F1')
+            ->new();
+        $f2 = $this->getFieldMock()
+            ->setLoad($F2, self::exactly($times))
+            ->getName('F2')
+            ->new();
+        $f3 = $this->getFieldMock()
+            ->setLoad($F3, self::exactly($times))
+            ->getName('F3')
+            ->new();
+        return $this->mock(self::CLS)
+            ->getFields([$f1, $f2, $f3])
+            ->new();
+    }
+
+    /**
      * @covers ::setColumns
      * @covers ::getColumns
      */
     public function testSetColumns() {
-        $f1 = $this->getFieldMock()
-            ->setLoad( true, self::once())
-            ->new();
-        $f2 = $this->getFieldMock()
-            ->setLoad(false, self::once())
-            ->new();
-        $f3 = $this->getFieldMock()
-            ->setLoad( true, self::once())
-            ->new();
-
-        $table = $this->mock(self::CLS)
-            ->getFields([$f1, $f2, $f3], self::once())
-            ->new();
-        /* @var $table \org\majkel\dbase\Table */
-
+        $table = $this->getTableWithColumns(true, false, true, 1);
         $this->reflect($table)->buffer = [1, 2, 3];
-
         self::assertSame($table, $table->setColumns(['F1', 'F2', 'F3', 'F?']));
-
         self::assertEmpty($this->reflect($table)->buffer);
         self::assertSame(['F1', 'F2', 'F3', 'F?'], $table->getColumns());
     }
@@ -93,7 +98,7 @@ class TableTest extends TestBase {
      */
     public function dataSetColumnsEmptyArguments() {
         return [
-            [null], [false], ['INVALID']
+            [null], [false], ['INVALID'], [[]], [new \stdClass()]
         ];
     }
 
@@ -103,13 +108,13 @@ class TableTest extends TestBase {
      * @dataProvider dataSetColumnsEmptyArguments
      */
     public function testSetColumnsEmptyArguments($columns) {
-        $table = $this->mock(self::CLS)
-            ->getFields([])
-            ->new();
-        $table->setColumns([1, 2, 3]);
+        $table = $this->getTableWithColumns(true, true, true, 2);
+        $table->setColumns(['F1', 'F2', 'F3']);
+        $this->reflect($table)->buffer = [1, 2];
         /* @var $table \org\majkel\dbase\Table */
         self::assertSame($table, $table->setColumns($columns));
         self::assertNull($table->getColumns());
+        self::assertEmpty($this->reflect($table)->buffer);
     }
 
     /**

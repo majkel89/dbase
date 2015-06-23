@@ -54,8 +54,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
      */
     public function setColumns($columns) {
         if (empty($columns) || !is_array($columns)) {
-            $this->columns = null;
-            return $this;
+            $columns = null;
         }
         $this->columns = $columns;
         foreach ($this->getFields() as $field) {
@@ -292,7 +291,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
 
     /**
      * @return \org\majkel\dbase\FormatFactory
-     * @@codeCoverageIgnore
+     * @codeCoverageIgnore
      */
     protected function getFormatFactory() {
         static $formatFactory = null;
