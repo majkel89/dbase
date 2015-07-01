@@ -29,8 +29,21 @@ class DBase3Test extends TestBase {
         self::assertSame('Bezp', $record->CHP_ODPLAT);
         self::assertSame(22, $record->NUM);
         self::assertSame('2015-06-26', $record->DAT->format('Y-m-d'));
-        self::assertSame(true, $record->LOGIC);
+        self::assertSame(true, $record['LOGIC']);
         self::assertSame('memo1', $record->MEMO);
+    }
+
+    /**
+     * @medium
+     * @coversNothing
+     */
+    public function testReadLongFile() {
+        $results = [];
+        $dbf = new Table('tests/fixtures/producents.dbf');
+        foreach ($dbf as $index => $record) {
+            $results[$index] = $record->SL_PROD;
+        }
+        self::assertCount(7356, $results);
     }
 
 }

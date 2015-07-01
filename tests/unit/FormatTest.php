@@ -355,7 +355,7 @@ class FormatTest extends TestBase {
             ->unserialize('field2')
             ->new();
         $header = $this->getHeaderMock()
-            ->getFields([], [$f1, $f2], self::once())
+            ->getFields([], ['FF1' => $f1, 'FF2' => $f2], self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
@@ -363,8 +363,8 @@ class FormatTest extends TestBase {
             ->new();
         $record = $this->reflect($format)->createRecord([
             'd' => 1,
-            'f0' => '123',
-            'f1' => 'field2',
+            'fFF1' => '123',
+            'fFF2' => 'field2',
         ]);
         self::assertTrue($record instanceof Record);
         self::assertTrue($record->isDeleted());

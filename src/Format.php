@@ -297,16 +297,13 @@ abstract class Format {
         $record = new Record;
         $record->setDeleted($data['d'] !== ' ');
         $fields = $this->getHeader()->getFields();
-        foreach ($data as $index => $value) {
-            if ($index !== 'd') {
-                $field = $fields[substr($index, 1)];
-                /* @var $field \org\majkel\dbase\Field */
-                if ($field->isLoad()) {
-                    if ($field->isMemoEntry()) {
-                        $value = $this->readMemoEntry($value);
-                    }
-                    $record[$field->getName()] = $field->unserialize($value);
+        foreach ($fields as $name => $field) {
+            if ($field->isLoad()) {
+                $value = $data['f'.$name];
+                if ($field->isMemoEntry()) {
+                    $value = $this->readMemoEntry($value);
                 }
+                $record[$name] = $field->unserialize($value);
             }
         }
         return $record;
