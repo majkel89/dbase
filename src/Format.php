@@ -29,7 +29,7 @@ abstract class Format {
     /** @var \SplFileObject File handle */
     protected $file;
     /** @var \SplFileObject File handle */
-    protected $dbtFile;
+    protected $memoFile;
     /** @var org\majkel\dbase\Header */
     protected $header;
     /** @var string record unpack format string */
@@ -154,7 +154,7 @@ abstract class Format {
     /**
      * @return string
      */
-    protected function getMemoFilePath() {
+    protected function getMemoFilePath($ext) {
         $fileInfo = $this->getFileInfo();
         $path = $fileInfo->getPath() . '/';
         $basename = $fileInfo->getBasename();
@@ -164,7 +164,7 @@ abstract class Format {
         } else {
             $path .= $basename;
         }
-        return $path . '.dbt';
+        return $path . '.' . $ext;
     }
 
     /**
@@ -175,14 +175,27 @@ abstract class Format {
     }
 
     /**
-     * @return SplFileObject
+     * @return \org\majkel\dbase\memo\IMemo
+     * @throws Exception
      */
     protected function getMemoFile() {
-        if (is_null($this->dbtFile)) {
-            $this->dbtFile = File::getObject($this->getMemoFilePath(),
-                    $this->getMode());
+        if (is_null($this->memoFile)) {
+
+            $filePath = $this->getMemoFilePath('dbt');
+            if (is_readable($filePath)) {
+                $this->memoFile = new memo\DbtMemo($filePath, $this->getMode());
+                return $this->memoFile;
+            }
+
+            $filePath = $this->getMemoFilePath('fpt');
+            if (is_readable($filePath)) {
+                $this->memoFile = new memo\FptMemo($filePath, $this->getMode());
+                return $this->memoFile;
+            }
+
+            throw new Exception("Unable to open memo file");
         }
-        return $this->dbtFile;
+        return $this->memoFile;
     }
 
     /**
@@ -284,9 +297,7 @@ abstract class Format {
      * @return string
      */
     protected function readMemoEntry($index) {
-        $memoFile = $this->getMemoFile();
-        $memoFile->fseek($index * 512);
-        return $memoFile->fread(512);
+        return $this->getMemoFile()->getEntry($index);
     }
 
     /**
