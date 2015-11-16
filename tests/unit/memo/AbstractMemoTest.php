@@ -38,7 +38,7 @@ class AbstractMemoTest extends TestBase {
         return array(
             array(1, 1),
             array(1.2, 1),
-            array(-2.2, 2),
+            array(-2.2, -2),
             array('1', 1),
             array('    1', 1),
             array('     ', 0),
