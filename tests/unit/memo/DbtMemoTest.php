@@ -49,10 +49,23 @@ class DbtMemoTest extends TestBase {
     }
 
     /**
+     * @return array
+     */
+    public function dataGetEntry() {
+        return array(
+            array(0.5),
+            array(1),
+            array('    2'),
+            array('     '),
+        );
+    }
+
+    /**
      * @test
      * @covers ::getEntry
+     * @dataProvider dataGetEntry
      */
-    public function testGetEntry() {
+    public function testGetEntry($entryId) {
         $mockedFile = $this->getFileMock()
                 ->getSize(2048)
                 ->fseek([1024], null, self::once())
@@ -61,7 +74,7 @@ class DbtMemoTest extends TestBase {
         $mock = $this->mock(self::CLS)
                 ->getFile([], $mockedFile, self::once())
                 ->new();
-        self::assertSame('DATA', $mock->getEntry(0.5));
+        self::assertSame('DATA', $mock->getEntry($entryId));
     }
 
 }

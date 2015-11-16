@@ -23,16 +23,12 @@ class DbtMemo extends AbstractMemo {
      * {@inheritdoc}
      */
     public function getEntry($entryId) {
-        if (is_numeric($entryId)) {
-            $entryId = (integer) $entryId;
-        } else {
-            $entryId = -1;
-        }
+        $filteredEntryId = $this->getFilteredEntryId($entryId);
         $file = $this->getFile();
-        if ($entryId < 0 || $entryId * self::B_SZ + self::B_SZ > $file->getSize()) {
+        if ($filteredEntryId < 0 || $filteredEntryId * self::B_SZ + self::B_SZ > $file->getSize()) {
             throw new Exception("Unable to read block `$entryId`");
         }
-        $file->fseek($entryId * self::B_SZ);
+        $file->fseek($filteredEntryId * self::B_SZ);
         return $file->fread(self::B_SZ);
     }
 

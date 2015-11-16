@@ -54,8 +54,9 @@ class FptMemoTest extends TestBase {
      */
     public function dataGetEntry() {
         return array(
-            array(1.2, 'DATA'),
-            array(2,   'DATA'),
+            array(1.2,    'DATA'),
+            array(2,      'DATA'),
+            array('   2', 'DATA'),
         );
     }
 
@@ -78,10 +79,21 @@ class FptMemoTest extends TestBase {
     }
 
     /**
+     * @return array
+     */
+    public function dataGetEntryZero() {
+        return array(
+            array(0),
+            array('       '),
+        );
+    }
+
+    /**
      * @test
      * @covers ::getEntry
+     * @dataProvider dataGetEntryZero
      */
-    public function testGetEntryZero() {
+    public function testGetEntryZero($entryId) {
         $mockedFile = $this->getFileMock()
                 ->getSize(2048)
                 ->new();
@@ -89,7 +101,7 @@ class FptMemoTest extends TestBase {
                 ->getFile($mockedFile)
                 ->getBlockSize(4)
                 ->new();
-        self::assertSame('', $mock->getEntry(0));
+        self::assertSame('', $mock->getEntry($entryId));
     }
 
     /**

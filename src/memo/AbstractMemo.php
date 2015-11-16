@@ -43,4 +43,17 @@ abstract class AbstractMemo implements IMemo {
         return $this->getFile()->getFileInfo();
     }
 
+    /**
+     * @param string $entryId
+     * @return integer
+     */
+    protected function getFilteredEntryId($entryId) {
+        if (is_numeric($entryId)) {
+            return (integer) $entryId;
+        } else {
+            $entryId = trim($entryId);
+            return empty($entryId) ? 0 : -1;
+        }
+    }
+
 }

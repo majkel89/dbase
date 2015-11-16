@@ -42,16 +42,12 @@ class FptMemo extends AbstractMemo {
      * {@inheritdoc}
      */
     public function getEntry($entryId) {
-        if (is_numeric($entryId)) {
-            $entryId = (integer) $entryId;
-        } else {
-            $entryId = -1;
-        }
+        $filteredEntryId = $this->getFilteredEntryId($entryId);
         $file = $this->getFile();
-        $entryOffset = $entryId * $this->getBlockSize();
-        if ($entryId < 0 || $entryOffset + self::BH_SZ > $file->getSize()) {
+        $entryOffset = $filteredEntryId * $this->getBlockSize();
+        if ($filteredEntryId < 0 || $entryOffset + self::BH_SZ > $file->getSize()) {
             throw new Exception("Unable to read block `$entryId`");
-        } else if ($entryId === 0) {
+        } else if ($filteredEntryId === 0) {
             return '';
         }
 
