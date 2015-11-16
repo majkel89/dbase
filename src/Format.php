@@ -180,19 +180,17 @@ abstract class Format {
      */
     protected function getMemoFile() {
         if (is_null($this->memoFile)) {
-
-            $filePath = $this->getMemoFilePath('dbt');
-            if (is_readable($filePath)) {
-                $this->memoFile = new memo\DbtMemo($filePath, $this->getMode());
-                return $this->memoFile;
+            $supportedMemoFiles = array(
+                'dbt' => 'org\majkel\dbase\memo\DbtMemo',
+                'fpt' => 'org\majkel\dbase\memo\FptMemo',
+            );
+            foreach ($supportedMemoFiles as $ext => $class) {
+                $filePath = $this->getMemoFilePath($ext);
+                if (is_readable($filePath)) {
+                    $this->memoFile = new $class($filePath, $this->getMode());
+                    return $this->memoFile;
+                }
             }
-
-            $filePath = $this->getMemoFilePath('fpt');
-            if (is_readable($filePath)) {
-                $this->memoFile = new memo\FptMemo($filePath, $this->getMode());
-                return $this->memoFile;
-            }
-
             throw new Exception("Unable to open memo file");
         }
         return $this->memoFile;

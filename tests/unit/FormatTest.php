@@ -185,11 +185,11 @@ class FormatTest extends TestBase {
      */
     public function dataGetMemoFilePath() {
         return [
-            ['some/file.txt', 'some/file.txt.dbt'],
-            ['some/file', 'some/file.dbt'],
-            ['some/file.dbf', 'some/file.dbt'],
-            ['some/file.dBf', 'some/file.dbt'],
-            ['some/file.DBF', 'some/file.dbt'],
+            ['some/file.txt', 'some/file.txt.dbt', 'dbt'],
+            ['some/file', 'some/file.dbt', 'dbt'],
+            ['some/file.dbf', 'some/file.dbt', 'dbt'],
+            ['some/file.dBf', 'some/file.dbt', 'dbt'],
+            ['some/file.DBF', 'some/file.xxx', 'xxx'],
         ];
     }
 
@@ -197,12 +197,12 @@ class FormatTest extends TestBase {
      * @covers ::getMemoFilePath
      * @dataProvider dataGetMemoFilePath
      */
-    public function testGetMemoFilePath($dbfPath, $memoPath) {
+    public function testGetMemoFilePath($dbfPath, $memoPath, $ext) {
         $fileInfo = new SplFileInfo($dbfPath);
         $format = $this->getFormatMock()
             ->getFileInfo($fileInfo, self::once())
             ->new();
-        self::assertSame($memoPath, $this->reflect($format)->getMemoFilePath());
+        self::assertSame($memoPath, $this->reflect($format)->getMemoFilePath($ext));
     }
 
     /**
@@ -214,7 +214,7 @@ class FormatTest extends TestBase {
             ->getMode('rb', self::once())
             ->new();
         $file = $this->reflect($format)->getMemoFile();
-        self::assertSame(__FILE__, $file->getPathname());
+        self::assertSame(__FILE__, $file->getFileInfo()->getPathname());
     }
 
     /**
@@ -307,13 +307,12 @@ class FormatTest extends TestBase {
      */
     public function testReadMemoEntry() {
         $memo = $this->getHeaderMock()
-            ->fseek([1024], self::once())
-            ->fread([512], 'DAT', self::once())
+            ->getEntry([2], 'DAT', self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getMemoFile($memo)
             ->new();
-        self::assertSame("DAT", $this->reflect($format)
+        self::assertSame('DAT', $this->reflect($format)
             ->readMemoEntry(2));
     }
 
@@ -439,4 +438,29 @@ class FormatTest extends TestBase {
         self::assertCount(2, $header);
     }
 
+    /**
+     * @test
+     * @covers ::getMemoFile
+     * @expectedException org\majkel\dbase\Exception
+     */
+    public function testGetMemoFileNoMemo() {
+        $format = $this->getFormatMock()
+            ->getMemoFilePath()
+            ->new();
+        $this->reflect($format)->getMemoFile();
+    }
+
+    /**
+     * @test
+     * @covers ::getMemoFile
+     */
+    public function testGetMemoFileExists() {
+        $format = $this->getFormatMock()
+            ->getMemoFilePath(__FILE__)
+            ->getMode('r')
+            ->new();
+        $memoFile = $this->reflect($format)->getMemoFile();
+        self::assertSame(__FILE__, $memoFile->getFileInfo()->getPathname());
+        self::assertSame($memoFile, $this->reflect($format)->getMemoFile());
+    }
 }

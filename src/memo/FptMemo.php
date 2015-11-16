@@ -28,7 +28,7 @@ class FptMemo extends AbstractMemo {
     /**
      * @return integer;
      */
-    private function getBlockSize() {
+    protected function getBlockSize() {
         if (is_null($this->blockSize)) {
             $file = $this->getFile();
             $file->fseek(6);
@@ -42,19 +42,28 @@ class FptMemo extends AbstractMemo {
      * {@inheritdoc}
      */
     public function getEntry($entryId) {
-        $entryId = (integer) $entryId;
-        if ($entryId === 0) {
+        if (is_numeric($entryId)) {
+            $entryId = (integer) $entryId;
+        } else {
+            $entryId = -1;
+        }
+        $file = $this->getFile();
+        $entryOffset = $entryId * $this->getBlockSize();
+        if ($entryId < 0 || $entryOffset + self::BH_SZ > $file->getSize()) {
+            throw new Exception("Unable to read block `$entryId`");
+        } else if ($entryId === 0) {
             return '';
         }
 
-        $file = $this->getFile();
-        $file->fseek($entryId * $this->getBlockSize());
+        $file->fseek($entryOffset);
 
         $bh = $file->fread(self::BH_SZ);
-        $len = (ord($bh[4]) << 24) + (ord($bh[5]) << 16)
-             + (ord($bh[6]) <<  8) +  ord($bh[7]);
-        if ($len < 0) {
+        $len = (ord($bh[4]) << 24) | (ord($bh[5]) << 16)
+             | (ord($bh[6]) <<  8) |  ord($bh[7]);
+        if ($len < 0 || (0xFFFFFFFF !== -1 && $len >= 0xFFFFFFFF)) {
             throw new Exception("Invalid block length (negative size)");
+        } else if ($len === 0) {
+            return '';
         }
 
         return $file->fread($len);
