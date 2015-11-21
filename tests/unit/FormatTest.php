@@ -218,29 +218,6 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @covers ::createHeader
-     */
-    public function testCreateHeader() {
-        $date = new DateTime;
-        $format = $this->getFormatMock()
-            ->getLastDate([1, 2, 3], $date, self::once())
-            ->new();
-        $header = $this->reflect($format)->createHeader([
-            'v' => 7, 'n' => 5, 'rs' => 123,
-            'd1' => 1, 'd2' => 2, 'd3' => 3,
-            'hs' => 321, 't' => true,
-        ]);
-        /* @var $header \org\majkel\dbase\Header */
-        self::assertSame(7, $header->getVersion());
-        self::assertSame($date, $header->getLastUpdate());
-        self::assertSame(5, $header->getRecordsCount());
-        self::assertSame(123, $header->getRecordSize());
-        self::assertSame(321, $header->getHeaderSize());
-        self::assertTrue($header->isPendingTransaction());
-        self::assertTrue($header->isValid());
-    }
-
-    /**
      * @covers ::getLastDate
      */
     public function testGetLastDate() {
@@ -248,23 +225,6 @@ class FormatTest extends TestBase {
         $date = $this->reflect($format)->getLastDate(115, 07, 06);
         self::assertTrue($date instanceof DateTime);
         self::assertSame('2015-07-06 00:00:00', $date->format('Y-m-d H:i:s'));
-    }
-
-    /**
-     * @covers ::createField
-     */
-    public function testCreateField() {
-        $format = $this->mock(self::CLS_FORMAT)
-            ->supportsType([Field::TYPE_CHARACTER], true, self::once())
-            ->new();
-        $field = $this->reflect($format)->createField([
-            't' => Field::TYPE_CHARACTER,
-            'n' => 'NaMe',
-            'll' => 123,
-        ]);
-        self::assertTrue($field instanceof Field);
-        self::assertSame('NaMe', $field->getName());
-        self::assertSame(123, $field->getLength());
     }
 
     /**
@@ -374,8 +334,14 @@ class FormatTest extends TestBase {
      * @return string
      */
     protected function getValidHeader() {
-        return "\x03s\x06\x15\x03\x00\x00\x00a\x00\x15\x00\x00\x00\x00\x00\x00"
-             . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+        return "\x03" // version
+            . "\xFF\x01\x03" // last update date
+            . "\x04\x03\x02\x01" //numer of records in the table
+            . "\x61\x00"  // bytes in header
+            . "\x20\x00" // bytes in record
+            . "\x00\x00\x00" // reserved
+            . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" // reserved
+            . "\x00\x00\x00\x00"; // reserved;
     }
 
     /**
@@ -387,18 +353,11 @@ class FormatTest extends TestBase {
             ->fread([32], $this->getValidHeader(), self::once()) // header
             ->getSize(50)
             ->new();
-        $header = $this->getHeaderMock()
-            ->getHeaderSize(97)
-            ->getRecordsCount(2)
-            ->getRecordSize(10)
-            ->new();
         $format = $this->getFormatMock()
             ->getFile($file)
-            ->createHeader($header, self::once())
             ->new();
-        $headerRet = $this->reflect($format)->readHeader();
+        $header = $this->reflect($format)->readHeader();
         self::assertTrue($header instanceof Header);
-        self::assertSame($header, $headerRet);
         self::assertFalse($header->isValid());
         self::assertEmpty($header->getFields());
     }
@@ -407,35 +366,56 @@ class FormatTest extends TestBase {
      * @return string
      */
     protected function getValidFields() {
-        return "F1\x00\x00\x00\x00\x00\x00\x00\x00\x00C\x00\x00\x00\x00\x0A"
-             . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-             . "F2\x00xyz\x00\x00\x00\x00\x00C\x00\x00\x00\x00\x0A\x00\x00"
-             . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+        return ''
+            //field 0
+            . "F1\x00\x00\x00\x00\x00\x00\x00\x00\x00" // field name
+            . "C" // field type
+            . "\x00\x00\x00\x00" // Field data address
+            . "\x0A" // Field length in binary.
+            . "\x00" // Field decimal count in binary.
+            . "\x00\x00" // Reserved for dBASE III PLUS on a LAN.
+            . "\x00" // Work area ID.
+            . "\x00\x00" // Reserved for dBASE III PLUS on a LAN.
+            . "\x00" // SET FIELDS flag.
+            . "\x00\x00\x00\x00\x00\x00\x00\x00" // Reserved bytes.
+            //field 1
+            . "F2\x00xyz\x00\x00\x00\x00\x00" // field name
+            . "C" // field type
+            . "\x00\x00\x00\x00" // Field data address
+            . "\x0A" // Field length in binary.
+            . "\x00" // Field decimal count in binary.
+            . "\x00\x00"  // Reserved for dBASE III PLUS on a LAN.
+            . "\x00" // Work area ID.c
+            . "\x00\x00" // Reserved for dBASE III PLUS on a LAN.
+            . "\x00" // SET FIELDS flag.
+            . "\x00\x00\x00\x00\x00\x00\x00\x00"; // Reserved bytes.
     }
 
     /**
      * @covers ::readHeader
+     * @covers ::createHeader
+     * @covers ::createField
      */
     public function testReadHeader() {
         $file = $this->getFileMock()
             ->fseek([0], self::once())
             ->fread([32], $this->getValidHeader(), self::at(1)) // header
-            ->getSize(161)
+            ->getSize(32 * 3 + 1 + 0x1020304 * 32)
             ->fread([64], $this->getValidFields(), self::at(3)) // fields
-            ->new();
-        $header = $this->getHeaderMock()
-            ->getHeaderSize(97)
-            ->getRecordsCount(2)
-            ->getRecordSize(32)
             ->new();
         $format = $this->getFormatMock()
             ->getFile($file)
-            ->createHeader($header, self::once())
             ->new();
-        $headerRet = $this->reflect($format)->readHeader();
+        $header = $this->reflect($format)->readHeader();
+        /* @var $header \org\majkel\dbase\Header */
         self::assertTrue($header instanceof Header);
-        self::assertSame($header, $headerRet);
-        self::assertCount(2, $header);
+        self::assertTrue($header->isValid());
+        self::assertSame(2, $header->getFieldsCount());
+        self::assertSame(0x1020304, $header->getRecordsCount());
+        self::assertSame(32, $header->getRecordSize());
+        self::assertSame(0x0A, $header->getField('F1')->getLength());
+        self::assertSame(0x0A, $header->getField('F2')->getLength());
+        self::assertSame('2155-01-03', $header->getLastUpdate()->format('Y-m-d'));
     }
 
     /**

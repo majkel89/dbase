@@ -23,7 +23,7 @@ abstract class Format {
     const FIELD_SIZE = 32;
     const HEADER_SIZE = 32;
 
-    const HEADER_FORMAT = 'Cv/c3d/Vn/vhs/vrs/vr1/Ct';
+    const HEADER_FORMAT = 'Cv/C3d/Vn/vhs/vrs/vr1/Ct';
     const FIELD_FORMAT = 'A11n/a1t/Vrr1/Cll/Cdd/vrr2/Cwa/vrr3/Csff/Crr4';
 
     /** @var \SplFileObject File handle */
@@ -226,7 +226,8 @@ abstract class Format {
 
         $fileSize = $file->getSize();
         $headerSize = $header->getHeaderSize();
-        if ($headerSize + $header->getRecordsCount() * $header->getRecordSize() > $fileSize) {
+        $recordsCount = $header->getRecordsCount();
+        if ($recordsCount < 0 || $headerSize + $recordsCount * $header->getRecordSize() > $fileSize) {
             $header->setValid(false);
             return $header;
         }
