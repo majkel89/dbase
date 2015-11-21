@@ -46,4 +46,26 @@ class DBase3Test extends TestBase {
         self::assertCount(7356, $results);
     }
 
+    /**
+     * @test
+     * @medium
+     * @coversNothing
+     */
+    public function testcCopyRecords() {
+        $sourceFile = 'tests/fixtures/dBase3.dbf';
+        $destFile = 'tests/fixtures/dBase3.dbf.copy';
+
+        if (file_exists($destFile)) {
+            unlink($destFile);
+        }
+        copy($sourceFile, $destFile);
+
+        $source = new Table($sourceFile);
+        $dest = new Table($destFile, Table::MODE_READWRITE);
+
+        foreach ($source as $sourceRecord) {
+            $dest->insert($sourceRecord);
+        }
+    }
+
 }

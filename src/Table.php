@@ -38,6 +38,8 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     protected $bufferSize = self::DEFAULT_BUFFER_SIZE;
     /** @var string[] Columns to read */
     protected $columns;
+    /** @var boolean */
+    protected $transaction = false;
 
     /**
      * @param string $filePath
@@ -84,6 +86,71 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      */
     public function getHeader() {
         return $this->getFormat()->getHeader();
+    }
+
+    /**
+     * Stores record in database
+     * @param integer $index
+     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
+     * @return void
+     */
+    public function update($index, $data) {
+        $this->getFormat()->update($index, $data);
+        // update buffer to reflect current changes
+        if (isset($this->buffer[$index])) {
+            if ($data instanceof Record && $data !== $this->buffer[$index]) {
+                $this->buffer[$index] = $data;
+            } else {
+                $this->buffer[$index] = new Record($data);
+            }
+        }
+    }
+
+    /**
+     * Adds new record to database
+     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
+     * @return index index of new record
+     */
+    public function insert($data) {
+        return $this->getFormat()->insert($data);
+    }
+
+    /**
+     * Marks record as deleted
+     * @param integer $index
+     * @return void
+     */
+    public function delete($index) {
+        $this->getFormat()->delete($index);
+        // update buffer to reflect current changes
+        if (isset($this->buffer[$index])) {
+            $this->buffer[$index]->setDeleted(true);
+        }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function checkPendingTransaction() {
+        return $this->getFormat()->checkPendingTransaction();
+    }
+
+    /**
+     * Begins transaction
+     * @throws Exception
+     * @return void
+     */
+    public function beginTransaction() {
+        $this->getFormat()->beginTransaction();
+    }
+
+    /**
+     * Ends transaction
+     * @throws Exception
+     * @return void
+     */
+    public function endTransaction() {
+        $this->getFormat()->endTransaction();
     }
 
     /**

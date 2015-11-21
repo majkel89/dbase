@@ -36,6 +36,8 @@ abstract class Format {
     protected $recordFormat;
     /** @var string */
     protected $mode;
+    /** @var boolean */
+    protected $transaction = false;
 
     /**
      * @param string $filePath
@@ -214,6 +216,113 @@ abstract class Format {
 
     /**
      * @return HeaderInterface
+     * @return boolean
+     */
+    protected function checkPendingTransaction() {
+        $currentHeader = $this->readHeader();
+        $header = $this->getHeader();
+        $header->setPendingTransaction($currentHeader->isPendingTransaction());
+        $header->setLastUpdate($currentHeader->getLastUpdate());
+        $header->setRecordsCount($currentHeader->getRecordsCount());
+        return $header->isPendingTransaction();
+    }
+
+    /**
+     * @throws Exception
+     * @return void
+     */
+    public function beginTransaction() {
+        $this->getFile()->flock(LOCK_EX);
+        if ($this->checkPendingTransaction()) {
+            $this->getFile()->flock(LOCK_EX);
+            throw new Exception("Transaction already started!");
+        }
+        $this->getHeader()->setPendingTransaction(true);
+        $this->updateHeader();
+        $this->transaction = true;
+        $this->getFile()->flock(LOCK_EX);
+    }
+
+    /**
+     * @throws Exception
+     * @return void
+     */
+    public function endTransaction() {
+        $this->getFile()->flock(LOCK_EX);
+        if (!$this->transaction) {
+            $this->getFile()->flock(LOCK_EX);
+            throw new Exception("Transaction haven't been started yet!");
+        }
+        $this->getHeader()->setPendingTransaction(false);
+        $this->writeHeader();
+        // update header
+        $this->transaction = false;
+        $this->getFile()->flock(LOCK_UN);
+    }
+
+    /**
+     * @param integer $index
+     * @return void
+     */
+    public function delete($index) {
+        $this->writeHeader();
+        list($offset) = $this->getReadBoudries($index, 0);
+        $file = $this->getFile();
+        $file->fseek($offset * $this->getHeader()->getRecordSize() + 11 + 1 + 1 + 11);
+        $file->fwrite("\x2A");
+    }
+
+    /**
+     * @param \org\majkel\dbase|\ArrayAccess|array $data
+     * @return integer
+     */
+    public function insert($data) {
+        $header = $this->getHeader();
+        $newIndex = $header->getRecordsCount();
+        $header->setRecordsCount($newIndex + 1);
+        $this->writeHeader();
+        $format = $this->getRecordFormat();
+        $file = $this->getFile();
+        $file->fseek(0, SEEK_END);
+        $DATA = call_user_func_array('pack', array_merge([$format], $data));
+        $file->fwrite($DATA);
+        return $newIndex;
+    }
+
+    /**
+     * @param integer $index
+     * @param \org\majkel\dbase|\ArrayAccess|array $data
+     * @return void
+     */
+    public function update($index, $data) {
+        $this->writeHeader();
+        list($offset) = $this->getReadBoudries($index, 0);
+        $file = $this->getFile();
+        $file->fseek($offset * $this->getHeader()->getRecordSize());
+        // .. store data .. //
+    }
+
+    /**
+     * @return void
+     */
+    protected function writeHeader() {
+        $file = $this->getFile();
+        $file->fseek(0);
+        $header = $this->getHeader();
+        $header->setLastUpdate(new \DateTime());
+        $date = $header->getLastUpdate();
+        $data = pack('C1c3VvvvC1',
+                $header->getVersion(),
+                $date->format('Y') - 1900, $date->format('m'), $date->format('d'),
+                $header->getRecordsCount(),
+                $header->getRecordSize(),
+                $header->getHeaderSize(),
+                $header->isPendingTransaction());
+        $file->fwrite($data);
+    }
+
+    /**
+     * @return Header
      */
     protected function readHeader() {
         $file = $this->getFile();
