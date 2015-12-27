@@ -86,7 +86,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @return \org\majkel\dbase\Format
+     * @return \stdClass
      */
     protected function getFormatMock() {
         return $this->mock(self::CLS_FORMAT)
