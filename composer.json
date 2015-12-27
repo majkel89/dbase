@@ -1,7 +1,6 @@
 {
     "name": "org.majkel/dbase",
     "description": "Library to access dbase / xbase / dbf database files",
-    "version": "0.1",
     "type": "library",
     "keywords": ["dbase", "xbase", "dbf"],
     "homepage": "https://github.com/majkel89",
