@@ -334,14 +334,14 @@ class FormatTest extends TestBase {
      * @return string
      */
     protected function getValidHeader() {
-        return "\x03" // version
-            . "\xFF\x01\x03" // last update date
-            . "\x04\x03\x02\x01" //numer of records in the table
-            . "\x61\x00"  // bytes in header
-            . "\x20\x00" // bytes in record
-            . "\x00\x00\x00" // reserved
+        return "\x03"                                                // version
+            . "\xFF\x01\x03"                                         // last update date
+            . "\x04\x03\x02\x01"                                     // numer of records in the table
+            . "\x61\x00"                                             // bytes in header
+            . "\x20\x00"                                             // bytes in record
+            . "\x00\x00\x00"                                         // reserved
             . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" // reserved
-            . "\x00\x00\x00\x00"; // reserved;
+            . "\x00\x00\x00\x00";                                    // reserved
     }
 
     /**
