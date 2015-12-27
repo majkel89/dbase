@@ -14,6 +14,9 @@
         <testsuite name="Unit Tests">
             <directory>tests/unit</directory>
         </testsuite>
+        <testsuite name="Integration tests">
+            <directory>tests/integration</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
