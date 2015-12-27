@@ -6,6 +6,8 @@
  * and open the template in the editor.
  */
 
+chdir(__DIR__);
+
 require_once 'vendor/autoload.php';
 
 error_reporting(E_ALL);
