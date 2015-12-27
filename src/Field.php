@@ -31,7 +31,7 @@ abstract class Field {
     protected $length;
     /** @var boolean */
     protected $load = true;
-    /** @var \org\majkel\dbase\IFilter[] */
+    /** @var \org\majkel\dbase\FilterInterface[] */
     protected $filters = [];
 
     /**
@@ -42,10 +42,12 @@ abstract class Field {
 
     /**
      * Adds filter
-     * @param \org\majkel\dbase\IFilter $filter
+     *
+     * @param \org\majkel\dbase\FilterInterface $filter
+     *
      * @return \org\majkel\dbase\Field
      */
-    public function addFilter(IFilter $filter) {
+    public function addFilter(FilterInterface $filter) {
         if ($filter->supportsType($this->getType())) {
             $this->filters[] = $filter;
         }
@@ -54,7 +56,9 @@ abstract class Field {
 
     /**
      * Adds filters
-     * @param \org\majkel\dbase\IFilter[] $filters
+     *
+     * @param \org\majkel\dbase\FilterInterface[] $filters
+     *
      * @return \org\majkel\dbase\Field
      */
     public function addFilters($filters) {
@@ -69,7 +73,7 @@ abstract class Field {
 
     /**
      * Returns all filters
-     * @return \org\majkel\dbaseIFilter[]
+     * @return \org\majkel\dbase\FilterInterface[]
      */
     public function getFilters() {
         return $this->filters;
@@ -83,7 +87,7 @@ abstract class Field {
     public function removeFilter($indexOrFilter) {
         if (is_scalar($indexOrFilter)) {
             unset($this->filters[$indexOrFilter]);
-        } else if ($indexOrFilter instanceof IFilter) {
+        } else if ($indexOrFilter instanceof FilterInterface) {
             foreach ($this->filters as $i => $filter) {
                 if ($filter === $indexOrFilter) {
                     unset($this->filters[$i]);
@@ -103,8 +107,11 @@ abstract class Field {
 
     /**
      * Sets filed name
+     *
      * @param string $name
+     *
      * @return \org\majkel\dbase\Field
+     * @throws \org\majkel\dbase\Exception
      */
     public function setName($name) {
         if (strlen($name) > self::MAX_NAME_LENGTH) {

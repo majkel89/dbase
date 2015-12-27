@@ -18,7 +18,7 @@ use DateTime;
  *
  * @author majkel
  */
-class Header implements IHeader, Iterator, Countable, ArrayAccess {
+class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
 
     use Flags;
 
@@ -149,6 +149,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
 
     /**
      * @param integer $recordSize
+     *
      * @return \org\majkel\dbase\Header
      */
     public function setRecordSize($recordSize) {
@@ -195,7 +196,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
     }
 
     /**
-     * @return org\majkel\dbase\Field
+     * @return \org\majkel\dbase\Field
      */
     public function current() {
         return current($this->fields);
@@ -239,7 +240,7 @@ class Header implements IHeader, Iterator, Countable, ArrayAccess {
 
     /**
      * @param integer $offset
-     * @return org\majkel\dbase\Field
+     * @return \org\majkel\dbase\Field
      */
     public function offsetGet($offset) {
         return $this->fields[$offset];

@@ -357,7 +357,7 @@ class FormatTest extends TestBase {
             ->getFile($file)
             ->new();
         $header = $this->reflect($format)->readHeader();
-        self::assertTrue($header instanceof Header);
+        self::assertTrue($header instanceof HeaderInterface);
         self::assertFalse($header->isValid());
         self::assertEmpty($header->getFields());
     }
@@ -407,8 +407,8 @@ class FormatTest extends TestBase {
             ->getFile($file)
             ->new();
         $header = $this->reflect($format)->readHeader();
-        /* @var $header \org\majkel\dbase\Header */
-        self::assertTrue($header instanceof Header);
+        /* @var $header \org\majkel\dbase\HeaderInterface */
+        self::assertTrue($header instanceof HeaderInterface);
         self::assertTrue($header->isValid());
         self::assertSame(2, $header->getFieldsCount());
         self::assertSame(0x1020304, $header->getRecordsCount());

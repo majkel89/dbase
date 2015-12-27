@@ -13,7 +13,7 @@ namespace org\majkel\dbase;
  *
  * @author majkel
  */
-interface IFilter {
+interface FilterInterface {
 
     /**
      * @param mixed $value

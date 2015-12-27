@@ -13,7 +13,7 @@ namespace org\majkel\dbase;
  *
  * @author majkel
  */
-abstract class Filter implements IFilter {
+abstract class Filter implements FilterInterface {
 
     /**
      * {@inheritdoc}

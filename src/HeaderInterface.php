@@ -13,7 +13,7 @@ namespace org\majkel\dbase;
  *
  * @author majkel
  */
-interface IHeader {
+interface HeaderInterface {
 
     /**
      * @return \org\majkel\dbase\Field[]

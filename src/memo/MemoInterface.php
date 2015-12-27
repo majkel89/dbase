@@ -13,7 +13,7 @@ namespace org\majkel\dbase\memo;
  *
  * @author majkel
  */
-interface IMemo {
+interface MemoInterface {
 
     /**
      * @return \SplFileInfo
@@ -23,7 +23,7 @@ interface IMemo {
     /**
      * Reads entry from memo file
      * @param string $entryId
-     * @return nixed
+     * @return mixed
      */
     public function getEntry($entryId);
 

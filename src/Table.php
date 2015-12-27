@@ -17,7 +17,7 @@ use ArrayAccess;
  *
  * @author majkel
  */
-class Table implements Iterator, Countable, ArrayAccess, IHeader {
+class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     const MODE_READ = 1;
     const MODE_WRITE = 2;
@@ -80,7 +80,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
     }
 
     /**
-     * @return \org\majkel\dbase\Header
+     * @return \org\majkel\dbase\HeaderInterface
      */
     public function getHeader() {
         return $this->getFormat()->getHeader();
@@ -105,7 +105,7 @@ class Table implements Iterator, Countable, ArrayAccess, IHeader {
         return $this->buffer[$index];
     }
 
-    // <editor-fold defaultstate="collapsed" desc="IHeader implementation">
+    // <editor-fold defaultstate="collapsed" desc="HeaderInterface implementation">
 
     /**
      * {@inheritdoc}

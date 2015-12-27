@@ -15,7 +15,7 @@ use org\majkel\dbase\File;
  *
  * @author majkel
  */
-abstract class AbstractMemo implements IMemo {
+abstract class AbstractMemo implements MemoInterface {
 
     /** @var \SplFileObject */
     private $file;

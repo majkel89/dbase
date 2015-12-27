@@ -30,7 +30,7 @@ abstract class Format {
     protected $file;
     /** @var \SplFileObject File handle */
     protected $memoFile;
-    /** @var org\majkel\dbase\Header */
+    /** @var \org\majkel\dbase\Header */
     protected $header;
     /** @var string record unpack format string */
     protected $recordFormat;
@@ -133,8 +133,8 @@ abstract class Format {
     /**
      * @param integer $index
      * @param integer $length
-     * @return [$index, $stop]
-     * @throws Exception
+     * @return array [$index, $stop]
+     * @throws \org\majkel\dbase\Exception
      */
     protected function getReadBoudries($index, $length) {
         $totalRecords = $this->getHeader()->getRecordsCount();
@@ -175,7 +175,7 @@ abstract class Format {
     }
 
     /**
-     * @return \org\majkel\dbase\memo\IMemo
+     * @return \org\majkel\dbase\memo\MemoInterface
      * @throws Exception
      */
     protected function getMemoFile() {
@@ -213,7 +213,7 @@ abstract class Format {
     }
 
     /**
-     * @return Header
+     * @return HeaderInterface
      */
     protected function readHeader() {
         $file = $this->getFile();
@@ -265,7 +265,8 @@ abstract class Format {
 
     /**
      * @param array $data
-     * @return Field
+     * @return \org\majkel\dbase\Field
+     * @throws \org\majkel\dbase\Exception
      */
     protected function createField($data) {
         if (!$this->supportsType($data['t'])) {

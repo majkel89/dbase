@@ -40,7 +40,7 @@ class CharsetFilter extends Filter {
 
     /**
      * @param string $input
-     * @return \org\majkel\dbase\Trim\Charset
+     * @return \org\majkel\dbase\filter\CharsetFilter
      */
     public function setInput($input) {
         if (empty($input)) {
@@ -59,7 +59,7 @@ class CharsetFilter extends Filter {
 
     /**
      * @param string $output
-     * @return \org\majkel\dbase\Trim\Charset
+     * @return \org\majkel\dbase\filter\CharsetFilter
      */
     public function setOutput($output) {
         if (empty($output)) {

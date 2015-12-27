@@ -16,7 +16,7 @@ namespace org\majkel\dbase\tests\utils;
 abstract class AbstractFilterTest extends TestBase {
 
     /**
-     * @return \org\majkel\dbase\IFilter
+     * @return \org\majkel\dbase\FilterInterface
      */
     abstract protected function getFilterObject();
 
