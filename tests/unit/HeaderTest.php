@@ -210,6 +210,6 @@ class HeaderTest extends TestBase {
      */
     public function testOffsetSetInvalidType() {
         $header = $this->getHeaderStub();
-        $header[] = new \stdClass();
+        $header->offsetSet(0, new \stdClass());
     }
 }

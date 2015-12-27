@@ -79,7 +79,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @return \org\majkel\dbase\HeaderInterface
+     * @return \org\majkel\dbase\Header
      */
     protected function getHeaderStub() {
         return $this->getHeaderMock()->new();
