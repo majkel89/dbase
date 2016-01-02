@@ -20,6 +20,8 @@ abstract class Format {
     const AUTO = 'auto';
     const DBASE3 = 'dbase3';
 
+    const NAME = 'Abstract DBase Format';
+
     const FIELD_SIZE = 32;
     const HEADER_SIZE = 32;
 

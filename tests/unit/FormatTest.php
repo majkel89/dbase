@@ -282,7 +282,7 @@ class FormatTest extends TestBase {
     public function testGetSupportedFormats() {
         $reflection = new ReflectionClass(self::CLS_FORMAT);
         $types = [];
-        $excludes = ['AUTO', 'FIELD', 'HEADER'];
+        $excludes = ['AUTO', 'FIELD_', 'HEADER_', 'NAME'];
         foreach ($reflection->getConstants() as $typeName => $typeValue) {
             $found = false;
             foreach ($excludes as $exclude) {
