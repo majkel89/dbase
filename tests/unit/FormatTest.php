@@ -443,4 +443,246 @@ class FormatTest extends TestBase {
         self::assertSame(__FILE__, $memoFile->getFileInfo()->getPathname());
         self::assertSame($memoFile, $this->reflect($format)->getMemoFile());
     }
+
+    /**
+     * @covers ::isTransaction
+     */
+    public function testsTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction([], true, self::once())
+            ->new();
+
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::isTransaction
+     * @expectedException \Exception
+     * @expectedExceptionMessage FAILED
+     */
+    public function testsTransactionException() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(self::throwException(new \Exception('FAILED')))
+            ->new();
+
+        $format->isTransaction();
+    }
+
+    /**
+     * @covers ::isTransaction
+     */
+    public function testIsTransactionLockFail() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::checkIfTransaction
+     */
+    public function testCheckIfTransaction() {
+
+        $newHeader = new Header();
+        $newHeader->setPendingTransaction(true);
+        $newHeader->setLastUpdate(new \DateTime());
+        $newHeader->setRecordsCount(12);
+
+        $oldHeader = new Header();
+        $oldHeader->setPendingTransaction(false);
+        $oldHeader->setLastUpdate(new DateTime('2016-01-01'));
+        $oldHeader->setRecordsCount(10);
+
+        $format = $this->getFormatMock()
+            ->readHeader($newHeader)
+            ->getHeader($oldHeader)
+            ->new();
+
+        self::assertTrue($this->reflect($format)->checkIfTransaction());
+        self::assertSame($newHeader->isPendingTransaction(), $oldHeader->isPendingTransaction());
+        self::assertSame($newHeader->getLastUpdate(), $oldHeader->getLastUpdate());
+        self::assertSame($newHeader->getRecordsCount(), $oldHeader->getRecordsCount());
+    }
+
+    /**
+     * @covers ::setTransactionStatus
+     * @covers ::isTransaction
+     */
+    public function testSetTransactionStatus() {
+        $header = new Header();
+        $header->setPendingTransaction(false);
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], null, self::once())
+            ->new();
+
+        $this->reflect($format)->setTransactionStatus(true);
+
+        self::assertTrue($format->isTransaction());
+        self::assertTrue($header->isPendingTransaction());
+    }
+
+    /**
+     * @covers ::beginTransaction
+     */
+    public function testBeginTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->setTransactionStatus([true], null, self::once())
+            ->new();
+
+        $format->beginTransaction();
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction already started by somebody else
+     */
+    public function testBeginTransactionAlreadyInTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(true)
+            ->new();
+
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Failed to acquire exclusive lock
+     */
+    public function testBeginTransactionLockFail() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction already started
+     */
+    public function testBeginTransactionCalledTwice() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->writeHeader([], null, self::once())
+            ->new();
+
+        $format->beginTransaction();
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     */
+    public function testEndTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->setTransactionStatus([false], null, self::once())
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction haven't been started yet
+     */
+    public function testEndTransactionNotStarted() {
+        $format = $this->getFormatMock()
+            ->new();
+        $format->endTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Failed to acquire exclusive lock
+     */
+    public function testEndTransactionLockFailed() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
+
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction haven't been started yet
+     */
+    public function testEndTransactionNotStartedFile() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(true)
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
 }

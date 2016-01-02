@@ -225,7 +225,9 @@ abstract class Format {
         if ($this->transaction) {
             return true;
         }
-        $this->getFile()->flock(LOCK_EX);
+        if (!$this->getFile()->flock(LOCK_SH)) {
+            return true;
+        }
         try {
             $isTransaction = $this->checkIfTransaction();
         } catch (StdException $e) {
@@ -250,35 +252,58 @@ abstract class Format {
     }
 
     /**
-     * @throws Exception
-     * @return void
+     * @param boolean $enabled
      */
-    public function beginTransaction() {
-        $this->getFile()->flock(LOCK_EX);
-        if ($this->checkPendingTransaction()) {
-            $this->getFile()->flock(LOCK_EX);
-            throw new Exception("Transaction already started!");
-        }
-        $this->getHeader()->setPendingTransaction(true);
-        $this->updateHeader();
-        $this->transaction = true;
-        $this->getFile()->flock(LOCK_EX);
+    protected function setTransactionStatus($enabled) {
+        $enabled = (boolean) $enabled;
+        $this->getHeader()->setPendingTransaction($enabled);
+        $this->transaction = $enabled;
+        $this->writeHeader();
     }
 
     /**
-     * @throws Exception
-     * @return void
+     * @throws \Exception
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function beginTransaction() {
+        if ($this->transaction) {
+            throw new Exception("Transaction already started");
+        }
+        if (!$this->getFile()->flock(LOCK_EX)) {
+            throw new Exception("Failed to acquire exclusive lock");
+        }
+        try {
+            if ($this->checkIfTransaction()) {
+                throw new Exception("Transaction already started by somebody else");
+            }
+            $this->setTransactionStatus(true);
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
+        $this->getFile()->flock(LOCK_UN);
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \org\majkel\dbase\Exception
      */
     public function endTransaction() {
-        $this->getFile()->flock(LOCK_EX);
         if (!$this->transaction) {
-            $this->getFile()->flock(LOCK_EX);
-            throw new Exception("Transaction haven't been started yet!");
+            throw new Exception("Transaction haven't been started yet");
         }
-        $this->getHeader()->setPendingTransaction(false);
-        $this->writeHeader();
-        // update header
-        $this->transaction = false;
+        if (!$this->getFile()->flock(LOCK_EX)) {
+            throw new Exception("Failed to acquire exclusive lock");
+        }
+        try {
+            if ($this->checkIfTransaction()) {
+                throw new Exception("Transaction haven't been started yet");
+            }
+            $this->setTransactionStatus(false);
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
         $this->getFile()->flock(LOCK_UN);
     }
 
