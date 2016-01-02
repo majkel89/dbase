@@ -34,6 +34,32 @@ class HeaderTest extends TestBase {
     }
 
     /**
+     * @covers ::addField
+     * @covers ::isFieldsLocked
+     * @covers ::lockFields
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Header is locked. Use TableBuilder to construct new table with new definition.
+     */
+    public function testAddFieldWhenLocked() {
+        $header = $this->getHeaderStub();
+        $header->lockFields();
+        $header->addField($this->getFieldStub());
+    }
+
+    /**
+     * @covers ::removeField
+     * @covers ::isFieldsLocked
+     * @covers ::lockFields
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Header is locked. Use TableBuilder to construct new table with new definition.
+     */
+    public function testRemoveFieldWhenLocked() {
+        $header = $this->getHeaderStub();
+        $header->lockFields();
+        $header->removeField($this->getFieldStub());
+    }
+
+    /**
      * @covers ::getField
      * @covers ::addField
      * @covers ::offsetExists

@@ -416,6 +416,7 @@ class FormatTest extends TestBase {
         self::assertSame(0x0A, $header->getField('F1')->getLength());
         self::assertSame(0x0A, $header->getField('F2')->getLength());
         self::assertSame('2155-01-03', $header->getLastUpdate()->format('Y-m-d'));
+        self::assertTrue($header->isFieldsLocked());
     }
 
     /**

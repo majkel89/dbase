@@ -37,6 +37,8 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
     protected $recordSize;
     /** @var integer */
     protected $headerSize;
+    /** @var boolean */
+    protected $fieldsLocked;
 
     /**
      * {@inheritdoc}
@@ -48,8 +50,12 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
     /**
      * @param \org\majkel\dbase\Field $field
      * @return \org\majkel\dbase\Header
+     * @throws \org\majkel\dbase\Exception
      */
     public function addField(Field $field) {
+        if ($this->isFieldsLocked()) {
+            throw new Exception("Header is locked. Use TableBuilder to construct new table with new definition.");
+        }
         $this->fields[$field->getName()] = $field;
         return $this;
     }
@@ -57,10 +63,29 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
     /**
      * @param string $name
      * @return \org\majkel\dbase\Header
+     * @throws \org\majkel\dbase\Exception
      */
     public function removeField($name) {
+        if ($this->isFieldsLocked()) {
+            throw new Exception("Header is locked. Use TableBuilder to construct new table with new definition.");
+        }
         unset($this->fields[$name]);
         return $this;
+    }
+
+    /**
+     * @return \org\majkel\dbase\Header
+     */
+    public function lockFields() {
+        $this->fieldsLocked = true;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFieldsLocked() {
+        return (boolean) $this->fieldsLocked;
     }
 
     /**

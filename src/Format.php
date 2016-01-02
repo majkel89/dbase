@@ -403,6 +403,7 @@ abstract class Format {
             $header->addField($this->createField($data));
         }
 
+        $header->lockFields();
         return $header;
     }
 
