@@ -96,7 +96,7 @@ class SplFileObjectMock implements RecursiveIterator, SeekableIterator {
 
     }
 
-    public function fwrite($str, $length) {
+    public function fwrite($str, $length = null) {
 
     }
 

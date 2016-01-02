@@ -350,6 +350,13 @@ abstract class Format {
     }
 
     /**
+     * @return string
+     */
+    protected function getWriteHeaderFormat() {
+        return 'C4Vvvva18';
+    }
+
+    /**
      * @return void
      */
     protected function writeHeader() {
@@ -358,13 +365,16 @@ abstract class Format {
         $header = $this->getHeader();
         $header->setLastUpdate(new \DateTime());
         $date = $header->getLastUpdate();
-        $data = pack('C1c3VvvvC1',
-                $header->getVersion(),
-                $date->format('Y') - 1900, $date->format('m'), $date->format('d'),
-                $header->getRecordsCount(),
-                $header->getRecordSize(),
-                $header->getHeaderSize(),
-                $header->isPendingTransaction());
+        $data = pack($this->getWriteHeaderFormat(),
+            $header->getVersion(),
+            $date->format('Y') - 1900,
+            (integer) $date->format('m'),
+            (integer) $date->format('d'),
+            $header->getRecordsCount(),
+            $header->getRecordSize(),
+            $header->getHeaderSize(),
+            $header->isPendingTransaction(),
+        '');
         $file->fwrite($data);
     }
 

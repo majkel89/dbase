@@ -331,6 +331,50 @@ class FormatTest extends TestBase {
     }
 
     /**
+     * @covers ::writeHeader
+     * @covers ::getWriteHeaderFormat
+     */
+    public function testWriteHeader() {
+        $header = new Header();
+        $header->setVersion(0x03);
+        $header->setRecordsCount(0x1020304);
+        $header->setPendingTransaction(true);
+        $header->setHeaderSize(0x20);
+        $header->setRecordSize(0x61);
+        $date = new \DateTime();
+
+        $headerData =  "\x03"                                        // version
+            . chr($date->format('Y') - 1900)
+            . chr($date->format('m'))
+            . chr($date->format('d'))                                // last update date
+            . "\x04\x03\x02\x01"                                     // numer of records in the table
+            . "\x61\x00"                                             // bytes in header
+            . "\x20\x00"                                             // bytes in record
+            . "\x01\x00\x00"                                         // reserved
+            . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" // reserved
+            . "\x00\x00\x00\x00";                                    // reserved
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(0);
+        $file->expects(self::once())->method('fwrite')->with($headerData);
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->getHeader($header)
+            ->new();
+
+        $this->reflect($format)->writeHeader();
+
+        self::assertSame(
+            $date->format('Y-m-d'),
+            $header->getLastUpdate()->format('Y-m-d')
+        );
+    }
+
+    /**
      * @return string
      */
     protected function getValidHeader() {
