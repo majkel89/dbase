@@ -82,7 +82,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
-     * @return \org\majkel\dbase\HeaderInterface
+     * @return \org\majkel\dbase\Header
      */
     public function getHeader() {
         return $this->getFormat()->getHeader();
@@ -109,7 +109,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * Adds new record to database
      * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
-     * @return index index of new record
+     * @return integer index of new record
      */
     public function insert($data) {
         return $this->getFormat()->insert($data);
@@ -157,6 +157,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      * Reads record from table
      * @param integer $index
      * @return \org\majkel\dbase\Record
+     * @throws \org\majkel\dbase\Exception
      */
     public function getRecord($index) {
         if (!$this->isValid()) {
@@ -315,8 +316,9 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
-     * @param integer $offset
+     * @param integer                  $offset
      * @param \org\majkel\dbase\Record $value
+     * @throws \org\majkel\dbase\Exception
      */
     public function offsetSet($offset, $value) {
         throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);
@@ -324,6 +326,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @param integer $offset
+     * @throws \org\majkel\dbase\Exception
      */
     public function offsetUnset($offset) {
         throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);

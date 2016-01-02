@@ -102,15 +102,21 @@ class FormatFactory {
                             continue;
                         }
                         $format = $generator($filePath, $this->getMode($mode));
+                        if (!$format instanceof Format) {
+                            throw new Exception('Invalid format returned from generator (' . Utils::getType($format) . ')');
+                        }
                         if ($format->isValid()) {
                             return $format;
                         }
                     }
+                    catch(Exception $e) {
+                        throw $e;
+                    }
                     catch (StdException $e) {
-                        throw new Exception("Unable detect format for file `$filePath`", 0, $e);
+                        throw new Exception("Unable to detect format of `$filePath`", 0, $e);
                     }
                 }
-                throw new Exception("Unable detect format for file `$filePath`");
+                throw new Exception("Unable to detect format of `$filePath`");
             });
         }
         return $this;
