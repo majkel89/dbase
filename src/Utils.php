@@ -25,4 +25,25 @@ final class Utils {
         return is_object($variable) ? get_class($variable) : gettype($variable);
     }
 
+    /**
+     * @param array|\ArrayObject|\Traversable $data
+     * @return array
+     * @throws \org\majkel\dbase\Exception
+     */
+    public static function toArray($data) {
+        if (is_array($data)) {
+            return $data;
+        } else if ($data instanceof \ArrayObject) {
+            return $data->getArrayCopy();
+        } else if ($data instanceof \Traversable) {
+            $result = [];
+            foreach ($data as $key => $value) {
+                $result[$key] = $value;
+            }
+            return $result;
+        } else {
+            throw new Exception('Unable to convert ' . self::getType($data) . ' to array');
+        }
+    }
+
 }

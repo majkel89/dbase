@@ -43,4 +43,56 @@ class UtilsTest extends TestBase {
     public function testGetType($variable, $excepted) {
         self::assertSame($excepted, Utils::getType($variable));
     }
+
+    /**
+     * @return array
+     */
+    public function dataToArray() {
+        return [
+            [
+                [1, 'x' => 2, 3],
+                [1, 'x' => 2, 3],
+            ],
+            [
+                new Record(['x' => 1, 'y' => 2]),
+                           ['x' => 1, 'y' => 2],
+            ],
+            [
+                new \ArrayObject([2 => 'x', 3 => 'z']),
+                                 [2 => 'x', 3 => 'z'],
+            ],
+            [
+                new \ArrayIterator([3 => 'x', 6 => 'z']),
+                                   [3 => 'x', 6 => 'z'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataToArray
+     */
+    public function testToArray($data, $excepted) {
+        self::assertSame($excepted, Utils::toArray($data));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataToArrayInvalid() {
+        return [
+            [false],
+            [true],
+            [1],
+            ['some text'],
+            [new stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider dataToArrayInvalid
+     * @expectedException \org\majkel\dbase\Exception
+     */
+    public function testToArrayInvalid($data) {
+        Utils::toArray($data);
+    }
 }
