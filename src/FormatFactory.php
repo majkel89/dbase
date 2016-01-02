@@ -101,7 +101,7 @@ class FormatFactory {
                         if ($name === Format::AUTO) {
                             continue;
                         }
-                        $format = $generator($filePath, $this->getMode($mode));
+                        $format = $generator($filePath, $mode);
                         if (!$format instanceof Format) {
                             throw new Exception('Invalid format returned from generator (' . Utils::getType($format) . ')');
                         }

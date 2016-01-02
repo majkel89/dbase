@@ -282,7 +282,7 @@ class FormatTest extends TestBase {
     public function testGetSupportedFormats() {
         $reflection = new ReflectionClass(self::CLS_FORMAT);
         $types = [];
-        $excludes = ['AUTO', 'FIELD_', 'HEADER_', 'NAME'];
+        $excludes = ['AUTO', 'FIELD_', 'HEADER_', 'NAME', 'RECORD_'];
         foreach ($reflection->getConstants() as $typeName => $typeValue) {
             $found = false;
             foreach ($excludes as $exclude) {
@@ -348,8 +348,8 @@ class FormatTest extends TestBase {
             . chr($date->format('m'))
             . chr($date->format('d'))                                // last update date
             . "\x04\x03\x02\x01"                                     // numer of records in the table
-            . "\x61\x00"                                             // bytes in header
-            . "\x20\x00"                                             // bytes in record
+            . "\x20\x00"                                             // bytes in header
+            . "\x61\x00"                                             // bytes in record
             . "\x01\x00\x00"                                         // reserved
             . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" // reserved
             . "\x00\x00\x00\x00";                                    // reserved
@@ -785,26 +785,160 @@ class FormatTest extends TestBase {
      * @covers ::getWriteRecordFormat
      */
     public function testGetWriteRecordFormat() {
-        $f1 = Field::create(Field::TYPE_LOGICAL)
-            ->setName('f1')
-            ->setLength(1);
-        $f2 = Field::create(Field::TYPE_CHARACTER)
-            ->setName('f2')
-            ->setLength(23);
-        $f3 = Field::create(Field::TYPE_MEMO)
-            ->setName('f3')
-            ->setLength(9);
-
         $header = new Header();
-        $header->addField($f1);
-        $header->addField($f2);
-        $header->addField($f3);
+        $header->addField(Field::create(Field::TYPE_LOGICAL)->setName('f1')->setLength(1));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)->setName('f2')->setLength(23));
+        $header->addField(Field::create(Field::TYPE_MEMO)->setName('f3')->setLength(9));
 
         $format = $this->getFormatMock()
             ->getHeader($header)
             ->new();
 
-        self::assertSame('Ca1a23a9', $this->reflect($format)->getWriteRecordFormat());
+        self::assertSame('aA1A23A9', $this->reflect($format)->getWriteRecordFormat());
     }
 
+    /**
+     * @covers ::serializeRecord
+     */
+    public function testSerializeRecord() {
+        $header = new Header();
+        $header->addField(Field::create(Field::TYPE_LOGICAL)
+            ->setName('f1')->setLength(1));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)
+            ->setName('f2')->setLength(3));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)
+            ->setName('f3')->setLength(3));
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->new();
+
+        $record = new Record([
+            'f1' => true,
+            'f2' => 'ab',
+            'f3' => 'x234',
+        ]);
+        $record->setDeleted(true);
+
+        $actual = $this->reflect($format)->serializeRecord($record);
+
+        self::assertSame("*Tab x23", $actual);
+    }
+
+    /**
+     * @covers ::serializeRecord
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage This feature is not yet implemented!
+     */
+    public function testSerializeRecordMemo() {
+        $header = new Header();
+        $header->addField(Field::create(Field::TYPE_MEMO)
+            ->setName('f1')->setLength(1));
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->new();
+
+        $this->reflect($format)->serializeRecord(new Record([
+            'f1' => 123,
+        ]));
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsert() {
+        $header = new Header();
+        $header->setRecordsCount(3);
+
+        $record = new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(-1, SEEK_END);
+        $file->expects(self::once())->method('fwrite')->with("<RECORD>\x1A");
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->getFile($file)
+            ->new();
+
+        $newIndex = $format->insert($record);
+
+        self::assertSame(3, $newIndex);
+        self::assertSame(4, $header->getRecordsCount());
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsertTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->serializeRecord()
+            ->getFile($this->getFileMock()->new())
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->insert(new Record());
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdate() {
+        $header = new Header();
+        $header->setRecordSize(12);
+        $header->setHeaderSize(23);
+        $header->setRecordsCount(3);
+
+        $record = new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(23 + 2 * 12);
+        $file->expects(self::once())->method('fwrite')->with('<RECORD>');
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->getFile($file)
+            ->new();
+
+        $format->update(2, $record);
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdateTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->serializeRecord('<RECORD>')
+            ->getFile($this->getFileMock())
+            ->getReadBoundaries(0)
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->update(2, new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]));
+    }
 }

@@ -29,6 +29,10 @@ abstract class Format {
     const HEADER_FORMAT = 'Cv/C3d/Vn/vhs/vrs/vr1/Ct';
     const FIELD_FORMAT = 'A11n/a1t/Vrr1/Cll/Cdd/vrr2/Cwa/vrr3/Csff/Crr4';
 
+    const RECORD_END     = "\x1A";
+    const RECORD_DELETED = "\x2A";
+    const RECORD_ACTIVE  = "\x20";
+
     /** @var \SplFileObject File handle */
     protected $file;
     /** @var \SplFileObject File handle */
@@ -249,7 +253,7 @@ abstract class Format {
         $header = $this->getHeader();
         $header->setPendingTransaction($currentHeader->isPendingTransaction());
         $header->setLastUpdate($currentHeader->getLastUpdate());
-        $header->setRecordsCount($currentHeader->getRecordsCount());
+        $header->setRecordsCount(max($header->getRecordsCount(), $currentHeader->getRecordsCount()));
         return $header->isPendingTransaction();
     }
 
@@ -321,7 +325,7 @@ abstract class Format {
         list($offset) = $this->getReadBoundaries($index, 0);
         $file = $this->getFile();
         $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
-        $file->fwrite($deleted ? "\x2A" : "\x20");
+        $file->fwrite($deleted ? self::RECORD_DELETED : self::RECORD_ACTIVE);
     }
 
     /**
@@ -329,42 +333,67 @@ abstract class Format {
      */
     protected function getWriteRecordFormat() {
         if (is_null($this->writeRecordFormat)) {
-            $this->writeRecordFormat = 'C';
+            $this->writeRecordFormat = 'a';
             foreach ($this->getHeader()->getFields() as $i => $field) {
-                $this->writeRecordFormat .= 'a' . $field->getLength();
+                $this->writeRecordFormat .= 'A' . $field->getLength();
             }
         }
         return $this->writeRecordFormat;
     }
 
     /**
-     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
+     * @param \org\majkel\dbase\Record $data
+     * @return string
+     * @throws \org\majkel\dbase\Exception
+     */
+    protected function serializeRecord(Record $data) {
+        $format = $this->getWriteRecordFormat();
+        $params = [$format, $data->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
+        foreach ($this->getHeader()->getFields() as $name => $field) {
+            if ($field->isMemoEntry()) {
+                throw new Exception("This feature is not yet implemented!");
+            }
+            $params[$name] = $field->serialize($data->$name);
+        }
+        return call_user_func_array('pack', $params);
+    }
+
+    /**
+     * @param \org\majkel\dbase\Record $data
      * @return integer
      */
-    public function insert($data) {
+    public function insert(Record $data) {
         $header = $this->getHeader();
-        $newIndex = $header->getRecordsCount();
+        $newIndex = (integer) $header->getRecordsCount();
         $header->setRecordsCount($newIndex + 1);
-        $this->writeHeader();
-        $format = $this->getRecordFormat();
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+
         $file = $this->getFile();
-        $file->fseek(0, SEEK_END);
-        $DATA = call_user_func_array('pack', array_merge([$format], $data));
-        $file->fwrite($DATA);
+        $file->fseek(-1, SEEK_END);
+        $data->setDeleted(false);
+        $file->fwrite($this->serializeRecord($data) . self::RECORD_END);
         return $newIndex;
     }
 
     /**
      * @param integer $index
-     * @param \org\majkel\dbase|\ArrayAccess|array $data
+     * @param \org\majkel\dbase\Record $data
      * @return void
      */
-    public function update($index, $data) {
-        $this->writeHeader();
-        list($offset) = $this->getReadBoudries($index, 0);
+    public function update($index, Record $data) {
+        list($offset) = $this->getReadBoundaries($index, 0);
+
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+
         $file = $this->getFile();
-        $file->fseek($offset * $this->getHeader()->getRecordSize());
-        // .. store data .. //
+        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+
+        $data = $this->serializeRecord($data);
+        $file->fwrite($data);
     }
 
     /**
@@ -389,8 +418,8 @@ abstract class Format {
             (integer) $date->format('m'),
             (integer) $date->format('d'),
             $header->getRecordsCount(),
-            $header->getRecordSize(),
             $header->getHeaderSize(),
+            $header->getRecordSize(),
             $header->isPendingTransaction()
         );
         $file->fwrite($data);

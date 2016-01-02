@@ -37,6 +37,43 @@ class DBase3Test extends TestBase {
      * @medium
      * @coversNothing
      */
+    public function testCopyRecords() {
+        $sourceFile = 'tests/fixtures/simple3.dbf';
+        $destinationFile = 'tests/fixtures/simple3.dbf.copy';
+
+        copy($sourceFile, $destinationFile);
+
+        $source = new Table($sourceFile);
+        $destination = new Table($destinationFile, Table::MODE_READWRITE);
+
+        $destination->beginTransaction();
+
+        foreach ($source as $sourceRecord) {
+            $destination->insert($sourceRecord);
+        }
+
+        $destination->endTransaction();
+
+        self::assertSame(
+            2 * $source->getRecordsCount(),
+            $destination->getRecordsCount()
+        );
+
+        $destination = null;
+
+        $destinationFile2 = 'tests/fixtures/simple3.dbf.2.copy';
+        copy($destinationFile, $destinationFile2);
+        $final = new Table($destinationFile2);
+        foreach ($final as $record) {
+            $record = $record;
+        }
+        self::assertSame(2 * $source->getRecordsCount(), $final->getRecordsCount());
+    }
+
+    /**
+     * @medium
+     * @coversNothing
+     */
     public function testReadLongFile() {
         $results = [];
         $dbf = new Table('tests/fixtures/producents.dbf');
@@ -44,28 +81,6 @@ class DBase3Test extends TestBase {
             $results[$index] = $record->SL_PROD;
         }
         self::assertCount(7356, $results);
-    }
-
-    /**
-     * @test
-     * @medium
-     * @coversNothing
-     */
-    public function testcCopyRecords() {
-        $sourceFile = 'tests/fixtures/dBase3.dbf';
-        $destFile = 'tests/fixtures/dBase3.dbf.copy';
-
-        if (file_exists($destFile)) {
-            unlink($destFile);
-        }
-        copy($sourceFile, $destFile);
-
-        $source = new Table($sourceFile);
-        $dest = new Table($destFile, Table::MODE_READWRITE);
-
-        foreach ($source as $sourceRecord) {
-            $dest->insert($sourceRecord);
-        }
     }
 
 }

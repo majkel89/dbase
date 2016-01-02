@@ -411,8 +411,38 @@ class TableTest extends TestBase {
     /**
      * @covers ::insert
      */
-    public function testInsert() {
-        $this->formatProxyTest('insert', 'INDEX', ['DATA']);
+    public function testInsertRemovedRecord() {
+        $record = new Record();
+        $record->setDeleted(true);
+
+        $format = $this->getFormatMock()
+            ->insert([self::anything()], true, self::once())
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->new();
+
+        $table->insert($record);
+
+        self::assertTrue($record->isDeleted());
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsertArray() {
+        $record = [];
+
+        $format = $this->getFormatMock()
+            ->insert([self::anything()], true, self::once())
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->new();
+
+        $table->insert($record);
     }
 
     /**

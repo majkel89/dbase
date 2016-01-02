@@ -91,27 +91,31 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * Stores record in database
      * @param integer $index
-     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
+     * @param \org\majkel\dbase\Record|\Traversable|array $data
      * @return void
      */
     public function update($index, $data) {
+        if (!$data instanceof Record) {
+            $data = new Record(Utils::toArray($data));
+        }
         $this->getFormat()->update($index, $data);
         // update buffer to reflect current changes
         if (isset($this->buffer[$index])) {
-            if ($data instanceof Record) {
-                $this->buffer[$index] = $data;
-            } else {
-                $this->buffer[$index] = new Record($data);
-            }
+            $this->buffer[$index] = $data;
         }
     }
 
     /**
      * Adds new record to database
-     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
+     * @param \org\majkel\dbase\Record|\Traversable|array $data
      * @return integer index of new record
      */
     public function insert($data) {
+        if ($data instanceof Record) {
+            $data = clone $data;
+        } else {
+            $data = new Record(Utils::toArray($data));
+        }
         return $this->getFormat()->insert($data);
     }
 
