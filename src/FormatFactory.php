@@ -46,7 +46,7 @@ class FormatFactory {
     }
 
     /**
-     * Returns all avileable formats
+     * Returns all available formats
      * @return callable[]
      */
     public function getFormats() {
@@ -67,7 +67,7 @@ class FormatFactory {
     }
 
     /**
-     * Unregisteres format
+     * Unregisters format
      * @param string $name
      * @return \org\majkel\dbase\FormatFactory
      */

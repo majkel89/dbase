@@ -156,6 +156,7 @@ abstract class Format {
     }
 
     /**
+     * @param string $ext
      * @return string
      */
     protected function getMemoFilePath($ext) {
