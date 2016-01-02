@@ -9,6 +9,7 @@
 namespace org\majkel\dbase;
 
 use DateTime;
+use Exception as StdException;
 
 /**
  * Implements how to read / write header / record(s)
@@ -101,9 +102,9 @@ abstract class Format {
     /**
      * @param integer $index
      * @param integer $length
-     * @param string[] $columns
-     * @return Record[]
-     * @throws Exception
+     * @return \org\majkel\dbase\Record[]
+     * @throws \org\majkel\dbase\Exception
+     * @internal param \string[] $columns
      */
     public function getRecords($index, $length) {
         list($start, $stop) = $this->getReadBoudries($index, $length);
@@ -217,10 +218,29 @@ abstract class Format {
     }
 
     /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function isTransaction() {
+        if ($this->transaction) {
+            return true;
+        }
+        $this->getFile()->flock(LOCK_EX);
+        try {
+            $isTransaction = $this->checkIfTransaction();
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
+        $this->getFile()->flock(LOCK_UN);
+        return $isTransaction;
+    }
+
+    /**
      * @return HeaderInterface
      * @return boolean
      */
-    public function checkPendingTransaction() {
+    protected function checkIfTransaction() {
         $currentHeader = $this->readHeader();
         $header = $this->getHeader();
         $header->setPendingTransaction($currentHeader->isPendingTransaction());

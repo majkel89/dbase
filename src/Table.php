@@ -98,7 +98,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
         $this->getFormat()->update($index, $data);
         // update buffer to reflect current changes
         if (isset($this->buffer[$index])) {
-            if ($data instanceof Record && $data !== $this->buffer[$index]) {
+            if ($data instanceof Record) {
                 $this->buffer[$index] = $data;
             } else {
                 $this->buffer[$index] = new Record($data);
@@ -131,8 +131,8 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * @return boolean
      */
-    public function checkPendingTransaction() {
-        return $this->getFormat()->checkPendingTransaction();
+    public function isTransaction() {
+        return $this->getFormat()->isTransaction();
     }
 
     /**
