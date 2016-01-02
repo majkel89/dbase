@@ -109,7 +109,7 @@ class FormatTest extends TestBase {
     /**
      * @return array
      */
-    public function dataGetReadBoudries() {
+    public function dataGetReadBoundaries() {
         return [
             [ 0,  1, 10, 0, 1],
             [-1,  1, 10, 0, 1],
@@ -118,17 +118,17 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @covers ::getReadBoudries
-     * @dataProvider dataGetReadBoudries
+     * @covers ::getReadBoundaries
+     * @dataProvider dataGetReadBoundaries
      */
-    public function testGetReadBoudries($index, $length, $records, $expectedStart, $expectedStop) {
+    public function testGetReadBoundaries($index, $length, $records, $expectedStart, $expectedStop) {
         $header = $this->getHeaderMock()
             ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
             ->new();
-        list($start, $stop) = $this->reflect($format)->getReadBoudries($index, $length);
+        list($start, $stop) = $this->reflect($format)->getReadBoundaries($index, $length);
         self::assertSame($expectedStart, $start);
         self::assertSame($expectedStop, $stop);
     }
@@ -136,7 +136,7 @@ class FormatTest extends TestBase {
     /**
      * @return array
      */
-    public function dataGetReadBoudriesException() {
+    public function dataGetReadBoundariesException() {
         return [
             [0, 1, 0],
             [1, 1, 1],
@@ -144,18 +144,18 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @covers ::getReadBoudries
+     * @covers ::getReadBoundaries
      * @expectedException \org\majkel\dbase\Exception
-     * @dataProvider dataGetReadBoudriesException
+     * @dataProvider dataGetReadBoundariesException
      */
-    public function testGetReadBoudriesException($index, $length, $records) {
+    public function testGetReadBoundariesException($index, $length, $records) {
         $header = $this->getHeaderMock()
             ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
             ->new();
-        $this->reflect($format)->getReadBoudries($index, $length);
+        $this->reflect($format)->getReadBoundaries($index, $length);
     }
 
     /**
@@ -171,7 +171,7 @@ class FormatTest extends TestBase {
             ->getHeaderSize(12, self::once())
             ->new();
         $format = $this->getFormatMock()
-            ->getReadBoudries([2, 2], [2, 4], self::once())
+            ->getReadBoundaries([2, 2], [2, 4], self::once())
             ->getFile($file, self::once())
             ->getRecordFormat('a7x', self::once())
             ->getHeader($header)
@@ -421,7 +421,7 @@ class FormatTest extends TestBase {
     /**
      * @test
      * @covers ::getMemoFile
-     * @expectedException org\majkel\dbase\Exception
+     * @expectedException \org\majkel\dbase\Exception
      */
     public function testGetMemoFileNoMemo() {
         $format = $this->getFormatMock()

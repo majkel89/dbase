@@ -104,10 +104,9 @@ abstract class Format {
      * @param integer $length
      * @return \org\majkel\dbase\Record[]
      * @throws \org\majkel\dbase\Exception
-     * @internal param \string[] $columns
      */
     public function getRecords($index, $length) {
-        list($start, $stop) = $this->getReadBoudries($index, $length);
+        list($start, $stop) = $this->getReadBoundaries($index, $length);
         $file = $this->getFile();
         $rSz = $this->getHeader()->getRecordSize();
         $file->fseek($this->getHeader()->getHeaderSize() + $start * $rSz);
@@ -141,7 +140,7 @@ abstract class Format {
      * @return array [$index, $stop]
      * @throws \org\majkel\dbase\Exception
      */
-    protected function getReadBoudries($index, $length) {
+    protected function getReadBoundaries($index, $length) {
         $totalRecords = $this->getHeader()->getRecordsCount();
         if ($index < 0) {
             $index = 0;
