@@ -451,13 +451,24 @@ class TableTest extends TestBase {
     /**
      * @covers ::delete
      */
-    public function testDeleteCache() {
+    public function testDelete() {
+        $format = $this->mock(self::CLS)
+            ->markDeleted([1, true], self::once())
+            ->new();
+        $format->delete(1);
+    }
+
+    /**
+     * @covers ::markDeleted
+     */
+    public function testMarkDeletedCache() {
         $record = new Record();
         $record->x = 1;
 
         $format = $this->getFormatMock()
             ->getRecords([22, 1], [22 => $record], self::once())
-            ->delete([22], null, self::once())
+            ->markDeleted([22, true], null, self::at(0))
+            ->markDeleted([22, false], null, self::at(1))
             ->new();
 
         $table = $this->mock(self::CLS)
@@ -468,9 +479,12 @@ class TableTest extends TestBase {
             ->new();
 
         self::assertSame($record, $table->getRecord(22));
-        $table->delete(22);
+        $table->markDeleted(22, true);
 
         self::assertTrue($table->getRecord(22)->isDeleted());
+
+        $table->markDeleted(22, false);
+        self::assertFalse($table->getRecord(22)->isDeleted());
     }
 
 }

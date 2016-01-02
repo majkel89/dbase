@@ -309,14 +309,17 @@ abstract class Format {
 
     /**
      * @param integer $index
-     * @return void
+     * @param boolean $deleted
+     * @throws \org\majkel\dbase\Exception
      */
-    public function delete($index) {
-        $this->writeHeader();
-        list($offset) = $this->getReadBoudries($index, 0);
+    public function markDeleted($index, $deleted) {
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+        list($offset) = $this->getReadBoundaries($index, 0);
         $file = $this->getFile();
-        $file->fseek($offset * $this->getHeader()->getRecordSize() + 11 + 1 + 1 + 11);
-        $file->fwrite("\x2A");
+        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+        $file->fwrite($deleted ? "\x2A" : "\x20");
     }
 
     /**

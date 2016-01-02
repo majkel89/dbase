@@ -116,16 +116,23 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
+     * @param integer $index
+     * @param boolean $deleted
+     */
+    public function markDeleted($index, $deleted) {
+        $this->getFormat()->markDeleted($index, $deleted);
+        if (isset($this->buffer[$index])) {
+            $this->buffer[$index]->setDeleted($deleted);
+        }
+    }
+
+    /**
      * Marks record as deleted
      * @param integer $index
      * @return void
      */
     public function delete($index) {
-        $this->getFormat()->delete($index);
-        // update buffer to reflect current changes
-        if (isset($this->buffer[$index])) {
-            $this->buffer[$index]->setDeleted(true);
-        }
+        $this->markDeleted($index, true);
     }
 
     /**

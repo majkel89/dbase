@@ -730,4 +730,54 @@ class FormatTest extends TestBase {
 
         $format->endTransaction();
     }
+
+    /**
+     * @return array
+     */
+    public function dataMarkDeleted() {
+        return [
+            [true, "\x2A"],
+            [false, "\x20"],
+        ];
+    }
+
+    /**
+     * @dataProvider dataMarkDeleted
+     * @covers ::markDeleted
+     */
+    public function testMarkDeleted($deleted, $char) {
+        $header = new Header();
+        $header->setRecordSize(10);
+        $header->setHeaderSize(32);
+        $header->setRecordsCount(3);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(32 + 2 * 10);
+        $file->expects(self::once())->method('fwrite')->with($char);
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->getFile($file)
+            ->new();
+
+        $format->markDeleted(2, $deleted);
+    }
+
+    /**
+     * @covers ::markDeleted
+     */
+    public function testMarkDeletedTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->getFile($this->getFileMock())
+            ->getReadBoundaries(0)
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->markDeleted(2, true);
+    }
 }
