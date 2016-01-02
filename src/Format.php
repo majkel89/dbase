@@ -356,7 +356,7 @@ abstract class Format {
      * @return string
      */
     protected function getWriteHeaderFormat() {
-        return 'C4Vvvva18';
+        return 'C4Vvvv@32';
     }
 
     /**
@@ -376,8 +376,8 @@ abstract class Format {
             $header->getRecordsCount(),
             $header->getRecordSize(),
             $header->getHeaderSize(),
-            $header->isPendingTransaction(),
-        '');
+            $header->isPendingTransaction()
+        );
         $file->fwrite($data);
     }
 
