@@ -780,4 +780,31 @@ class FormatTest extends TestBase {
         $this->reflect($format)->transaction = true;
         $format->markDeleted(2, true);
     }
+
+    /**
+     * @covers ::getWriteRecordFormat
+     */
+    public function testGetWriteRecordFormat() {
+        $f1 = Field::create(Field::TYPE_LOGICAL)
+            ->setName('f1')
+            ->setLength(1);
+        $f2 = Field::create(Field::TYPE_CHARACTER)
+            ->setName('f2')
+            ->setLength(23);
+        $f3 = Field::create(Field::TYPE_MEMO)
+            ->setName('f3')
+            ->setLength(9);
+
+        $header = new Header();
+        $header->addField($f1);
+        $header->addField($f2);
+        $header->addField($f3);
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->new();
+
+        self::assertSame('Ca1a23a9', $this->reflect($format)->getWriteRecordFormat());
+    }
+
 }

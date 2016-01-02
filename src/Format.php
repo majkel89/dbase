@@ -41,6 +41,8 @@ abstract class Format {
     protected $mode;
     /** @var boolean */
     protected $transaction = false;
+    /** @var string */
+    protected $writeRecordFormat;
 
     /**
      * @param string $filePath
@@ -323,7 +325,20 @@ abstract class Format {
     }
 
     /**
-     * @param \org\majkel\dbase|\ArrayAccess|array $data
+     * @return string
+     */
+    protected function getWriteRecordFormat() {
+        if (is_null($this->writeRecordFormat)) {
+            $this->writeRecordFormat = 'C';
+            foreach ($this->getHeader()->getFields() as $i => $field) {
+                $this->writeRecordFormat .= 'a' . $field->getLength();
+            }
+        }
+        return $this->writeRecordFormat;
+    }
+
+    /**
+     * @param \org\majkel\dbase\Record|\ArrayAccess|array $data
      * @return integer
      */
     public function insert($data) {
