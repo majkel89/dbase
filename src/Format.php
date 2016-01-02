@@ -218,7 +218,7 @@ abstract class Format {
      * @return HeaderInterface
      * @return boolean
      */
-    protected function checkPendingTransaction() {
+    public function checkPendingTransaction() {
         $currentHeader = $this->readHeader();
         $header = $this->getHeader();
         $header->setPendingTransaction($currentHeader->isPendingTransaction());
