@@ -18,4 +18,6 @@ install:
     - composer self-update
     - composer install -o --dev
 
-script: ./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml
+script:
+    - ./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml
+    - bash build/run_benchmarks.sh

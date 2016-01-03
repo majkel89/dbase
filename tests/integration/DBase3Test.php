@@ -64,10 +64,13 @@ class DBase3Test extends TestBase {
         $destinationFile2 = 'tests/fixtures/simple3.dbf.2.copy';
         copy($destinationFile, $destinationFile2);
         $final = new Table($destinationFile2);
+        $records = 0;
         foreach ($final as $record) {
-            $record = $record;
+            self::assertFalse(empty($record->F1));
+            $records += 1;
         }
         self::assertSame(2 * $source->getRecordsCount(), $final->getRecordsCount());
+        self::assertSame($final->getRecordsCount(), $records);
     }
 
     /**
