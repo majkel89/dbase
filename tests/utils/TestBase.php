@@ -28,6 +28,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     const CLS_FORMAT = '\org\majkel\dbase\Format';
     const CLS_FORMAT_FACTORY = '\org\majkel\dbase\FormatFactory';
     const CLS_SPLFILEOBJECT = '\org\majkel\dbase\tests\utils\SplFileObjectMock';
+    const CLS_MEMO = '\org\majkel\dbase\memo\MemoInterface';
 
     /**
      * @return MockWriter

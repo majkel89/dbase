@@ -526,6 +526,7 @@ abstract class Format {
             if ($field->isLoad()) {
                 $value = $data['f'.$name];
                 if ($field->isMemoEntry()) {
+                    $record->setMemoEntryId($name, $value);
                     $value = $this->readMemoEntry($value);
                 }
                 $record[$name] = $field->unserialize($value);

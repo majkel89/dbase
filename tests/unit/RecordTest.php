@@ -55,4 +55,15 @@ class RecordTest extends TestBase {
             'b' => 2,
         ], $record->toArray());
     }
+
+    /**
+     * @covers ::getMemoEntryId
+     * @covers ::setMemoEntryId
+     */
+    public function testMemoEntries() {
+        $record = new Record();
+        self::assertNull($record->getMemoEntryId('field'));
+        $record->setMemoEntryId('field', 123);
+        self::assertSame(123, $record->getMemoEntryId('field'));
+    }
 }

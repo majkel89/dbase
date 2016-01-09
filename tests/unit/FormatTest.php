@@ -328,6 +328,7 @@ class FormatTest extends TestBase {
         self::assertTrue($record instanceof Record);
         self::assertTrue($record->isDeleted());
         self::assertSame(['FF1' => 'field1'], $record->toArray());
+        self::assertSame(123, $record->getMemoEntryId('FF1'));
     }
 
     /**

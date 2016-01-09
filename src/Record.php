@@ -21,6 +21,9 @@ class Record extends ArrayObject {
 
     const FLAG_DELETED = 1;
 
+    /** @var integer[] [$fieldName => $entryId] */
+    private $memoEntries;
+
     /**
      * @param array $array
      */
@@ -49,5 +52,21 @@ class Record extends ArrayObject {
      */
     public function toArray() {
         return $this->getArrayCopy();
+    }
+
+    /**
+     * @param string $name
+     * @return integer|null
+     */
+    public function getMemoEntryId($name) {
+        return isset($this->memoEntries[$name]) ? $this->memoEntries[$name] : null;
+    }
+
+    /**
+     * @param string $name
+     * @param integer $entryId
+     */
+    public function setMemoEntryId($name, $entryId) {
+        $this->memoEntries[$name] = (integer) $entryId;
     }
 }
