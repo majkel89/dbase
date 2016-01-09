@@ -828,21 +828,33 @@ class FormatTest extends TestBase {
 
     /**
      * @covers ::serializeRecord
-     * @expectedException \org\majkel\dbase\Exception
-     * @expectedExceptionMessage This feature is not yet implemented!
      */
     public function testSerializeRecordMemo() {
         $header = new Header();
-        $header->addField(Field::create(Field::TYPE_MEMO)
-            ->setName('f1')->setLength(1));
+        $header->addField(
+            Field::create(Field::TYPE_MEMO)
+                ->setName('f1')
+                ->setLength(9)
+        );
+
+        $memoFile = $this->mock(self::CLS_MEMO)
+            ->getFileInfo()
+            ->getEntry()
+            ->setEntry([123, "Some text\x1A\x1A"], 124, self::once())
+            ->new();
 
         $format = $this->getFormatMock()
+            ->getMemoFile($memoFile)
             ->getHeader($header)
             ->new();
 
-        $this->reflect($format)->serializeRecord(new Record([
-            'f1' => 123,
-        ]));
+        $record = new Record();
+        $record->f1 = 'Some text';
+        $record->setMemoEntryId('f1', 123);
+
+        $actual = $this->reflect($format)->serializeRecord($record);
+        self::assertSame(' 124      ', $actual);
+        self::assertSame(124, $record->getMemoEntryId('f1'));
     }
 
     /**

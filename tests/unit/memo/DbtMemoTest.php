@@ -35,8 +35,9 @@ class DbtMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      * @dataProvider dataGetEntryInvalidEntryId
-     * @expectedException org\majkel\dbase\Exception
+     * @expectedException \org\majkel\dbase\Exception
      */
     public function testGetEntryInvalidEntryId($entryId) {
         $mockedFile = $this->getFileMock()
@@ -63,6 +64,7 @@ class DbtMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      * @dataProvider dataGetEntry
      */
     public function testGetEntry($entryId) {
@@ -72,9 +74,68 @@ class DbtMemoTest extends TestBase {
                 ->fread([512], 'DATA', self::once())
                 ->new();
         $mock = $this->mock(self::CLS)
-                ->getFile([], $mockedFile, self::once())
+                ->getFile($mockedFile)
                 ->new();
         self::assertSame('DATA', $mock->getEntry($entryId));
     }
 
+    /**
+     * @covers ::setEntry
+     * @covers ::gotoEntry
+     */
+    public function testSetEntry() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite', 'getSize'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn(2048);
+        $file->expects(self::once())->method('fseek')->with(3 * 512);
+        $file->expects(self::once())->method('fwrite')->with(pack('a3@512', '123'));
+
+        $mock = $this->mock(self::CLS)
+            ->getFile($file)
+            ->new();
+
+        self::assertSame(3, $mock->setEntry(3, '123'));
+    }
+
+    /**
+     * @covers ::setEntry
+     * @covers ::gotoEntry
+     */
+    public function testSetEntryNew() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite', 'getSize'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn(2048);
+        $file->expects(self::once())->method('fseek')->with(0, SEEK_END);
+        $file->expects(self::once())->method('fwrite')->with(pack('a3@512', '123'));
+
+        $mock = $this->mock(self::CLS)
+            ->getFile($file)
+            ->new();
+
+        self::assertSame(4, $mock->setEntry(null, '123'));
+    }
+
+    /**
+     * @covers ::setEntry
+     * @covers ::gotoEntry
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Unable to move to block `55`
+     */
+    public function testSetEntryInvalid() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['getSize'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn(2048);
+
+        $mock = $this->mock(self::CLS)
+            ->getFile($file)
+            ->new();
+
+        self::assertSame(3, $mock->setEntry(55, '123'));
+    }
 }

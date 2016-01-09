@@ -342,18 +342,22 @@ abstract class Format {
     }
 
     /**
-     * @param \org\majkel\dbase\Record $data
+     * @param \org\majkel\dbase\Record $record
      * @return string
      * @throws \org\majkel\dbase\Exception
      */
-    protected function serializeRecord(Record $data) {
-        $format = $this->getWriteRecordFormat();
-        $params = [$format, $data->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
+    protected function serializeRecord(Record $record) {
+        $params = [$this->getWriteRecordFormat(), $record->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
         foreach ($this->getHeader()->getFields() as $name => $field) {
             if ($field->isMemoEntry()) {
-                throw new Exception("This feature is not yet implemented!");
+                $params[$name] = $this->getMemoFile()->setEntry(
+                    $record->getMemoEntryId($name),
+                    $field->serialize($record->$name)
+                );
+                $record->setMemoEntryId($name, $params[$name]);
+            } else {
+                $params[$name] = $field->serialize($record->$name);
             }
-            $params[$name] = $field->serialize($data->$name);
         }
         return call_user_func_array('pack', $params);
     }
