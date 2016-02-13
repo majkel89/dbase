@@ -186,7 +186,7 @@ class FormatTest extends TestBase {
      */
     public function testGetMemo() {
         $format = $this->getFormatMock()->new();
-        $memo = $this->getMemoMock()->new();
+        $memo = $this->getMemoObject();
         $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
             ->getMemoForDbf([$format], $memo, self::once())
             ->new();
