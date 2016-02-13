@@ -30,14 +30,12 @@ class MemoFactoryTest extends TestBase {
     public function testRegister() {
         $memoFactory = new MemoFactory();
         self::assertCount(0, $memoFactory->getFormats());
-        $memoFactory->registerFormat('txt', function () {
-        });
-        self::assertCount(1, $memoFactory->getFormats());
-        $memoFactory->registerFormat('www', function () {
-        });
-        self::assertCount(2, $memoFactory->getFormats());
+        $memoFactory->registerFormat('txt', '\stdClass');
+        self::assertSame(['txt' => '\stdClass'], $memoFactory->getFormats());
+        $memoFactory->registerFormat('www', '\stdClass2');
+        self::assertSame(['txt' => '\stdClass', 'www' => '\stdClass2'], $memoFactory->getFormats());
         $memoFactory->unregisterFormat('txt');
-        self::assertCount(1, $memoFactory->getFormats());
+        self::assertSame(['www' => '\stdClass2'], $memoFactory->getFormats());
     }
 
     /**
@@ -143,8 +141,7 @@ class MemoFactoryTest extends TestBase {
             ->new();
         $memo = new \stdClass();
         $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
-            ->getFormats([], ['XX' => function(){
-            }])
+            ->getFormats([], ['XX' => '\stdClass'])
             ->getMemoPathForDbf([$format, 'XX'], __FILE__, self::once())
             ->getMemo([__FILE__, 'rx', 'XX'], $memo, self::once())
             ->new();

@@ -15,19 +15,19 @@ namespace org\majkel\dbase;
  */
 class MemoFactory {
 
-    /** @var callable[] [ext => generator, ...] */
+    /** @var string[] [ext => memo class name, ...] */
     private $formats = [];
 
     /** @var \org\majkel\dbase\MemoFactory */
     private static $instance;
 
     /**
-     * @param string    $ext
-     * @param callable $generator
+     * @param string $ext
+     * @param string $className
      * @return void
      */
-    public function registerFormat($ext, callable $generator) {
-        $this->formats[$ext] = $generator;
+    public function registerFormat($ext, $className) {
+        $this->formats[$ext] = $className;
     }
 
     /**
@@ -39,7 +39,7 @@ class MemoFactory {
     }
 
     /**
-     * @return \callable[]
+     * @return string[]
      */
     public function getFormats() {
         return $this->formats;
@@ -91,7 +91,7 @@ class MemoFactory {
         }
         $formats = $this->getFormats();
         if (isset($formats[$ext])) {
-            return $formats[$ext]($path, $mode);
+            return new $formats[$ext]($path, $mode);
         }
         throw new Exception("Unable to determine memo format");
     }
@@ -101,12 +101,8 @@ class MemoFactory {
      */
     public function initializeFormats() {
         $this->formats = [];
-        $this->registerFormat('dbt', function($path, $mode){
-            return new memo\DbtMemo($path, $mode);
-        });
-        $this->registerFormat('fpt', function ($path, $mode) {
-            return new memo\FptMemo($path, $mode);
-        });
+        $this->registerFormat('dbt', '\org\majkel\dbase\memo\DbtMemo');
+        $this->registerFormat('fpt', '\org\majkel\dbase\memo\FptMemo');
     }
 
     /**
