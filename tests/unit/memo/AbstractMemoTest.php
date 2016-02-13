@@ -27,7 +27,10 @@ class AbstractMemoTest extends TestBase {
      * @covers ::getFile
      */
     public function testGetFileInfo() {
-        $memoFile = $this->mock(self::CLS)->getEntry()->new(__FILE__, 'r');
+        $memoFile = $this->mock(self::CLS)
+            ->getEntry()
+            ->setEntry()
+            ->new(__FILE__, 'r');
         self::assertSame(__FILE__, $memoFile->getFileInfo()->getPathname());
     }
 
@@ -51,7 +54,10 @@ class AbstractMemoTest extends TestBase {
      * @dataProvider dataGetFilteredEntryId
      */
     public function testGetFilteredEntryId($entryId, $excepted) {
-        $memoFile = $this->reflect($this->mock(self::CLS)->getEntry()->new());
+        $memoFile = $this->reflect($this->mock(self::CLS)
+            ->getEntry()
+            ->setEntry()
+            ->new());
         self::assertSame($excepted, $memoFile->getFilteredEntryId($entryId));
     }
 

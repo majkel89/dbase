@@ -18,20 +18,22 @@
     "archive": {
         "exclude": ["vendor/", "tests/", "style/", "dumpContent.php",
             "bootstrap.php", "DEVELOP.md", "phpunit.xml", ".*", "build",
-            "*.zip", "*.tar", "phpunit.xml"]
+            "*.zip", "*.tar", "phpunit.xml", "benchmarks/"]
     },
     "require": {
     },
     "autoload": {
         "psr-4": {
             "org\\majkel\\dbase\\": "src/",
-            "org\\majkel\\dbase\\tests\\": "tests/"
+            "org\\majkel\\dbase\\tests\\": "tests/",
+            "org\\majkel\\dbase\\benchmarks\\": "benchmarks/"
         }
     },
     "require-dev": {
         "phpunit/phpunit": "4.7.*",
         "ptrofimov/xpmock": "1.*",
         "squizlabs/php_codesniffer": "2.*",
-        "symfony/yaml": "~2.1"
+        "symfony/yaml": "~2.1",
+        "athletic/athletic": "^0.1.8"
     }
 }

@@ -39,18 +39,19 @@ class FptMemo extends AbstractMemo {
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed $entryId
+     * @return integer
+     * @throws \org\majkel\dbase\Exception
      */
-    public function getEntry($entryId) {
+    private function gotoEntry($entryId) {
         $filteredEntryId = $this->getFilteredEntryId($entryId);
         $file = $this->getFile();
         $entryOffset = $filteredEntryId * $this->getBlockSize();
         if ($filteredEntryId < 0 || $entryOffset + self::BH_SZ > $file->getSize()) {
-            throw new Exception("Unable to read block `$entryId`");
+            throw new Exception("Unable to move to block `$entryId`");
         } else if ($filteredEntryId === 0) {
-            return '';
+            return [false, 0];
         }
-
         $file->fseek($entryOffset);
 
         $bh = $file->fread(self::BH_SZ);
@@ -59,10 +60,62 @@ class FptMemo extends AbstractMemo {
         if ($len < 0 || (0xFFFFFFFF !== -1 && $len >= 0xFFFFFFFF)) {
             throw new Exception("Invalid block length (negative size)");
         } else if ($len === 0) {
-            return '';
+            return [false, 0];
         }
 
-        return $file->fread($len);
+        return [$filteredEntryId, $len];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntry($entryId) {
+        list($entryId, $len) = $this->gotoEntry($entryId);
+        if ($entryId === false) {
+            return '';
+        }
+        return $this->getFile()->fread($len);
+    }
+
+    /**
+     * @param integer $dataLen
+     * @return integer
+     */
+    private function lenPaddedBlockSize($dataLen) {
+        $blockSize = $this->getBlockSize();
+        return ceil(max($dataLen + self::BH_SZ, 1) / $blockSize) * $blockSize;
+    }
+
+    /**
+     * @return integer
+     */
+    private function getEntitiesCount() {
+        return (integer) floor(($this->getFile()->getSize()) / $this->getBlockSize());
+    }
+
+    /**
+     * @param integer|null $entryId
+     * @param string       $data
+     * @return integer
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function setEntry($entryId, $data) {
+        $file = $this->getFile();
+        $dataLen = strlen($data);
+        if (is_null($entryId)) {
+            $file->fseek(0, SEEK_END);
+            $entryId = $this->getEntitiesCount();
+        } else {
+            list($entryId, $len) = $this->gotoEntry($entryId);
+            $total = $this->getEntitiesCount();
+            if ($this->lenPaddedBlockSize($len) < $dataLen + self::BH_SZ && $entryId < $total - 1) {
+                $file->fseek(0, SEEK_END);
+                $entryId = $total;
+            } else {
+                $file->fseek(-self::BH_SZ, SEEK_CUR);
+            }
+        }
+        $file->fwrite(pack('NNa' . $dataLen . '@' . $this->lenPaddedBlockSize($dataLen), 1, $dataLen, $data));
+        return $entryId;
+    }
 }

@@ -37,6 +37,46 @@ class DBase3Test extends TestBase {
      * @medium
      * @coversNothing
      */
+    public function testCopyRecords() {
+        $sourceFile = 'tests/fixtures/simple3.dbf';
+        $destinationFile = 'tests/fixtures/simple3.dbf.copy';
+
+        copy($sourceFile, $destinationFile);
+
+        $source = new Table($sourceFile);
+        $destination = new Table($destinationFile, Table::MODE_READWRITE);
+
+        $destination->beginTransaction();
+
+        foreach ($source as $sourceRecord) {
+            $destination->insert($sourceRecord);
+        }
+
+        $destination->endTransaction();
+
+        self::assertSame(
+            2 * $source->getRecordsCount(),
+            $destination->getRecordsCount()
+        );
+
+        $destination = null;
+
+        $destinationFile2 = 'tests/fixtures/simple3.dbf.2.copy';
+        copy($destinationFile, $destinationFile2);
+        $final = new Table($destinationFile2);
+        $records = 0;
+        foreach ($final as $record) {
+            self::assertFalse(empty($record->F1));
+            $records += 1;
+        }
+        self::assertSame(2 * $source->getRecordsCount(), $final->getRecordsCount());
+        self::assertSame($final->getRecordsCount(), $records);
+    }
+
+    /**
+     * @medium
+     * @coversNothing
+     */
     public function testReadLongFile() {
         $results = [];
         $dbf = new Table('tests/fixtures/producents.dbf');

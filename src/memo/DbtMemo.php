@@ -20,16 +20,43 @@ class DbtMemo extends AbstractMemo {
     const B_SZ = 512;
 
     /**
+     * @param integer $entryId
+     * @return int
+     * @throws \org\majkel\dbase\Exception
+     */
+    private function gotoEntry($entryId) {
+        $file = $this->getFile();
+        $filteredEntryId = $this->getFilteredEntryId($entryId);
+        if ($filteredEntryId < 0 || $filteredEntryId * self::B_SZ + self::B_SZ > $file->getSize()) {
+            throw new Exception("Unable to move to block `$entryId`");
+        }
+        $file->fseek($filteredEntryId * self::B_SZ);
+        return $filteredEntryId;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEntry($entryId) {
-        $filteredEntryId = $this->getFilteredEntryId($entryId);
-        $file = $this->getFile();
-        if ($filteredEntryId < 0 || $filteredEntryId * self::B_SZ + self::B_SZ > $file->getSize()) {
-            throw new Exception("Unable to read block `$entryId`");
-        }
-        $file->fseek($filteredEntryId * self::B_SZ);
-        return $file->fread(self::B_SZ);
+        $this->gotoEntry($entryId);
+        return $this->getFile()->fread(self::B_SZ);
     }
 
+    /**
+     * @param integer|null $entryId
+     * @param string       $data
+     * @return integer
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function setEntry($entryId, $data) {
+        $file = $this->getFile();
+        if (is_null($entryId)) {
+            $file->fseek(0, SEEK_END);
+            $entryId = $file->getSize() / self::B_SZ;
+        } else {
+            $entryId = $this->gotoEntry($entryId);
+        }
+        $file->fwrite(pack('a' . self::B_SZ, $data));
+        return $entryId;
+    }
 }

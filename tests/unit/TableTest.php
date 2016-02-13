@@ -37,6 +37,19 @@ class TableTest extends TestBase {
     }
 
     /**
+     * @param string $methodName
+     */
+    protected function formatProxyTest($methodName, $result = null, $additionalData = []) {
+        $format = $this->getFormatMock()
+            ->$methodName($additionalData, $result, self::once())
+            ->new();
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->new();
+        self::assertSame($result, call_user_func_array([$table, $methodName], $additionalData));
+    }
+
+    /**
      * @covers ::__construct
      * @covers ::getFormat
      */
@@ -372,6 +385,136 @@ class TableTest extends TestBase {
     public function testOffsetUnset() {
         $table = $this->mock(self::CLS)->new();
         self::assertSame('VALUE', $table->offsetUnset(333));
+    }
+
+    /**
+     * @covers ::isTransaction
+     */
+    public function testIsTransaction() {
+        $this->formatProxyTest('isTransaction', 'BOOLEAN');
+    }
+
+    /**
+     * @covers ::beginTransaction
+     */
+    public function testBeginTransaction() {
+        $this->formatProxyTest('beginTransaction');
+    }
+
+    /**
+     * @covers ::endTransaction
+     */
+    public function testEndTransaction() {
+        $this->formatProxyTest('endTransaction');
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsertRemovedRecord() {
+        $record = new Record();
+        $record->setDeleted(true);
+
+        $format = $this->getFormatMock()
+            ->insert([self::anything()], true, self::once())
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->new();
+
+        $table->insert($record);
+
+        self::assertTrue($record->isDeleted());
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsertArray() {
+        $record = [];
+
+        $format = $this->getFormatMock()
+            ->insert([self::anything()], true, self::once())
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->new();
+
+        $table->insert($record);
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdateCache() {
+        $originalField = new Record();
+        $originalField->x = 1;
+
+        $newRecord = clone $originalField;
+        $newRecord->x = 2;
+
+        $format = $this->getFormatMock()
+            ->getRecords([22, 1], [22 => $originalField], self::once())
+            ->update([22, $newRecord], null, self::once())
+            ->update([22, ['x' => 3]], null, self::once())
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->isValid(true)
+            ->offsetExists([22], true)
+            ->getBufferSize(1)
+            ->new();
+
+        self::assertSame($originalField, $table->getRecord(22));
+        $table->update(22, $newRecord);
+
+        self::assertSame($newRecord, $table->getRecord(22));
+
+        $table->update(22, ['x' => 3]);
+        self::assertNotSame($newRecord, $table->getRecord(22));
+        self::assertSame(3, $table->getRecord(22)->x);
+    }
+
+    /**
+     * @covers ::delete
+     */
+    public function testDelete() {
+        $format = $this->mock(self::CLS)
+            ->markDeleted([1, true], self::once())
+            ->new();
+        $format->delete(1);
+    }
+
+    /**
+     * @covers ::markDeleted
+     */
+    public function testMarkDeletedCache() {
+        $record = new Record();
+        $record->x = 1;
+
+        $format = $this->getFormatMock()
+            ->getRecords([22, 1], [22 => $record], self::once())
+            ->markDeleted([22, true], null, self::at(0))
+            ->markDeleted([22, false], null, self::at(1))
+            ->new();
+
+        $table = $this->mock(self::CLS)
+            ->getFormat($format)
+            ->isValid(true)
+            ->offsetExists([22], true)
+            ->getBufferSize(1)
+            ->new();
+
+        self::assertSame($record, $table->getRecord(22));
+        $table->markDeleted(22, true);
+
+        self::assertTrue($table->getRecord(22)->isDeleted());
+
+        $table->markDeleted(22, false);
+        self::assertFalse($table->getRecord(22)->isDeleted());
     }
 
 }

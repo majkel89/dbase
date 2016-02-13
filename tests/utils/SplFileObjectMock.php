@@ -60,7 +60,7 @@ class SplFileObjectMock implements RecursiveIterator, SeekableIterator {
 
     }
 
-    public function flock($operation, &$wouldblock) {
+    public function flock($operation, &$wouldblock = null) {
 
     }
 
@@ -96,7 +96,7 @@ class SplFileObjectMock implements RecursiveIterator, SeekableIterator {
 
     }
 
-    public function fwrite($str, $length) {
+    public function fwrite($str, $length = null) {
 
     }
 

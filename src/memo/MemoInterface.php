@@ -27,4 +27,11 @@ interface MemoInterface {
      */
     public function getEntry($entryId);
 
+    /**
+     * @param integer|null $entryId
+     * @param string       $data
+     * @return integer
+     */
+    public function setEntry($entryId, $data);
+
 }

@@ -8,6 +8,7 @@
 
 namespace org\majkel\dbase\memo;
 
+use org\majkel\dbase\Exception;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
@@ -35,15 +36,16 @@ class FptMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      * @dataProvider dataGetEntryInvalidEntryId
-     * @expectedException org\majkel\dbase\Exception
+     * @expectedException \org\majkel\dbase\Exception
      */
     public function testGetEntryInvalidEntryId($entryId) {
         $mockedFile = $this->getFileMock()
                 ->getSize(16)
                 ->new();
         $mock = $this->mock(self::CLS)
-                ->getFile([], $mockedFile)
+                ->getFile($mockedFile)
                 ->getBlockSize(8)
                 ->new();
         $mock->getEntry($entryId);
@@ -63,6 +65,7 @@ class FptMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      * @dataProvider dataGetEntry
      */
     public function testGetEntry($entryId, $expected) {
@@ -91,6 +94,7 @@ class FptMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      * @dataProvider dataGetEntryZero
      */
     public function testGetEntryZero($entryId) {
@@ -107,7 +111,8 @@ class FptMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
-     * @expectedException org\majkel\dbase\Exception
+     * @covers ::gotoEntry
+     * @expectedException \org\majkel\dbase\Exception
      */
     public function testGetEntryInvalidRecordSize() {
         $mockedFile = $this->getFileMock()
@@ -124,6 +129,7 @@ class FptMemoTest extends TestBase {
     /**
      * @test
      * @covers ::getEntry
+     * @covers ::gotoEntry
      */
     public function testGetEntryInvalidZeroSize() {
         $mockedFile = $this->getFileMock()
@@ -147,8 +153,140 @@ class FptMemoTest extends TestBase {
                 ->fread([2], "\x2\x1", self::once())
                 ->new();
         $mock = $this->mock(self::CLS)
-                ->getFile([], $mockedFile, self::once())
+                ->getFile($mockedFile)
                 ->new();
         self::assertSame(513, $this->reflect($mock)->getBlockSize());
+    }
+
+    /**
+     * Adds new entry
+     * @covers ::setEntry
+     * @covers ::getEntitiesCount
+     * @covers ::lenPaddedBlockSize
+     */
+    public function testSetEntryNew() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'getSize', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(0, SEEK_END);
+        $file->expects(self::any())->method('getSize')->willReturn(3 * 16);
+        $file->expects(self::once())->method('fwrite')->with(
+            "\x00\x00\x00\x01" . //type
+            "\x00\x00\x00\x04" . //data length
+            "data\x00\x00\x00\x00"
+        );
+
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize(16)
+            ->new();
+
+        self::assertSame(3, $memo->setEntry(null, 'data'));
+    }
+
+    /**
+     * Tries to modify non existing entry
+     * @covers ::setEntry
+     * @expectedException Exception
+     * @expectedExceptionMessage Unable to move to block `333`
+     */
+    public function testSetEntryInvalid() {
+        $file = $this->getFileMock()
+            ->getSize(3 * 16)
+            ->new();
+
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize(16)
+            ->new();
+
+        self::assertSame(3, $memo->setEntry(333, 'data'));
+    }
+
+    /**
+     * Modifies existing entry that does not fit into existing block
+     * @covers ::setEntry
+     */
+    public function testSetEntryOverlapping() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::at(0))->method('getSize')->willReturn(3 * 16);
+        $file->expects(self::at(1))->method('fseek')->with(16);
+        $file->expects(self::at(2))->method('fread')->willReturn("\x00\x00\x00\x01\x00\x00\x00\x04");
+        $file->expects(self::at(3))->method('getSize')->willReturn(3 * 16);
+        $file->expects(self::at(4))->method('fseek')->with(0, SEEK_END);
+        $file->expects(self::at(5))->method('fwrite')->with(
+            "\x00\x00\x00\x01" . //type
+            "\x00\x00\x00\x10" . //data length
+            str_repeat('a', 16) .
+            str_repeat("\x00", 8)
+        );
+
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize(16)
+            ->new();
+
+        self::assertSame(3, $memo->setEntry(1, str_repeat('a', 16)));
+    }
+
+    /**
+     * Modifies last entry that does not fit into block size
+     * @covers ::setEntry
+     */
+    public function testSetEntryOverlappingLast() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::at(0))->method('getSize')->willReturn(3 * 16);
+        $file->expects(self::at(1))->method('fseek')->with(32);
+        $file->expects(self::at(2))->method('fread')->willReturn("\x00\x00\x00\x01\x00\x00\x00\x04");
+        $file->expects(self::at(3))->method('getSize')->willReturn(3 * 16);
+        $file->expects(self::at(4))->method('fseek')->with(-8, SEEK_CUR);
+        $file->expects(self::at(5))->method('fwrite')->with(
+            "\x00\x00\x00\x01" . //type
+            "\x00\x00\x00\x10" . //data length
+            str_repeat('a', 16) .
+            str_repeat("\x00", 8)
+        );
+
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize(16)
+            ->new();
+
+        self::assertSame(2, $memo->setEntry(2, str_repeat('a', 16)));
+    }
+
+    /**
+     * Modifies existing entry that fits into block size
+     * @covers ::setEntry
+     */
+    public function testSetEntry() {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::at(0))->method('getSize')->willReturn(2 * 16);
+        $file->expects(self::at(1))->method('fseek')->with(16);
+        $file->expects(self::at(2))->method('fread')->willReturn("\x00\x00\x00\x01\x00\x00\x00\x04");
+        $file->expects(self::at(3))->method('getSize')->willReturn(2 * 16);
+        $file->expects(self::at(4))->method('fseek')->with(-8, SEEK_CUR);
+        $file->expects(self::at(5))->method('fwrite')->with(
+            "\x00\x00\x00\x01" . //type
+            "\x00\x00\x00\x08" . //data length
+            str_repeat('a', 8)
+        );
+
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize(16)
+            ->new();
+
+        self::assertSame(1, $memo->setEntry(1, str_repeat('a', 8)));
     }
 }

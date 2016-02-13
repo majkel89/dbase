@@ -38,6 +38,8 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     protected $bufferSize = self::DEFAULT_BUFFER_SIZE;
     /** @var string[] Columns to read */
     protected $columns;
+    /** @var boolean */
+    protected $transaction = false;
 
     /**
      * @param string $filePath
@@ -80,16 +82,93 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
-     * @return \org\majkel\dbase\HeaderInterface
+     * @return \org\majkel\dbase\Header
      */
     public function getHeader() {
         return $this->getFormat()->getHeader();
     }
 
     /**
+     * Stores record in database
+     * @param integer $index
+     * @param \org\majkel\dbase\Record|\Traversable|array $data
+     * @return void
+     */
+    public function update($index, $data) {
+        if (!$data instanceof Record) {
+            $data = new Record(Utils::toArray($data));
+        }
+        $this->getFormat()->update($index, $data);
+        // update buffer to reflect current changes
+        if (isset($this->buffer[$index])) {
+            $this->buffer[$index] = $data;
+        }
+    }
+
+    /**
+     * Adds new record to database
+     * @param \org\majkel\dbase\Record|\Traversable|array $data
+     * @return integer index of new record
+     */
+    public function insert($data) {
+        if ($data instanceof Record) {
+            $data = clone $data;
+        } else {
+            $data = new Record(Utils::toArray($data));
+        }
+        return $this->getFormat()->insert($data);
+    }
+
+    /**
+     * @param integer $index
+     * @param boolean $deleted
+     */
+    public function markDeleted($index, $deleted) {
+        $this->getFormat()->markDeleted($index, $deleted);
+        if (isset($this->buffer[$index])) {
+            $this->buffer[$index]->setDeleted($deleted);
+        }
+    }
+
+    /**
+     * Marks record as deleted
+     * @param integer $index
+     * @return void
+     */
+    public function delete($index) {
+        $this->markDeleted($index, true);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isTransaction() {
+        return $this->getFormat()->isTransaction();
+    }
+
+    /**
+     * Begins transaction
+     * @throws Exception
+     * @return void
+     */
+    public function beginTransaction() {
+        $this->getFormat()->beginTransaction();
+    }
+
+    /**
+     * Ends transaction
+     * @throws Exception
+     * @return void
+     */
+    public function endTransaction() {
+        $this->getFormat()->endTransaction();
+    }
+
+    /**
      * Reads record from table
      * @param integer $index
      * @return \org\majkel\dbase\Record
+     * @throws \org\majkel\dbase\Exception
      */
     public function getRecord($index) {
         if (!$this->isValid()) {
@@ -248,8 +327,9 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
-     * @param integer $offset
+     * @param integer                  $offset
      * @param \org\majkel\dbase\Record $value
+     * @throws \org\majkel\dbase\Exception
      */
     public function offsetSet($offset, $value) {
         throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);
@@ -257,6 +337,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @param integer $offset
+     * @throws \org\majkel\dbase\Exception
      */
     public function offsetUnset($offset) {
         throw new Exception("Table is opened in read only mode", Exception::READ_ONLY);

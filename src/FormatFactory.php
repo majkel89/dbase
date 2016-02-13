@@ -46,7 +46,7 @@ class FormatFactory {
     }
 
     /**
-     * Returns all avileable formats
+     * Returns all available formats
      * @return callable[]
      */
     public function getFormats() {
@@ -67,7 +67,7 @@ class FormatFactory {
     }
 
     /**
-     * Unregisteres format
+     * Unregisters format
      * @param string $name
      * @return \org\majkel\dbase\FormatFactory
      */
@@ -101,16 +101,22 @@ class FormatFactory {
                         if ($name === Format::AUTO) {
                             continue;
                         }
-                        $format = $generator($filePath, $this->getMode($mode));
+                        $format = $generator($filePath, $mode);
+                        if (!$format instanceof Format) {
+                            throw new Exception('Invalid format returned from generator (' . Utils::getType($format) . ')');
+                        }
                         if ($format->isValid()) {
                             return $format;
                         }
                     }
+                    catch(Exception $e) {
+                        throw $e;
+                    }
                     catch (StdException $e) {
-                        throw new Exception("Unable detect format for file `$filePath`", 0, $e);
+                        throw new Exception("Unable to detect format of `$filePath`", 0, $e);
                     }
                 }
-                throw new Exception("Unable detect format for file `$filePath`");
+                throw new Exception("Unable to detect format of `$filePath`");
             });
         }
         return $this;

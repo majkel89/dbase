@@ -9,6 +9,7 @@
 namespace org\majkel\dbase;
 
 use DateTime;
+use Exception as StdException;
 
 /**
  * Implements how to read / write header / record(s)
@@ -20,11 +21,17 @@ abstract class Format {
     const AUTO = 'auto';
     const DBASE3 = 'dbase3';
 
+    const NAME = 'Abstract DBase Format';
+
     const FIELD_SIZE = 32;
     const HEADER_SIZE = 32;
 
     const HEADER_FORMAT = 'Cv/C3d/Vn/vhs/vrs/vr1/Ct';
     const FIELD_FORMAT = 'A11n/a1t/Vrr1/Cll/Cdd/vrr2/Cwa/vrr3/Csff/Crr4';
+
+    const RECORD_END     = "\x1A";
+    const RECORD_DELETED = "\x2A";
+    const RECORD_ACTIVE  = "\x20";
 
     /** @var \SplFileObject File handle */
     protected $file;
@@ -36,6 +43,10 @@ abstract class Format {
     protected $recordFormat;
     /** @var string */
     protected $mode;
+    /** @var boolean */
+    protected $transaction = false;
+    /** @var string */
+    protected $writeRecordFormat;
 
     /**
      * @param string $filePath
@@ -97,12 +108,11 @@ abstract class Format {
     /**
      * @param integer $index
      * @param integer $length
-     * @param string[] $columns
-     * @return Record[]
-     * @throws Exception
+     * @return \org\majkel\dbase\Record[]
+     * @throws \org\majkel\dbase\Exception
      */
     public function getRecords($index, $length) {
-        list($start, $stop) = $this->getReadBoudries($index, $length);
+        list($start, $stop) = $this->getReadBoundaries($index, $length);
         $file = $this->getFile();
         $rSz = $this->getHeader()->getRecordSize();
         $file->fseek($this->getHeader()->getHeaderSize() + $start * $rSz);
@@ -136,7 +146,7 @@ abstract class Format {
      * @return array [$index, $stop]
      * @throws \org\majkel\dbase\Exception
      */
-    protected function getReadBoudries($index, $length) {
+    protected function getReadBoundaries($index, $length) {
         $totalRecords = $this->getHeader()->getRecordsCount();
         if ($index < 0) {
             $index = 0;
@@ -152,6 +162,7 @@ abstract class Format {
     }
 
     /**
+     * @param string $ext
      * @return string
      */
     protected function getMemoFilePath($ext) {
@@ -213,7 +224,213 @@ abstract class Format {
     }
 
     /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function isTransaction() {
+        if ($this->transaction) {
+            return true;
+        }
+        if (!$this->getFile()->flock(LOCK_SH)) {
+            return true;
+        }
+        try {
+            $isTransaction = $this->checkIfTransaction();
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
+        $this->getFile()->flock(LOCK_UN);
+        return $isTransaction;
+    }
+
+    /**
      * @return HeaderInterface
+     * @return boolean
+     */
+    protected function checkIfTransaction() {
+        $currentHeader = $this->readHeader();
+        $header = $this->getHeader();
+        $header->setPendingTransaction($currentHeader->isPendingTransaction());
+        $header->setLastUpdate($currentHeader->getLastUpdate());
+        $header->setRecordsCount(max($header->getRecordsCount(), $currentHeader->getRecordsCount()));
+        return $header->isPendingTransaction();
+    }
+
+    /**
+     * @param boolean $enabled
+     */
+    protected function setTransactionStatus($enabled) {
+        $enabled = (boolean) $enabled;
+        $this->getHeader()->setPendingTransaction($enabled);
+        $this->transaction = $enabled;
+        $this->writeHeader();
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function beginTransaction() {
+        if ($this->transaction) {
+            throw new Exception("Transaction already started");
+        }
+        if (!$this->getFile()->flock(LOCK_EX)) {
+            throw new Exception("Failed to acquire exclusive lock");
+        }
+        try {
+            if ($this->checkIfTransaction()) {
+                throw new Exception("Transaction already started by somebody else");
+            }
+            $this->setTransactionStatus(true);
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
+        $this->getFile()->flock(LOCK_UN);
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function endTransaction() {
+        if (!$this->transaction) {
+            throw new Exception("Transaction haven't been started yet");
+        }
+        if (!$this->getFile()->flock(LOCK_EX)) {
+            throw new Exception("Failed to acquire exclusive lock");
+        }
+        try {
+            if ($this->checkIfTransaction()) {
+                throw new Exception("Transaction haven't been started yet");
+            }
+            $this->setTransactionStatus(false);
+        } catch (StdException $e) {
+            $this->getFile()->flock(LOCK_UN);
+            throw $e;
+        }
+        $this->getFile()->flock(LOCK_UN);
+    }
+
+    /**
+     * @param integer $index
+     * @param boolean $deleted
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function markDeleted($index, $deleted) {
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+        list($offset) = $this->getReadBoundaries($index, 0);
+        $file = $this->getFile();
+        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+        $file->fwrite($deleted ? self::RECORD_DELETED : self::RECORD_ACTIVE);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWriteRecordFormat() {
+        if (is_null($this->writeRecordFormat)) {
+            $this->writeRecordFormat = 'a';
+            foreach ($this->getHeader()->getFields() as $i => $field) {
+                $this->writeRecordFormat .= 'A' . $field->getLength();
+            }
+        }
+        return $this->writeRecordFormat;
+    }
+
+    /**
+     * @param \org\majkel\dbase\Record $record
+     * @return string
+     * @throws \org\majkel\dbase\Exception
+     */
+    protected function serializeRecord(Record $record) {
+        $params = [$this->getWriteRecordFormat(), $record->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
+        foreach ($this->getHeader()->getFields() as $name => $field) {
+            if ($field->isMemoEntry()) {
+                $params[$name] = $this->getMemoFile()->setEntry(
+                    $record->getMemoEntryId($name),
+                    $field->serialize($record->$name)
+                );
+                $record->setMemoEntryId($name, $params[$name]);
+            } else {
+                $params[$name] = $field->serialize($record->$name);
+            }
+        }
+        return call_user_func_array('pack', $params);
+    }
+
+    /**
+     * @param \org\majkel\dbase\Record $data
+     * @return integer
+     */
+    public function insert(Record $data) {
+        $header = $this->getHeader();
+        $newIndex = (integer) $header->getRecordsCount();
+        $header->setRecordsCount($newIndex + 1);
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+
+        $file = $this->getFile();
+        $file->fseek(-1, SEEK_END);
+        $data->setDeleted(false);
+        $file->fwrite($this->serializeRecord($data) . self::RECORD_END);
+        return $newIndex;
+    }
+
+    /**
+     * @param integer $index
+     * @param \org\majkel\dbase\Record $data
+     * @return void
+     */
+    public function update($index, Record $data) {
+        list($offset) = $this->getReadBoundaries($index, 0);
+
+        if (!$this->transaction) {
+            $this->writeHeader();
+        }
+
+        $file = $this->getFile();
+        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+
+        $data = $this->serializeRecord($data);
+        $file->fwrite($data);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWriteHeaderFormat() {
+        return 'C4Vvvv@32';
+    }
+
+    /**
+     * @return void
+     */
+    protected function writeHeader() {
+        $file = $this->getFile();
+        $file->fseek(0);
+        $header = $this->getHeader();
+        $header->setLastUpdate(new \DateTime());
+        $date = $header->getLastUpdate();
+        $data = pack($this->getWriteHeaderFormat(),
+            $header->getVersion(),
+            $date->format('Y') - 1900,
+            (integer) $date->format('m'),
+            (integer) $date->format('d'),
+            $header->getRecordsCount(),
+            $header->getHeaderSize(),
+            $header->getRecordSize(),
+            $header->isPendingTransaction()
+        );
+        $file->fwrite($data);
+    }
+
+    /**
+     * @return Header
      */
     protected function readHeader() {
         $file = $this->getFile();
@@ -247,6 +464,7 @@ abstract class Format {
             $header->addField($this->createField($data));
         }
 
+        $header->lockFields();
         return $header;
     }
 
@@ -312,6 +530,7 @@ abstract class Format {
             if ($field->isLoad()) {
                 $value = $data['f'.$name];
                 if ($field->isMemoEntry()) {
+                    $record->setMemoEntryId($name, $value);
                     $value = $this->readMemoEntry($value);
                 }
                 $record[$name] = $field->unserialize($value);

@@ -160,7 +160,7 @@ class FormatFactoryTest extends TestBase {
     /**
      * @covers ::initializeFormats
      * @expectedException \org\majkel\dbase\Exception
-     * @expectedExceptionMessage Unable detect format for file `unknown_file`
+     * @expectedExceptionMessage Unable to detect format of `unknown_file`
      */
     public function testGetFormatAutoUnknown() {
         $format = $this->getFormatMock()
@@ -171,6 +171,19 @@ class FormatFactoryTest extends TestBase {
             return $format;
         });
         $formatFactory->getFormat(Format::AUTO, 'unknown_file', Table::MODE_READ);
+    }
+
+    /**
+     * @covers ::initializeFormats
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Invalid format returned from generator (string)
+     */
+    public function testGetFormatGeneratorInvalid() {
+        $formatFactory = $this->getCleanFormatFactory();
+        $formatFactory->registerFormat('INVALID', function () {
+            return 'NOT A FORMAT CLASS';
+        });
+        $formatFactory->getFormat(Format::AUTO, 'FILE', Table::MODE_READ);
     }
 
     /**
@@ -188,7 +201,7 @@ class FormatFactoryTest extends TestBase {
         }
         catch (Exception $e) {
             $exceptionThrown = true;
-            self::assertSame('Unable detect format for file `FILE`', $e->getMessage());
+            self::assertSame('Unable to detect format of `FILE`', $e->getMessage());
             self::assertSame($exception, $e->getPrevious());
         }
         if (!$exceptionThrown) {

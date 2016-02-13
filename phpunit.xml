@@ -11,10 +11,10 @@
          beStrictAboutTestSize="true"
          verbose="true">
     <testsuites>
-        <testsuite name="Unit Tests">
+        <testsuite name="Unit">
             <directory>tests/unit</directory>
         </testsuite>
-        <testsuite name="Integration tests">
+        <testsuite name="Integration">
             <directory>tests/integration</directory>
         </testsuite>
     </testsuites>

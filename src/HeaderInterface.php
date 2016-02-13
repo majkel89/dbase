@@ -61,6 +61,7 @@ interface HeaderInterface {
     public function getHeaderSize();
 
     /**
+     * @param integer|string $indexOrName
      * @return \org\majkel\dbase\Field
      */
     public function getField($indexOrName);

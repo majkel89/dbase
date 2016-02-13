@@ -140,7 +140,7 @@ abstract class Field {
     }
 
     /**
-     * Allows to set wether to load value
+     * Allows to set whether to load value
      * @param boolean $load
      * @return \org\majkel\dbase\Field
      */
@@ -150,7 +150,7 @@ abstract class Field {
     }
 
     /**
-     * Determins wether to load filed value
+     * Determines whether to load filed value
      * @return boolean;
      */
     public function isLoad() {
@@ -158,7 +158,7 @@ abstract class Field {
     }
 
     /**
-     * Constructs value from raw data and applyes filters
+     * Constructs value from raw data and applies filters
      * @param string $data
      * @return mixed
      */
@@ -171,7 +171,7 @@ abstract class Field {
     }
 
     /**
-     * Applyes filters and converts value to raw data
+     * Applies filters and converts value to raw data
      * @param mixed $value
      * @return string
      */
@@ -204,7 +204,7 @@ abstract class Field {
     abstract public function getType();
 
     /**
-     * Determin wether to read data from memo file
+     * Determines whether to read data from memo file
      * @return boolean
      */
     public function isMemoEntry() {

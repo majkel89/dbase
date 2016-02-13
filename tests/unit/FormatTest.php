@@ -109,7 +109,7 @@ class FormatTest extends TestBase {
     /**
      * @return array
      */
-    public function dataGetReadBoudries() {
+    public function dataGetReadBoundaries() {
         return [
             [ 0,  1, 10, 0, 1],
             [-1,  1, 10, 0, 1],
@@ -118,17 +118,17 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @covers ::getReadBoudries
-     * @dataProvider dataGetReadBoudries
+     * @covers ::getReadBoundaries
+     * @dataProvider dataGetReadBoundaries
      */
-    public function testGetReadBoudries($index, $length, $records, $expectedStart, $expectedStop) {
+    public function testGetReadBoundaries($index, $length, $records, $expectedStart, $expectedStop) {
         $header = $this->getHeaderMock()
             ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
             ->new();
-        list($start, $stop) = $this->reflect($format)->getReadBoudries($index, $length);
+        list($start, $stop) = $this->reflect($format)->getReadBoundaries($index, $length);
         self::assertSame($expectedStart, $start);
         self::assertSame($expectedStop, $stop);
     }
@@ -136,7 +136,7 @@ class FormatTest extends TestBase {
     /**
      * @return array
      */
-    public function dataGetReadBoudriesException() {
+    public function dataGetReadBoundariesException() {
         return [
             [0, 1, 0],
             [1, 1, 1],
@@ -144,18 +144,18 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @covers ::getReadBoudries
+     * @covers ::getReadBoundaries
      * @expectedException \org\majkel\dbase\Exception
-     * @dataProvider dataGetReadBoudriesException
+     * @dataProvider dataGetReadBoundariesException
      */
-    public function testGetReadBoudriesException($index, $length, $records) {
+    public function testGetReadBoundariesException($index, $length, $records) {
         $header = $this->getHeaderMock()
             ->getRecordsCount($records, self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
             ->new();
-        $this->reflect($format)->getReadBoudries($index, $length);
+        $this->reflect($format)->getReadBoundaries($index, $length);
     }
 
     /**
@@ -171,7 +171,7 @@ class FormatTest extends TestBase {
             ->getHeaderSize(12, self::once())
             ->new();
         $format = $this->getFormatMock()
-            ->getReadBoudries([2, 2], [2, 4], self::once())
+            ->getReadBoundaries([2, 2], [2, 4], self::once())
             ->getFile($file, self::once())
             ->getRecordFormat('a7x', self::once())
             ->getHeader($header)
@@ -282,7 +282,7 @@ class FormatTest extends TestBase {
     public function testGetSupportedFormats() {
         $reflection = new ReflectionClass(self::CLS_FORMAT);
         $types = [];
-        $excludes = ['AUTO', 'FIELD', 'HEADER'];
+        $excludes = ['AUTO', 'FIELD_', 'HEADER_', 'NAME', 'RECORD_'];
         foreach ($reflection->getConstants() as $typeName => $typeValue) {
             $found = false;
             foreach ($excludes as $exclude) {
@@ -328,6 +328,51 @@ class FormatTest extends TestBase {
         self::assertTrue($record instanceof Record);
         self::assertTrue($record->isDeleted());
         self::assertSame(['FF1' => 'field1'], $record->toArray());
+        self::assertSame(123, $record->getMemoEntryId('FF1'));
+    }
+
+    /**
+     * @covers ::writeHeader
+     * @covers ::getWriteHeaderFormat
+     */
+    public function testWriteHeader() {
+        $header = new Header();
+        $header->setVersion(0x03);
+        $header->setRecordsCount(0x1020304);
+        $header->setPendingTransaction(true);
+        $header->setHeaderSize(0x20);
+        $header->setRecordSize(0x61);
+        $date = new \DateTime();
+
+        $headerData =  "\x03"                                        // version
+            . chr($date->format('Y') - 1900)
+            . chr($date->format('m'))
+            . chr($date->format('d'))                                // last update date
+            . "\x04\x03\x02\x01"                                     // numer of records in the table
+            . "\x20\x00"                                             // bytes in header
+            . "\x61\x00"                                             // bytes in record
+            . "\x01\x00\x00"                                         // reserved
+            . "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" // reserved
+            . "\x00\x00\x00\x00";                                    // reserved
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(0);
+        $file->expects(self::once())->method('fwrite')->with($headerData);
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->getHeader($header)
+            ->new();
+
+        $this->reflect($format)->writeHeader();
+
+        self::assertSame(
+            $date->format('Y-m-d'),
+            $header->getLastUpdate()->format('Y-m-d')
+        );
     }
 
     /**
@@ -416,12 +461,13 @@ class FormatTest extends TestBase {
         self::assertSame(0x0A, $header->getField('F1')->getLength());
         self::assertSame(0x0A, $header->getField('F2')->getLength());
         self::assertSame('2155-01-03', $header->getLastUpdate()->format('Y-m-d'));
+        self::assertTrue($header->isFieldsLocked());
     }
 
     /**
      * @test
      * @covers ::getMemoFile
-     * @expectedException org\majkel\dbase\Exception
+     * @expectedException \org\majkel\dbase\Exception
      */
     public function testGetMemoFileNoMemo() {
         $format = $this->getFormatMock()
@@ -442,5 +488,470 @@ class FormatTest extends TestBase {
         $memoFile = $this->reflect($format)->getMemoFile();
         self::assertSame(__FILE__, $memoFile->getFileInfo()->getPathname());
         self::assertSame($memoFile, $this->reflect($format)->getMemoFile());
+    }
+
+    /**
+     * @covers ::isTransaction
+     */
+    public function testsTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction([], true, self::once())
+            ->new();
+
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::isTransaction
+     * @expectedException \Exception
+     * @expectedExceptionMessage FAILED
+     */
+    public function testsTransactionException() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(self::throwException(new \Exception('FAILED')))
+            ->new();
+
+        $format->isTransaction();
+    }
+
+    /**
+     * @covers ::isTransaction
+     */
+    public function testIsTransactionLockFail() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_SH], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::checkIfTransaction
+     */
+    public function testCheckIfTransaction() {
+
+        $newHeader = new Header();
+        $newHeader->setPendingTransaction(true);
+        $newHeader->setLastUpdate(new \DateTime());
+        $newHeader->setRecordsCount(12);
+
+        $oldHeader = new Header();
+        $oldHeader->setPendingTransaction(false);
+        $oldHeader->setLastUpdate(new DateTime('2016-01-01'));
+        $oldHeader->setRecordsCount(10);
+
+        $format = $this->getFormatMock()
+            ->readHeader($newHeader)
+            ->getHeader($oldHeader)
+            ->new();
+
+        self::assertTrue($this->reflect($format)->checkIfTransaction());
+        self::assertSame($newHeader->isPendingTransaction(), $oldHeader->isPendingTransaction());
+        self::assertSame($newHeader->getLastUpdate(), $oldHeader->getLastUpdate());
+        self::assertSame($newHeader->getRecordsCount(), $oldHeader->getRecordsCount());
+    }
+
+    /**
+     * @covers ::setTransactionStatus
+     * @covers ::isTransaction
+     */
+    public function testSetTransactionStatus() {
+        $header = new Header();
+        $header->setPendingTransaction(false);
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], null, self::once())
+            ->new();
+
+        $this->reflect($format)->setTransactionStatus(true);
+
+        self::assertTrue($format->isTransaction());
+        self::assertTrue($header->isPendingTransaction());
+    }
+
+    /**
+     * @covers ::beginTransaction
+     */
+    public function testBeginTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->setTransactionStatus([true], null, self::once())
+            ->new();
+
+        $format->beginTransaction();
+        self::assertTrue($format->isTransaction());
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction already started by somebody else
+     */
+    public function testBeginTransactionAlreadyInTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(true)
+            ->new();
+
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Failed to acquire exclusive lock
+     */
+    public function testBeginTransactionLockFail() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::beginTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction already started
+     */
+    public function testBeginTransactionCalledTwice() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->writeHeader([], null, self::once())
+            ->new();
+
+        $format->beginTransaction();
+        $format->beginTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     */
+    public function testEndTransaction() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(false)
+            ->setTransactionStatus([false], null, self::once())
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction haven't been started yet
+     */
+    public function testEndTransactionNotStarted() {
+        $format = $this->getFormatMock()
+            ->new();
+        $format->endTransaction();
+    }
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Failed to acquire exclusive lock
+     */
+    public function testEndTransactionLockFailed() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], false, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
+
+
+    /**
+     * @covers ::endTransaction
+     * @expectedException \org\majkel\dbase\Exception
+     * @expectedExceptionMessage Transaction haven't been started yet
+     */
+    public function testEndTransactionNotStartedFile() {
+        $file = $this->getFileMock()
+            ->flock([LOCK_EX], true, self::at(0))
+            ->flock([LOCK_UN], true, self::at(1))
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getFile($file)
+            ->checkIfTransaction(true)
+            ->new();
+        $this->reflect($format)->transaction = true;
+
+        $format->endTransaction();
+    }
+
+    /**
+     * @return array
+     */
+    public function dataMarkDeleted() {
+        return [
+            [true, "\x2A"],
+            [false, "\x20"],
+        ];
+    }
+
+    /**
+     * @dataProvider dataMarkDeleted
+     * @covers ::markDeleted
+     */
+    public function testMarkDeleted($deleted, $char) {
+        $header = new Header();
+        $header->setRecordSize(10);
+        $header->setHeaderSize(32);
+        $header->setRecordsCount(3);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(32 + 2 * 10);
+        $file->expects(self::once())->method('fwrite')->with($char);
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->getFile($file)
+            ->new();
+
+        $format->markDeleted(2, $deleted);
+    }
+
+    /**
+     * @covers ::markDeleted
+     */
+    public function testMarkDeletedTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->getFile($this->getFileMock())
+            ->getReadBoundaries(0)
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->markDeleted(2, true);
+    }
+
+    /**
+     * @covers ::getWriteRecordFormat
+     */
+    public function testGetWriteRecordFormat() {
+        $header = new Header();
+        $header->addField(Field::create(Field::TYPE_LOGICAL)->setName('f1')->setLength(1));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)->setName('f2')->setLength(23));
+        $header->addField(Field::create(Field::TYPE_MEMO)->setName('f3')->setLength(9));
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->new();
+
+        self::assertSame('aA1A23A9', $this->reflect($format)->getWriteRecordFormat());
+    }
+
+    /**
+     * @covers ::serializeRecord
+     */
+    public function testSerializeRecord() {
+        $header = new Header();
+        $header->addField(Field::create(Field::TYPE_LOGICAL)
+            ->setName('f1')->setLength(1));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)
+            ->setName('f2')->setLength(3));
+        $header->addField(Field::create(Field::TYPE_CHARACTER)
+            ->setName('f3')->setLength(3));
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->new();
+
+        $record = new Record([
+            'f1' => true,
+            'f2' => 'ab',
+            'f3' => 'x234',
+        ]);
+        $record->setDeleted(true);
+
+        $actual = $this->reflect($format)->serializeRecord($record);
+
+        self::assertSame("*Tab x23", $actual);
+    }
+
+    /**
+     * @covers ::serializeRecord
+     */
+    public function testSerializeRecordMemo() {
+        $header = new Header();
+        $header->addField(
+            Field::create(Field::TYPE_MEMO)
+                ->setName('f1')
+                ->setLength(9)
+        );
+
+        $memoFile = $this->mock(self::CLS_MEMO)
+            ->getFileInfo()
+            ->getEntry()
+            ->setEntry([123, "Some text\x1A\x1A"], 124, self::once())
+            ->new();
+
+        $format = $this->getFormatMock()
+            ->getMemoFile($memoFile)
+            ->getHeader($header)
+            ->new();
+
+        $record = new Record();
+        $record->f1 = 'Some text';
+        $record->setMemoEntryId('f1', 123);
+
+        $actual = $this->reflect($format)->serializeRecord($record);
+        self::assertSame(' 124      ', $actual);
+        self::assertSame(124, $record->getMemoEntryId('f1'));
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsert() {
+        $header = new Header();
+        $header->setRecordsCount(3);
+
+        $record = new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(-1, SEEK_END);
+        $file->expects(self::once())->method('fwrite')->with("<RECORD>\x1A");
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->getFile($file)
+            ->new();
+
+        $newIndex = $format->insert($record);
+
+        self::assertSame(3, $newIndex);
+        self::assertSame(4, $header->getRecordsCount());
+    }
+
+    /**
+     * @covers ::insert
+     */
+    public function testInsertTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->serializeRecord()
+            ->getFile($this->getFileMock()->new())
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->insert(new Record());
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdate() {
+        $header = new Header();
+        $header->setRecordSize(12);
+        $header->setHeaderSize(23);
+        $header->setRecordsCount(3);
+
+        $record = new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]);
+
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(['fseek', 'fwrite'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::once())->method('fseek')->with(23 + 2 * 12);
+        $file->expects(self::once())->method('fwrite')->with('<RECORD>');
+
+        $format = $this->getFormatMock()
+            ->getHeader($header)
+            ->writeHeader([], self::once())
+            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->getFile($file)
+            ->new();
+
+        $format->update(2, $record);
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdateTransaction() {
+        $format = $this->getFormatMock()
+            ->getHeader(new Header())
+            ->writeHeader([], self::never())
+            ->serializeRecord('<RECORD>')
+            ->getFile($this->getFileMock())
+            ->getReadBoundaries(0)
+            ->new();
+        $this->reflect($format)->transaction = true;
+        $format->update(2, new Record([
+            'f1' => 'T',
+            'f2' => '123',
+            'f3' => 'ala ma kota'
+        ]));
     }
 }
