@@ -19,9 +19,9 @@ use ArrayAccess;
  */
 class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
-    const MODE_READ = 1;
-    const MODE_WRITE = 2;
-    const MODE_READWRITE = 3;
+    const MODE_READ = 'rb';
+    const MODE_WRITE = self::MODE_READWRITE;
+    const MODE_READWRITE = 'rb+';
 
     const BUFFER_BYTES = 0;
     const BUFFER_RECORDS = 1;
@@ -43,11 +43,11 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @param string $filePath
-     * @param integer $mode
+     * @param string $mode
      * @param string $format
      */
     public function __construct($filePath, $mode = self::MODE_READ, $format = Format::AUTO) {
-        $this->format = $this->getFormatFactory()->getFormat($format, $filePath, $mode);
+        $this->format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
     }
 
     /**
@@ -371,22 +371,9 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
-     * @return \org\majkel\dbase\FormatFactory
-     * @codeCoverageIgnore
-     */
-    protected function getFormatFactory() {
-        static $formatFactory = null;
-        if (is_null($formatFactory)) {
-            $formatFactory = new FormatFactory;
-        }
-        return $formatFactory;
-    }
-
-    /**
      * @return \org\majkel\dbase\Format
      */
     protected function getFormat() {
         return $this->format;
     }
-
 }

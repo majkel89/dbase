@@ -25,7 +25,8 @@ class FormatFactoryTest extends TestBase {
      * @return FormatFactory
      */
     protected function getCleanFormatFactory() {
-        $formatFactory = $this->getFormatFactoryObject();
+        $formatFactory = new FormatFactory();
+        $formatFactory->initializeFormats();
         foreach (Format::getSupportedFormats() as $formatName) {
             $formatFactory->unregisterFormat($formatName);
         }
@@ -38,7 +39,6 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatUnknown() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::once())
             ->getFormats([], [], self::once())
             ->new();
         $formatFactory->getFormat('UNKNOWN', 'FILE', 'MODE');
@@ -50,11 +50,9 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatInvalidGenerator() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => 'IMPL'], self::once())
             ->new();
-        self::assertSame('IMPL', $formatFactory
-            ->getFormat('FORMAT', 'FILE', 'MODE'));
+        self::assertSame('IMPL', $formatFactory->getFormat('FORMAT', 'FILE', 'MODE'));
     }
 
     /**
@@ -63,13 +61,11 @@ class FormatFactoryTest extends TestBase {
      */
     public function testGetFormatInvalidClass() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => function () {
                 return 'IMPL';
             }], self::once())
             ->new();
-        self::assertSame('IMPL', $formatFactory
-            ->getFormat('FORMAT', 'FILE', 'MODE'));
+        self::assertSame('IMPL', $formatFactory->getFormat('FORMAT', 'FILE', 'MODE'));
     }
 
     /**
@@ -78,16 +74,14 @@ class FormatFactoryTest extends TestBase {
     public function testGetFormat() {
         $format = $this->getFormatStub();
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::once())
             ->getFormats([], ['FORMAT' => function ($filePath, $mode) use ($format) {
-                if ($filePath != 'FILE' || $mode != 'rb') {
+                if ($filePath != 'FILE' || $mode != 'MODE') {
                     throw new \Exception("Generator invalid call $filePath, $mode");
                 }
                 return $format;
             }], self::once())
             ->new();
-        self::assertSame($format, $formatFactory
-            ->getFormat('FORMAT', 'FILE', 'MODE'));
+        self::assertSame($format, $formatFactory->getFormat('FORMAT', 'FILE', 'MODE'));
     }
 
     /**
@@ -97,12 +91,11 @@ class FormatFactoryTest extends TestBase {
      */
     public function testFormatRegisteration() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::exactly(4))
+            ->initializeFormats(self::exactly(0))
             ->new();
         $impl = function () {
         };
-        self::assertSame($formatFactory, $formatFactory
-            ->registerFormat('FORMAT', $impl));
+        self::assertSame($formatFactory, $formatFactory->registerFormat('FORMAT', $impl));
         self::assertSame(['FORMAT' => $impl], $formatFactory->getFormats());
         self::assertSame($formatFactory, $formatFactory->unregisterFormat('FORMAT'));
         self::assertSame([], $formatFactory->getFormats());
@@ -121,23 +114,11 @@ class FormatFactoryTest extends TestBase {
     }
 
     /**
-     * @param string $mode
-     * @param string $expected
-     * @dataProvider dataGetMode
-     */
-    public function testGetMode($mode, $expected) {
-        $formatFactory = $this->getFormatFactoryObject();
-        self::assertSame($expected, $this->reflect($formatFactory)
-            ->getMode($mode));
-    }
-
-    /**
      * @covers ::initializeFormats
      */
     public function testInitializeFormats() {
         $formatFactory = $this->getFormatFactoryObject();
-        self::assertSame($formatFactory, $this->reflect($formatFactory)
-            ->initializeFormats());
+        self::assertSame($formatFactory, $this->reflect($formatFactory)->initializeFormats());
         $excepted = array_merge(Format::getSupportedFormats(), [Format::AUTO]);
         self::assertSame($excepted, array_keys($formatFactory->getFormats()));
     }
@@ -150,11 +131,11 @@ class FormatFactoryTest extends TestBase {
             ->isValid(true)
             ->new();
         $formatFactory = $this->getFormatFactoryObject();
-        $formatFactory->registerFormat('VALID', function () use ($format) {
+        $formatFactory->initializeFormats();
+        $formatFactory->registerFormat('VALID', function () use (&$format) {
             return $format;
         });
-        self::assertSame($format, $formatFactory
-            ->getFormat(Format::AUTO, __FILE__, Table::MODE_READ));
+        self::assertSame($format, $formatFactory->getFormat(Format::AUTO, __FILE__, Table::MODE_READ));
     }
 
     /**
