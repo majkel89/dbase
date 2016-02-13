@@ -8,6 +8,7 @@
 
 namespace org\majkel\dbase;
 
+use org\majkel\dbase\memo\MemoInterface;
 use org\majkel\dbase\tests\utils\TestBase;
 
 use stdClass;
@@ -181,10 +182,11 @@ class FormatTest extends TestBase {
 
     /**
      * @covers ::getMemo
+     * @covers ::setMemo
      */
     public function testGetMemo() {
         $format = $this->getFormatMock()->new();
-        $memo = new stdClass();
+        $memo = $this->getMemoMock()->new();
         $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
             ->getMemoForDbf([$format], $memo, self::once())
             ->new();

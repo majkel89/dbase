@@ -175,7 +175,7 @@ abstract class Format {
      */
     public function getMemo() {
         if (is_null($this->memoFile)) {
-            $this->memoFile = MemoFactory::getInstance()->getMemoForDbf($this);
+            $this->setMemo(MemoFactory::getInstance()->getMemoForDbf($this));
         }
         return $this->memoFile;
     }

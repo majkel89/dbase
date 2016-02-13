@@ -89,9 +89,9 @@ class FormatFactoryTest extends TestBase {
      * @covers ::unregisterFormat
      * @covers ::getFormats
      */
-    public function testFormatRegisteration() {
+    public function testFormatRegistration() {
         $formatFactory = $this->getFormatFactoryMock()
-            ->initializeFormats(self::exactly(0))
+            ->initializeFormats(self::never())
             ->new();
         $impl = function () {
         };
@@ -190,4 +190,16 @@ class FormatFactoryTest extends TestBase {
         }
     }
 
+    /**
+     * @test
+     * @covers ::setInstance
+     * @covers ::getInstance
+     */
+    public function testGetSetInstance() {
+        $formatFactory = $this->getFormatFactoryObject();
+        FormatFactory::setInstance($formatFactory);
+        self::assertSame($formatFactory, FormatFactory::getInstance());
+        FormatFactory::setInstance(null);
+        self::assertNotEmpty(FormatFactory::getInstance()->getFormats());
+    }
 }

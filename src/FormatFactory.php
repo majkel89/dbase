@@ -126,7 +126,7 @@ class FormatFactory {
     /**
      * @param \org\majkel\dbase\FormatFactory $factory
      */
-    public static function setInstance(FormatFactory $factory) {
+    public static function setInstance(FormatFactory $factory = null) {
         self::$instance = $factory;
     }
 }

@@ -145,4 +145,15 @@ class TestBase extends PHPUnit_Framework_TestCase {
         return $this->mock(self::CLS_SPLFILEOBJECT);
     }
 
+
+    /**
+     * @return MemoInterface
+     */
+    protected function getMemoMock() {
+        return $this->mock(self::CLS_MEMO)
+            ->getFileInfo()
+            ->getEntry()
+            ->setEntry();
+    }
+
 }
