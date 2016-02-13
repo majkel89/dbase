@@ -10,6 +10,7 @@ namespace org\majkel\dbase;
 
 use DateTime;
 use Exception as StdException;
+use org\majkel\dbase\memo\MemoInterface;
 
 /**
  * Implements how to read / write header / record(s)
@@ -85,7 +86,7 @@ abstract class Format {
      * @return \SplFileInfo
      */
     public function getMemoFileInfo() {
-        return $this->getMemoFile()->getFileInfo();
+        return $this->getMemo()->getFileInfo();
     }
 
     /**
@@ -162,26 +163,9 @@ abstract class Format {
     }
 
     /**
-     * @param string $ext
      * @return string
      */
-    protected function getMemoFilePath($ext) {
-        $fileInfo = $this->getFileInfo();
-        $path = $fileInfo->getPath() . '/';
-        $basename = $fileInfo->getBasename();
-        $index = stripos($basename, '.dbf');
-        if ($index !== false) {
-            $path .= substr($basename, 0, $index);
-        } else {
-            $path .= $basename;
-        }
-        return $path . '.' . $ext;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getMode() {
+    public function getMode() {
         return $this->mode;
     }
 
@@ -189,22 +173,19 @@ abstract class Format {
      * @return \org\majkel\dbase\memo\MemoInterface
      * @throws Exception
      */
-    protected function getMemoFile() {
+    public function getMemo() {
         if (is_null($this->memoFile)) {
-            $supportedMemoFiles = array(
-                'dbt' => 'org\majkel\dbase\memo\DbtMemo',
-                'fpt' => 'org\majkel\dbase\memo\FptMemo',
-            );
-            foreach ($supportedMemoFiles as $ext => $class) {
-                $filePath = $this->getMemoFilePath($ext);
-                if (is_readable($filePath)) {
-                    $this->memoFile = new $class($filePath, $this->getMode());
-                    return $this->memoFile;
-                }
-            }
-            throw new Exception("Unable to open memo file");
+            $this->memoFile = MemoFactory::getInstance()->getMemoForDbf($this);
         }
         return $this->memoFile;
+    }
+
+    /**
+     * @param \org\majkel\dbase\memo\MemoInterface $memo
+     * @author Michał (majkel) Kowalik <maf.michal@gmail.com>
+     */
+    public function setMemo(MemoInterface $memo) {
+        $this->memoFile = $memo;
     }
 
     /**
@@ -350,7 +331,7 @@ abstract class Format {
         $params = [$this->getWriteRecordFormat(), $record->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
         foreach ($this->getHeader()->getFields() as $name => $field) {
             if ($field->isMemoEntry()) {
-                $params[$name] = $this->getMemoFile()->setEntry(
+                $params[$name] = $this->getMemo()->setEntry(
                     $record->getMemoEntryId($name),
                     $field->serialize($record->$name)
                 );
@@ -515,7 +496,7 @@ abstract class Format {
      * @return string
      */
     protected function readMemoEntry($index) {
-        return $this->getMemoFile()->getEntry($index);
+        return $this->getMemo()->getEntry($index);
     }
 
     /**

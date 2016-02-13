@@ -11,7 +11,6 @@ namespace org\majkel\dbase;
 use org\majkel\dbase\tests\utils\TestBase;
 
 use stdClass;
-use SplFileInfo;
 use DateTime;
 use ReflectionClass;
 
@@ -93,7 +92,7 @@ class FormatTest extends TestBase {
      */
     public function testGetMemoFileInfo() {
         $this->getterProxyTest('getMemoFileInfo', self::CLS_SPLFILEOBJECT,
-                'getMemoFile', 'getFileInfo');
+                'getMemo', 'getFileInfo');
     }
 
     /**
@@ -181,40 +180,16 @@ class FormatTest extends TestBase {
     }
 
     /**
-     * @return array
+     * @covers ::getMemo
      */
-    public function dataGetMemoFilePath() {
-        return [
-            ['some/file.txt', 'some/file.txt.dbt', 'dbt'],
-            ['some/file', 'some/file.dbt', 'dbt'],
-            ['some/file.dbf', 'some/file.dbt', 'dbt'],
-            ['some/file.dBf', 'some/file.dbt', 'dbt'],
-            ['some/file.DBF', 'some/file.xxx', 'xxx'],
-        ];
-    }
-
-    /**
-     * @covers ::getMemoFilePath
-     * @dataProvider dataGetMemoFilePath
-     */
-    public function testGetMemoFilePath($dbfPath, $memoPath, $ext) {
-        $fileInfo = new SplFileInfo($dbfPath);
-        $format = $this->getFormatMock()
-            ->getFileInfo($fileInfo, self::once())
+    public function testGetMemo() {
+        $format = $this->getFormatMock()->new();
+        $memo = new stdClass();
+        $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
+            ->getMemoForDbf([$format], $memo, self::once())
             ->new();
-        self::assertSame($memoPath, $this->reflect($format)->getMemoFilePath($ext));
-    }
-
-    /**
-     * @covers ::getMemoFile
-     */
-    public function testGetMemoFile() {
-        $format = $this->getFormatMock()
-            ->getMemoFilePath(__FILE__, self::once())
-            ->getMode('rb', self::once())
-            ->new();
-        $file = $this->reflect($format)->getMemoFile();
-        self::assertSame(__FILE__, $file->getFileInfo()->getPathname());
+        MemoFactory::setInstance($memoFactory);
+        self::assertSame($memo, $format->getMemo());
     }
 
     /**
@@ -270,7 +245,7 @@ class FormatTest extends TestBase {
             ->getEntry([2], 'DAT', self::once())
             ->new();
         $format = $this->getFormatMock()
-            ->getMemoFile($memo)
+            ->getMemo($memo)
             ->new();
         self::assertSame('DAT', $this->reflect($format)
             ->readMemoEntry(2));
@@ -462,32 +437,6 @@ class FormatTest extends TestBase {
         self::assertSame(0x0A, $header->getField('F2')->getLength());
         self::assertSame('2155-01-03', $header->getLastUpdate()->format('Y-m-d'));
         self::assertTrue($header->isFieldsLocked());
-    }
-
-    /**
-     * @test
-     * @covers ::getMemoFile
-     * @expectedException \org\majkel\dbase\Exception
-     */
-    public function testGetMemoFileNoMemo() {
-        $format = $this->getFormatMock()
-            ->getMemoFilePath()
-            ->new();
-        $this->reflect($format)->getMemoFile();
-    }
-
-    /**
-     * @test
-     * @covers ::getMemoFile
-     */
-    public function testGetMemoFileExists() {
-        $format = $this->getFormatMock()
-            ->getMemoFilePath(__FILE__)
-            ->getMode('r')
-            ->new();
-        $memoFile = $this->reflect($format)->getMemoFile();
-        self::assertSame(__FILE__, $memoFile->getFileInfo()->getPathname());
-        self::assertSame($memoFile, $this->reflect($format)->getMemoFile());
     }
 
     /**
@@ -844,7 +793,7 @@ class FormatTest extends TestBase {
             ->new();
 
         $format = $this->getFormatMock()
-            ->getMemoFile($memoFile)
+            ->getMemo($memoFile)
             ->getHeader($header)
             ->new();
 
