@@ -21,6 +21,9 @@ class FormatFactory {
      */
     protected $formats;
 
+    /** @var FormatFactory */
+    private static $instance;
+
     /**
      * Returns new format object
      * @param string $name
@@ -30,7 +33,6 @@ class FormatFactory {
      * @throws Exception
      */
     public function getFormat($name, $filePath, $mode) {
-        $this->initializeFormats();
         $formats = $this->getFormats();
         if (!isset($formats[$name])) {
             throw new Exception("Format `$name` is not registered");
@@ -38,7 +40,7 @@ class FormatFactory {
         if (!is_callable($formats[$name])) {
             throw new Exception("Cannot generate format `$name`");
         }
-        $format = $formats[$name]($filePath, $this->getMode($mode));
+        $format = $formats[$name]($filePath, $mode);
         if (!$format instanceof Format) {
             throw new Exception("Cannot generate format `$name`");
         }
@@ -50,7 +52,6 @@ class FormatFactory {
      * @return callable[]
      */
     public function getFormats() {
-        $this->initializeFormats();
         return $this->formats;
     }
 
@@ -61,7 +62,6 @@ class FormatFactory {
      * @return \org\majkel\dbase\FormatFactory
      */
     public function registerFormat($name, callable $generator) {
-        $this->initializeFormats();
         $this->formats[$name] = $generator;
         return $this;
     }
@@ -72,26 +72,16 @@ class FormatFactory {
      * @return \org\majkel\dbase\FormatFactory
      */
     public function unregisterFormat($name) {
-        $this->initializeFormats();
         unset($this->formats[$name]);
         return $this;
-    }
-
-    /**
-     * @param int $mode
-     * @return string
-     */
-    protected function getMode($mode) {
-        return $mode & Table::MODE_WRITE ? 'rb+' : 'rb';
     }
 
     /**
      * Initializes formats
      * @return \org\majkel\dbase\FormatFactory
      */
-    protected function initializeFormats() {
+    public function initializeFormats() {
         if (is_null($this->formats)) {
-            $this->formats = [];
             $this->registerFormat(Format::DBASE3, function ($filePath, $mode) {
                 return new format\DBase3($filePath, $mode);
             });
@@ -120,5 +110,23 @@ class FormatFactory {
             });
         }
         return $this;
+    }
+
+    /**
+     * @return \org\majkel\dbase\FormatFactory
+     */
+    public static function getInstance() {
+        if (is_null(self::$instance)) {
+            self::$instance = new self;
+            self::$instance->initializeFormats();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * @param \org\majkel\dbase\FormatFactory $factory
+     */
+    public static function setInstance(FormatFactory $factory = null) {
+        self::$instance = $factory;
     }
 }

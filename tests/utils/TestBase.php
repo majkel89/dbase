@@ -8,6 +8,9 @@
 
 namespace org\majkel\dbase\tests\utils;
 
+use org\majkel\dbase\FormatFactory;
+use org\majkel\dbase\memo\MemoInterface;
+use org\majkel\dbase\MemoFactory;
 use PHPUnit_Framework_TestCase;
 use Xpmock\MockWriter;
 use Xpmock\TestCaseTrait;
@@ -29,6 +32,13 @@ class TestBase extends PHPUnit_Framework_TestCase {
     const CLS_FORMAT_FACTORY = '\org\majkel\dbase\FormatFactory';
     const CLS_SPLFILEOBJECT = '\org\majkel\dbase\tests\utils\SplFileObjectMock';
     const CLS_MEMO = '\org\majkel\dbase\memo\MemoInterface';
+    const CLS_MEMO_FACTORY = '\org\majkel\dbase\MemoFactory';
+
+    public function setUp() {
+        parent::setUp();
+        MemoFactory::setInstance(null);
+        FormatFactory::setInstance(null);
+    }
 
     /**
      * @return MockWriter
@@ -136,6 +146,23 @@ class TestBase extends PHPUnit_Framework_TestCase {
      */
     protected function getFileMock() {
         return $this->mock(self::CLS_SPLFILEOBJECT);
+    }
+
+    /**
+     * @return MockWriter
+     */
+    protected function getMemoMock() {
+        return $this->mock(self::CLS_MEMO)
+            ->getFileInfo()
+            ->getEntry()
+            ->setEntry();
+    }
+
+    /**
+     * @return MemoInterface
+     */
+    protected function getMemoObject() {
+        return $this->getMemoMock()->new();
     }
 
 }

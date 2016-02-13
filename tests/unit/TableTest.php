@@ -60,9 +60,9 @@ class TableTest extends TestBase {
             ->getFormat(['FORMAT', 'FILE', 'MODE'], $format, self::once())
             ->new();
 
-        $table = $this->mock(self::CLS)
-            ->getFormatFactory($formatFactory)
-            ->new();
+        FormatFactory::setInstance($formatFactory);
+
+        $table = $this->mock(self::CLS)->new();
         /* @var $table \org\majkel\dbase\Table */
 
         $table->__construct('FILE', 'MODE', 'FORMAT');

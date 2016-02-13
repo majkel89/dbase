@@ -1,8 +1,8 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.3/phpunit.xsd"
          bootstrap="../bootstrap.php"
-         backupGlobals="true"
-         backupStaticAttributes="true"
+         backupGlobals="false"
+         backupStaticAttributes="false"
          cacheTokens="false"
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
@@ -13,6 +13,9 @@
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>../tests/</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/integration</directory>
         </testsuite>
     </testsuites>
     <filter>
