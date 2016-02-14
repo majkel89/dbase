@@ -804,6 +804,7 @@ class FormatTest extends TestBase {
         $memoFile = $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
+            ->getEntriesCount()
             ->setEntry(array(123, "Some text\x1A\x1A"), 124, self::once())
             ->new();
 

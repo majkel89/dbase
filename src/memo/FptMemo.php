@@ -118,4 +118,12 @@ class FptMemo extends AbstractMemo {
         $file->fwrite(pack('NNa' . $dataLen . '@' . $this->lenPaddedBlockSize($dataLen), 1, $dataLen, $data));
         return $entryId;
     }
+
+    /**
+     * @return integer
+     */
+    public function getEntriesCount() {
+        $dataSize = max(0, $this->getFile()->getSize() - self::BH_SZ);
+        return (integer) floor($dataSize / $this->getBlockSize());
+    }
 }

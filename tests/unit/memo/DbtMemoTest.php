@@ -8,6 +8,7 @@
 
 namespace org\majkel\dbase\memo;
 
+use org\majkel\dbase\Table;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
@@ -141,5 +142,35 @@ class DbtMemoTest extends TestBase {
             ->new();
 
         self::assertSame(3, $mock->setEntry(55, '123'));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataGetEntriesCount() {
+        return array(
+            array(0 * DbtMemo::B_SZ, 0),
+            array(1 * DbtMemo::B_SZ, 1),
+            array(5 * DbtMemo::B_SZ, 5),
+            array(5 * DbtMemo::B_SZ + 10, 5),
+        );
+    }
+
+    /**
+     * @param $fileSize
+     * @param $expectedEntries
+     * @dataProvider dataGetEntriesCount
+     * @covers ::getEntriesCount
+     */
+    public function testGetEntriesCount($fileSize, $expectedEntries) {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(array('getSize'))
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn($fileSize);
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->new();
+        self::assertSame($expectedEntries, $memo->getEntriesCount());
     }
 }

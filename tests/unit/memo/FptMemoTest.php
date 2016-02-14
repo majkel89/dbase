@@ -296,4 +296,36 @@ class FptMemoTest extends TestBase {
 
         self::assertSame(1, $memo->setEntry(1, str_repeat('a', 8)));
     }
+
+    /**
+     * @return array
+     */
+    public function dataGetEntriesCount() {
+        return array(
+            array(                      0,     10, 0),
+            array(FptMemo::BH_SZ + 1 * 10,     10, 1),
+            array(FptMemo::BH_SZ + 5 * 10,     10, 5),
+            array(FptMemo::BH_SZ + 5 * 10 + 5, 10, 5),
+        );
+    }
+
+    /**
+     * @param $fileSize
+     * @param $blockSize
+     * @param $expectedEntries
+     * @dataProvider dataGetEntriesCount
+     * @covers ::getEntriesCount
+     */
+    public function testGetEntriesCount($fileSize, $blockSize, $expectedEntries) {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(array('getSize'))
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn($fileSize);
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize($blockSize)
+            ->new();
+        self::assertSame($expectedEntries, $memo->getEntriesCount());
+    }
 }

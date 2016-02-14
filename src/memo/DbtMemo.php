@@ -59,4 +59,12 @@ class DbtMemo extends AbstractMemo {
         $file->fwrite(pack('a' . self::B_SZ, $data));
         return $entryId;
     }
+
+    /**
+     * @return integer
+     */
+    public function getEntriesCount() {
+        $dataSize = max(0, $this->getFile()->getSize());
+        return (integer) floor($dataSize / self::B_SZ);
+    }
 }

@@ -152,7 +152,8 @@ class TestBase extends TestCase {
         return $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
-            ->setEntry();
+            ->setEntry()
+            ->getEntriesCount();
     }
 
     /**
