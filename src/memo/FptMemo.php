@@ -117,7 +117,7 @@ class FptMemo extends AbstractMemo {
      * @return integer
      */
     public function getEntriesCount() {
-        $dataSize = max(0, $this->getFile()->getSize() - self::BH_SZ);
+        $dataSize = max(0, $this->getFile()->getSize());
         return (integer) floor($dataSize / $this->getBlockSize());
     }
 

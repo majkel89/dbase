@@ -533,7 +533,10 @@ class TableTest extends TestBase {
      * @covers ::getFormatType
      */
     public function testGetFormatType() {
-        $format = $this->getFormatMock()->getType('TYPE')->new();
+        $format = $this->mock(self::CLS_FORMAT)
+            ->getType('TYPE')
+            ->supportsType(true)
+            ->new();
         $table = $this->mock(self::CLS)->getFormat($format)->new();
         self::assertSame('TYPE', $table->getFormatType());
     }

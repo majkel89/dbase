@@ -169,7 +169,6 @@ class FptMemoTest extends TestBase {
     /**
      * Adds new entry
      * @covers ::setEntry
-     * @covers ::getEntitiesCount
      * @covers ::lenPaddedBlockSize
      */
     public function testSetEntryNew() {
@@ -188,6 +187,7 @@ class FptMemoTest extends TestBase {
         $memo = $this->mock(self::CLS)
             ->getFile($file)
             ->getBlockSize(16)
+            ->getType()
             ->new();
 
         self::assertSame(3, $memo->setEntry(null, 'data'));
@@ -306,7 +306,7 @@ class FptMemoTest extends TestBase {
             array(                      0,     10, 0),
             array(FptMemo::BH_SZ + 1 * 10,     10, 1),
             array(FptMemo::BH_SZ + 5 * 10,     10, 5),
-            array(FptMemo::BH_SZ + 5 * 10 + 5, 10, 5),
+            array(FptMemo::BH_SZ + 5 * 10 + 5, 10, 6),
         );
     }
 

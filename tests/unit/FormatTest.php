@@ -223,6 +223,7 @@ class FormatTest extends TestBase {
         $format = $this->mock(self::CLS_FORMAT)
             ->supportsType(array(Field::TYPE_CHARACTER), false, self::once())
             ->getName('FoRmAt', self::once())
+            ->getType()
             ->new();
         $this->reflect($format)->createField(array(
             't' => Field::TYPE_CHARACTER,
@@ -804,6 +805,7 @@ class FormatTest extends TestBase {
         $memoFile = $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
+            ->getType()
             ->getEntriesCount()
             ->setEntry(array(123, "Some text\x1A\x1A"), 124, self::once())
             ->new();
