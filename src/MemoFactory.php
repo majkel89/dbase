@@ -15,6 +15,9 @@ namespace org\majkel\dbase;
  */
 class MemoFactory {
 
+    const TYPE_DBT = 'dbt';
+    const TYPE_FPT = 'fpt';
+
     /** @var string[] [ext => memo class name, ...] */
     private $formats = array();
 
@@ -102,8 +105,8 @@ class MemoFactory {
      */
     public function initializeFormats() {
         $this->formats = array();
-        $this->registerFormat('dbt', '\org\majkel\dbase\memo\DbtMemo');
-        $this->registerFormat('fpt', '\org\majkel\dbase\memo\FptMemo');
+        $this->registerFormat(self::TYPE_DBT, '\org\majkel\dbase\memo\DbtMemo');
+        $this->registerFormat(self::TYPE_FPT, '\org\majkel\dbase\memo\FptMemo');
     }
 
     /**
