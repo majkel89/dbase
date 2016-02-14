@@ -68,6 +68,8 @@ class DbtMemoTest extends TestBase {
      * @covers ::getEntry
      * @covers ::gotoEntry
      * @dataProvider dataGetEntry
+     *
+     * @param $entryId
      */
     public function testGetEntry($entryId) {
         $mockedFile = $this->getFileMock()

@@ -34,4 +34,8 @@ interface MemoInterface {
      */
     public function setEntry($entryId, $data);
 
+    /**
+     * @return integer
+     */
+    public function getEntriesCount();
 }

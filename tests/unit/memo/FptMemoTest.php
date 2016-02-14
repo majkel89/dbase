@@ -39,6 +39,8 @@ class FptMemoTest extends TestBase {
      * @covers ::gotoEntry
      * @dataProvider dataGetEntryInvalidEntryId
      * @expectedException \org\majkel\dbase\Exception
+     *
+     * @param $entryId
      */
     public function testGetEntryInvalidEntryId($entryId) {
         $mockedFile = $this->getFileMock()
@@ -67,6 +69,9 @@ class FptMemoTest extends TestBase {
      * @covers ::getEntry
      * @covers ::gotoEntry
      * @dataProvider dataGetEntry
+     *
+     * @param $entryId
+     * @param $expected
      */
     public function testGetEntry($entryId, $expected) {
         $mockedFile = $this->getFileMock()
@@ -96,6 +101,8 @@ class FptMemoTest extends TestBase {
      * @covers ::getEntry
      * @covers ::gotoEntry
      * @dataProvider dataGetEntryZero
+     *
+     * @param $entryId
      */
     public function testGetEntryZero($entryId) {
         $mockedFile = $this->getFileMock()

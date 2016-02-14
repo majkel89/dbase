@@ -76,6 +76,11 @@ class TableTest extends TestBase {
     }
 
     /**
+     * @param $F1
+     * @param $F2
+     * @param $F3
+     * @param $times
+     *
      * @return \org\majkel\dbase\Table
      */
     protected function getTableWithColumns($F1, $F2, $F3, $times) {
@@ -121,6 +126,8 @@ class TableTest extends TestBase {
      * @covers ::setColumns
      * @covers ::getColumns
      * @dataProvider dataSetColumnsEmptyArguments
+     *
+     * @param $columns
      */
     public function testSetColumnsEmptyArguments($columns) {
         $table = $this->getTableWithColumns(true, true, true, 2);
@@ -352,6 +359,9 @@ class TableTest extends TestBase {
     /**
      * @covers ::offsetExists
      * @dataProvider dataOffsetExists
+     *
+     * @param $index
+     * @param $excepted
      */
     public function testOffsetExists($index, $excepted) {
         $table = $this->mock(self::CLS)

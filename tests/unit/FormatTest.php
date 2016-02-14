@@ -706,6 +706,9 @@ class FormatTest extends TestBase {
     /**
      * @dataProvider dataMarkDeleted
      * @covers ::markDeleted
+     *
+     * @param $deleted
+     * @param $char
      */
     public function testMarkDeleted($deleted, $char) {
         $header = new Header();
