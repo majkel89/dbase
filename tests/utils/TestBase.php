@@ -11,19 +11,16 @@ namespace org\majkel\dbase\tests\utils;
 use org\majkel\dbase\FormatFactory;
 use org\majkel\dbase\memo\MemoInterface;
 use org\majkel\dbase\MemoFactory;
-use PHPUnit_Framework_TestCase;
 use Xpmock\MockWriter;
-use Xpmock\TestCaseTrait;
 use org\majkel\dbase\Field;
+use \Xpmock\TestCase;
 
 /**
  * Description of TestBase
  *
  * @author majkel
  */
-class TestBase extends PHPUnit_Framework_TestCase {
-
-    use TestCaseTrait;
+class TestBase extends TestCase {
 
     const CLS_FILTER = '\org\majkel\dbase\Filter';
     const CLS_FIELD = '\org\majkel\dbase\Field';
