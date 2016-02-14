@@ -25,16 +25,16 @@ class UtilsTest extends TestBase {
      * @return array
      */
     public function dataGetType() {
-        return [
-            ['', 'string'],
-            [0, 'integer'],
-            [0.0, 'double'],
-            [false, 'boolean'],
-            [null, 'NULL'],
-            [new stdClass(), 'stdClass'],
-            [new Record(), 'org\majkel\dbase\Record'],
-            [[], 'array'],
-        ];
+        return array(
+            array('', 'string'),
+            array(0, 'integer'),
+            array(0.0, 'double'),
+            array(false, 'boolean'),
+            array(null, 'NULL'),
+            array(new stdClass(), 'stdClass'),
+            array(new Record(), 'org\majkel\dbase\Record'),
+            array(array(), 'array'),
+        );
     }
 
     /**
@@ -48,24 +48,24 @@ class UtilsTest extends TestBase {
      * @return array
      */
     public function dataToArray() {
-        return [
-            [
-                [1, 'x' => 2, 3],
-                [1, 'x' => 2, 3],
-            ],
-            [
-                new Record(['x' => 1, 'y' => 2]),
-                           ['x' => 1, 'y' => 2],
-            ],
-            [
-                new \ArrayObject([2 => 'x', 3 => 'z']),
-                                 [2 => 'x', 3 => 'z'],
-            ],
-            [
-                new \ArrayIterator([3 => 'x', 6 => 'z']),
-                                   [3 => 'x', 6 => 'z'],
-            ],
-        ];
+        return array(
+            array(
+                array(1, 'x' => 2, 3),
+                array(1, 'x' => 2, 3),
+            ),
+            array(
+                new Record(array('x' => 1, 'y' => 2)),
+                           array('x' => 1, 'y' => 2),
+            ),
+            array(
+                new \ArrayObject(array(2 => 'x', 3 => 'z')),
+                                 array(2 => 'x', 3 => 'z'),
+            ),
+            array(
+                new \ArrayIterator(array(3 => 'x', 6 => 'z')),
+                                   array(3 => 'x', 6 => 'z'),
+            ),
+        );
     }
 
     /**
@@ -79,13 +79,13 @@ class UtilsTest extends TestBase {
      * @return array
      */
     public function dataToArrayInvalid() {
-        return [
-            [false],
-            [true],
-            [1],
-            ['some text'],
-            [new stdClass()],
-        ];
+        return array(
+            array(false),
+            array(true),
+            array(1),
+            array('some text'),
+            array(new stdClass()),
+        );
     }
 
     /**

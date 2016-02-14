@@ -119,7 +119,7 @@ abstract class Format {
         $file->fseek($this->getHeader()->getHeaderSize() + $start * $rSz);
         $format = $this->getRecordFormat();
         $allData = $file->fread($rSz * $length);
-        $records = [];
+        $records = array();
         for ($i = 0; $start < $stop; ++$start, ++$i) {
             $data = unpack($format, strlen($allData) === $rSz
                 ? $allData : substr($allData, $i * $rSz, $rSz));
@@ -159,7 +159,7 @@ abstract class Format {
         if ($stop > $totalRecords) {
             $stop -= $stop - $totalRecords;
         }
-        return [$index, $stop];
+        return array($index, $stop);
     }
 
     /**
@@ -328,7 +328,10 @@ abstract class Format {
      * @throws \org\majkel\dbase\Exception
      */
     protected function serializeRecord(Record $record) {
-        $params = [$this->getWriteRecordFormat(), $record->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE];
+        $params = array(
+            $this->getWriteRecordFormat(),
+            $record->isDeleted() ? self::RECORD_DELETED : self::RECORD_ACTIVE,
+        );
         foreach ($this->getHeader()->getFields() as $name => $field) {
             if ($field->isMemoEntry()) {
                 $params[$name] = $this->getMemo()->setEntry(
@@ -482,7 +485,7 @@ abstract class Format {
      */
     protected function getRecordFormat() {
         if (is_null($this->recordFormat)) {
-            $format = ['a1d'];
+            $format = array('a1d');
             foreach ($this->getHeader()->getFields() as $i => $field) {
                 $format[] = 'a' . $field->getLength() . 'f' . $i;
             }
@@ -524,8 +527,8 @@ abstract class Format {
      * @return string[]
      */
     public static function getSupportedFormats() {
-        return [
+        return array(
             Format::DBASE3,
-        ];
+        );
     }
 }

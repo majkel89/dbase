@@ -28,11 +28,11 @@ class FieldTest extends TestBase {
     public function testAddFilter() {
         $field = $this->getFieldStub();
         $filter = $this->mock(self::CLS_FILTER)
-            ->supportsType([$field->getType()], true, self::once())
+            ->supportsType(array($field->getType()), true, self::once())
             ->new();
-        self::assertSame([], $field->getFilters());
+        self::assertSame(array(), $field->getFilters());
         self::assertSame($field, $field->addFilter($filter));
-        self::assertSame([$filter], $field->getFilters());
+        self::assertSame(array($filter), $field->getFilters());
     }
 
     /**
@@ -43,10 +43,10 @@ class FieldTest extends TestBase {
     public function testAddFilterDoesNotSupport() {
         $field = $this->getFieldStub();
         $filter = $this->mock(self::CLS_FILTER)
-            ->supportsType([$field->getType()], false, self::once())
+            ->supportsType(array($field->getType()), false, self::once())
             ->new();
         $field->addFilter($filter);
-        self::assertSame([], $field->getFilters());
+        self::assertSame(array(), $field->getFilters());
     }
 
     /**
@@ -55,14 +55,14 @@ class FieldTest extends TestBase {
     public function dataAddFilters() {
         $fA = $this->getFilterStub();
         $fB = $this->getFilterStub();
-        return [
-            [[$fA, $fB, $fA], [$fA, $fB, $fA]],
-            [new \ArrayIterator([$fA, $fB, $fA]), [$fA, $fB, $fA]],
-            [false, []],
-            [null, []],
-            [123, []],
-            [new \stdClass(), []],
-        ];
+        return array(
+            array(array($fA, $fB, $fA), array($fA, $fB, $fA)),
+            array(new \ArrayIterator(array($fA, $fB, $fA)), array($fA, $fB, $fA)),
+            array(false, array()),
+            array(null, array()),
+            array(123, array()),
+            array(new \stdClass(), array()),
+        );
     }
 
     /**
@@ -87,7 +87,7 @@ class FieldTest extends TestBase {
         $filter = $this->getFilterStub();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter(0));
-        self::assertSame([], $field->getFilters());
+        self::assertSame(array(), $field->getFilters());
     }
 
     /**
@@ -100,7 +100,7 @@ class FieldTest extends TestBase {
         $filter = $this->getFilterStub();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter(66));
-        self::assertSame([$filter], $field->getFilters());
+        self::assertSame(array($filter), $field->getFilters());
     }
 
     /**
@@ -113,7 +113,7 @@ class FieldTest extends TestBase {
         $filter = $this->getFilterStub();
         $field->addFilter($filter);
         self::assertSame($field, $field->removeFilter($filter));
-        self::assertSame([], $field->getFilters());
+        self::assertSame(array(), $field->getFilters());
     }
 
     /**
@@ -127,7 +127,7 @@ class FieldTest extends TestBase {
         $fB = $this->getFilterStub();
         $field->addFilter($fA);
         self::assertSame($field, $field->removeFilter($fB));
-        self::assertSame([$fA], $field->getFilters());
+        self::assertSame(array($fA), $field->getFilters());
     }
 
     /**
@@ -175,18 +175,18 @@ class FieldTest extends TestBase {
      */
     public function testUnserialize() {
         $fA = $this->mock(self::CLS_FILTER)
-            ->toValue(['FROM_DATA'], 'FROM_FA', self::once())
+            ->toValue(array('FROM_DATA'), 'FROM_FA', self::once())
             ->supportsType(true)
             ->new();
         $fB = $this->mock(self::CLS_FILTER)
-            ->toValue(['FROM_FA'], 'FROM_FB', self::once())
+            ->toValue(array('FROM_FA'), 'FROM_FB', self::once())
             ->supportsType(true)
             ->new();
         $field = $this->mock(self::CLS_FIELD)
-            ->fromData(['IN_DATA'], 'FROM_DATA', self::once())
+            ->fromData(array('IN_DATA'), 'FROM_DATA', self::once())
             ->toData()
             ->getType()
-            ->getFilters([], [$fA, $fB], self::once())
+            ->getFilters(array(), array($fA, $fB), self::once())
             ->new();
         self::assertSame('FROM_FB', $field->unserialize('IN_DATA'));
     }
@@ -196,18 +196,18 @@ class FieldTest extends TestBase {
      */
     public function testSerialize() {
         $fB = $this->mock(self::CLS_FILTER)
-            ->fromValue(['FROM_FB'], 'FROM_FA', self::once())
+            ->fromValue(array('FROM_FB'), 'FROM_FA', self::once())
             ->supportsType(true)
             ->new();
         $fA = $this->mock(self::CLS_FILTER)
-            ->fromValue(['FROM_FA'], 'FROM_DATA', self::once())
+            ->fromValue(array('FROM_FA'), 'FROM_DATA', self::once())
             ->supportsType(true)
             ->new();
         $field = $this->mock(self::CLS_FIELD)
             ->fromData()
-            ->toData(['FROM_DATA'], 'IN_DATA', self::once())
+            ->toData(array('FROM_DATA'), 'IN_DATA', self::once())
             ->getType()
-            ->getFilters([], [$fA, $fB], self::once())
+            ->getFilters(array(), array($fA, $fB), self::once())
             ->new();
         self::assertSame('IN_DATA', $field->serialize('FROM_FB'));
     }
@@ -216,13 +216,13 @@ class FieldTest extends TestBase {
      * @return array
      */
     public function dataCreate() {
-        return [
-            [Field::TYPE_CHARACTER, '\org\majkel\dbase\Field\CharacterField', false],
-            [Field::TYPE_DATE, '\org\majkel\dbase\Field\DateField', false],
-            [Field::TYPE_LOGICAL, '\org\majkel\dbase\Field\LogicalField', false],
-            [Field::TYPE_MEMO, '\org\majkel\dbase\Field\MemoField', true],
-            [Field::TYPE_NUMERIC, '\org\majkel\dbase\Field\NumericField', false],
-        ];
+        return array(
+            array(Field::TYPE_CHARACTER, '\org\majkel\dbase\Field\CharacterField', false),
+            array(Field::TYPE_DATE, '\org\majkel\dbase\Field\DateField', false),
+            array(Field::TYPE_LOGICAL, '\org\majkel\dbase\Field\LogicalField', false),
+            array(Field::TYPE_MEMO, '\org\majkel\dbase\Field\MemoField', true),
+            array(Field::TYPE_NUMERIC, '\org\majkel\dbase\Field\NumericField', false),
+        );
     }
 
     /**

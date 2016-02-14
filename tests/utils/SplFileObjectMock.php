@@ -101,7 +101,7 @@ class SplFileObjectMock implements RecursiveIterator, SeekableIterator {
     }
 
     public function getCsvControl() {
-        return [$this->delimiter, $this->enclosure, $this->escape];
+        return array($this->delimiter, $this->enclosure, $this->escape);
     }
 
     public function getFlags() {

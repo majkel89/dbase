@@ -47,8 +47,8 @@ abstract class AbstractFormatTest extends TestBase {
      * @param array $data
      * @return array
      */
-    protected function getHeaderData(array $data = []) {
-        return array_merge([
+    protected function getHeaderData(array $data = array()) {
+        return array_merge(array(
             'v' => 0,
             'd1' => 0,
             'd2' => 0,
@@ -57,7 +57,7 @@ abstract class AbstractFormatTest extends TestBase {
             'rs' => 0,
             'hs' => 0,
             't' => 0,
-        ], $data);
+        ), $data);
     }
 
 }

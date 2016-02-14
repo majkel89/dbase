@@ -27,20 +27,20 @@ class MemoFieldTest extends AbstractFieldTest {
      * {@inheritdoc}
      */
     public function dataFromData() {
-        return [
-            [" some data\x1A\x1A\0\0\0\0", ' some data'],
-        ];
+        return array(
+            array(" some data\x1A\x1A\0\0\0\0", ' some data'),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataToData() {
-        return [
-            ["some data", "some data\x1A\x1A"],
-            ["some data\x1A", "some data\x1A\x1A"],
-            ["some data\x1A\x1A", "some data\x1A\x1A"],
-        ];
+        return array(
+            array("some data", "some data\x1A\x1A"),
+            array("some data\x1A", "some data\x1A\x1A"),
+            array("some data\x1A\x1A", "some data\x1A\x1A"),
+        );
     }
 
 }

@@ -16,7 +16,7 @@ namespace org\majkel\dbase;
 class MemoFactory {
 
     /** @var string[] [ext => memo class name, ...] */
-    private $formats = [];
+    private $formats = array();
 
     /** @var \org\majkel\dbase\MemoFactory */
     private static $instance;
@@ -100,7 +100,7 @@ class MemoFactory {
      * @return void
      */
     public function initializeFormats() {
-        $this->formats = [];
+        $this->formats = array();
         $this->registerFormat('dbt', '\org\majkel\dbase\memo\DbtMemo');
         $this->registerFormat('fpt', '\org\majkel\dbase\memo\FptMemo');
     }

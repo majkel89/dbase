@@ -44,7 +44,7 @@ class DbtMemoTest extends TestBase {
                 ->getSize(1024)
                 ->new();
         $mock = $this->mock(self::CLS)
-                ->getFile([], $mockedFile, self::once())
+                ->getFile(array(), $mockedFile, self::once())
                 ->new();
         $mock->getEntry($entryId);
     }
@@ -70,8 +70,8 @@ class DbtMemoTest extends TestBase {
     public function testGetEntry($entryId) {
         $mockedFile = $this->getFileMock()
                 ->getSize(2048)
-                ->fseek([1024], null, self::once())
-                ->fread([512], 'DATA', self::once())
+                ->fseek(array(1024), null, self::once())
+                ->fread(array(512), 'DATA', self::once())
                 ->new();
         $mock = $this->mock(self::CLS)
                 ->getFile($mockedFile)
@@ -85,7 +85,7 @@ class DbtMemoTest extends TestBase {
      */
     public function testSetEntry() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite', 'getSize'])
+            ->setMethods(array('fseek', 'fwrite', 'getSize'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::any())->method('getSize')->willReturn(2048);
@@ -105,7 +105,7 @@ class DbtMemoTest extends TestBase {
      */
     public function testSetEntryNew() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite', 'getSize'])
+            ->setMethods(array('fseek', 'fwrite', 'getSize'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::any())->method('getSize')->willReturn(2048);
@@ -127,7 +127,7 @@ class DbtMemoTest extends TestBase {
      */
     public function testSetEntryInvalid() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['getSize'])
+            ->setMethods(array('getSize'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::any())->method('getSize')->willReturn(2048);

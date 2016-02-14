@@ -31,11 +31,11 @@ class MemoFactoryTest extends TestBase {
         $memoFactory = new MemoFactory();
         self::assertCount(0, $memoFactory->getFormats());
         $memoFactory->registerFormat('txt', '\stdClass');
-        self::assertSame(['txt' => '\stdClass'], $memoFactory->getFormats());
+        self::assertSame(array('txt' => '\stdClass'), $memoFactory->getFormats());
         $memoFactory->registerFormat('www', '\stdClass2');
-        self::assertSame(['txt' => '\stdClass', 'www' => '\stdClass2'], $memoFactory->getFormats());
+        self::assertSame(array('txt' => '\stdClass', 'www' => '\stdClass2'), $memoFactory->getFormats());
         $memoFactory->unregisterFormat('txt');
-        self::assertSame(['www' => '\stdClass2'], $memoFactory->getFormats());
+        self::assertSame(array('www' => '\stdClass2'), $memoFactory->getFormats());
     }
 
     /**
@@ -53,10 +53,10 @@ class MemoFactoryTest extends TestBase {
      * @return array
      */
     public function dataGetKnownFormats() {
-        return [
-            ['dbt', '\org\majkel\dbase\memo\DbtMemo'],
-            ['fpt', '\org\majkel\dbase\memo\FptMemo'],
-        ];
+        return array(
+            array('dbt', '\org\majkel\dbase\memo\DbtMemo'),
+            array('fpt', '\org\majkel\dbase\memo\FptMemo'),
+        );
     }
 
     /**
@@ -91,13 +91,13 @@ class MemoFactoryTest extends TestBase {
      * @return array
      */
     public function dataGetMemoPathForDbf() {
-        return [
-            ['some/file.txt', 'some/file.txt.dbt', 'dbt'],
-            ['some/file', 'some/file.dbt', 'dbt'],
-            ['some/file.dbf', 'some/file.dbt', 'dbt'],
-            ['some/file.dBf', 'some/file.dbt', 'dbt'],
-            ['some/file.DBF', 'some/file.xxx', 'xxx'],
-        ];
+        return array(
+            array('some/file.txt', 'some/file.txt.dbt', 'dbt'),
+            array('some/file', 'some/file.dbt', 'dbt'),
+            array('some/file.dbf', 'some/file.dbt', 'dbt'),
+            array('some/file.dBf', 'some/file.dbt', 'dbt'),
+            array('some/file.DBF', 'some/file.xxx', 'xxx'),
+        );
     }
 
     /**
@@ -141,9 +141,9 @@ class MemoFactoryTest extends TestBase {
             ->new();
         $memo = new \stdClass();
         $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
-            ->getFormats([], ['XX' => '\stdClass'])
-            ->getMemoPathForDbf([$format, 'XX'], __FILE__, self::once())
-            ->getMemo([__FILE__, 'rx', 'XX'], $memo, self::once())
+            ->getFormats(array(), array('XX' => '\stdClass'))
+            ->getMemoPathForDbf(array($format, 'XX'), __FILE__, self::once())
+            ->getMemo(array(__FILE__, 'rx', 'XX'), $memo, self::once())
             ->new();
         self::assertSame($memo, $memoFactory->getMemoForDbf($format));
     }

@@ -32,7 +32,7 @@ abstract class Field {
     /** @var boolean */
     protected $load = true;
     /** @var \org\majkel\dbase\FilterInterface[] */
-    protected $filters = [];
+    protected $filters = array();
 
     /**
      * @codeCoverageIgnore
@@ -239,12 +239,12 @@ abstract class Field {
      * @return integer[]
      */
     public static function getTypes() {
-        return [
+        return array(
             self::TYPE_CHARACTER,
             self::TYPE_LOGICAL,
             self::TYPE_DATE ,
             self::TYPE_NUMERIC,
             self::TYPE_MEMO,
-        ];
+        );
     }
 }

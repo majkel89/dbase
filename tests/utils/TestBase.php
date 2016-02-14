@@ -132,11 +132,11 @@ class TestBase extends PHPUnit_Framework_TestCase {
      */
     public function genSupportsTypeDataSet($supportedTypes) {
         $supportedTypes = array_flip($supportedTypes);
-        $dataSet = [];
+        $dataSet = array();
         foreach (Field::getTypes() as $type) {
-            $dataSet[] = [
+            $dataSet[] = array(
                 $type, isset($supportedTypes[$type])
-            ];
+            );
         }
         return $dataSet;
     }

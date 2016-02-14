@@ -24,7 +24,7 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
     const FLAG_TRANSACTION = 2;
 
     /** @var Field[] */
-    protected $fields = [];
+    protected $fields = array();
     /** @var integer; */
     protected $version;
     /** @var \DateTime; */

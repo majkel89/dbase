@@ -30,7 +30,7 @@ class HeaderTest extends TestBase {
         $header = $this->getHeaderStub();
         self::assertSame($header, $header->addField($fA));
         self::assertSame($header, $header->addField($fB));
-        self::assertSame(['A' => $fA, 'B' => $fB], $header->getFields());
+        self::assertSame(array('A' => $fA, 'B' => $fB), $header->getFields());
     }
 
     /**
@@ -98,7 +98,7 @@ class HeaderTest extends TestBase {
         $header = $this->getHeaderStub()
             ->addField($fA)
             ->addField($fB);
-        self::assertSame(['A', 'B'], $header->getFieldsNames());
+        self::assertSame(array('A', 'B'), $header->getFieldsNames());
     }
 
     /**

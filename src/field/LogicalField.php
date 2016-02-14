@@ -32,9 +32,9 @@ class LogicalField extends Field {
      * {@inheritdoc}
      */
     public function fromData($data) {
-        if (in_array($data, ['T', 'Y'])) {
+        if (in_array($data, array('T', 'Y'))) {
             $value = true;
-        } else if (in_array($data, ['F', 'N'])) {
+        } else if (in_array($data, array('F', 'N'))) {
             $value = false;
         } else {
             $value = null;

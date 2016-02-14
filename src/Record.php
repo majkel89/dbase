@@ -37,7 +37,7 @@ class Record extends ArrayObject {
     /**
      * @param array $array
      */
-    public function __construct($array = []) {
+    public function __construct($array = array()) {
         parent::__construct($array);
         $this->setFlags(ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST);
     }
