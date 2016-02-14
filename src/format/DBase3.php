@@ -36,4 +36,10 @@ class DBase3 extends Format {
             Field::TYPE_LOGICAL, Field::TYPE_MEMO, Field::TYPE_NUMERIC));
     }
 
+    /**
+     * @return string
+     */
+    public function getType() {
+        return Format::DBASE3;
+    }
 }

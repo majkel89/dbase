@@ -529,4 +529,30 @@ class TableTest extends TestBase {
         self::assertFalse($table->getRecord(22)->isDeleted());
     }
 
+    /**
+     * @covers ::getFormatType
+     */
+    public function testGetFormatType() {
+        $format = $this->getFormatMock()->getType('TYPE')->new();
+        $table = $this->mock(self::CLS)->getFormat($format)->new();
+        self::assertSame('TYPE', $table->getFormatType());
+    }
+
+    /**
+     * @covers ::getMemoType
+     */
+    public function testGetMemoType() {
+        $memo = $this->getMemoMock()->getType('TYPE')->new();
+        $format = $this->getFormatMock()->getType()->getMemo($memo)->new();
+        $table = $this->mock(self::CLS)->getFormat($format)->new();
+        self::assertSame('TYPE', $table->getMemoType());
+    }
+
+    /**
+     * @covers ::getMemoType
+     */
+    public function testGetMemoTypeException() {
+        $table = $this->mock(self::CLS)->getFormat(new Exception('Some exception'))->new();
+        self::assertNull($table->getMemoType());
+    }
 }

@@ -9,6 +9,7 @@
 namespace org\majkel\dbase\memo;
 
 use org\majkel\dbase\Exception;
+use org\majkel\dbase\MemoFactory;
 
 /**
  * Description of FptMemo
@@ -66,5 +67,12 @@ class DbtMemo extends AbstractMemo {
     public function getEntriesCount() {
         $dataSize = max(0, $this->getFile()->getSize());
         return (integer) floor($dataSize / self::B_SZ);
+    }
+
+    /**
+     * @return string
+     */
+    public function getType() {
+        return MemoFactory::TYPE_DBT;
     }
 }

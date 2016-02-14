@@ -376,4 +376,22 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     protected function getFormat() {
         return $this->format;
     }
+
+    /**
+     * @return string
+     */
+    public function getFormatType() {
+        return $this->getFormat()->getType();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMemoType() {
+        try {
+            return $this->getFormat()->getMemo()->getType();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

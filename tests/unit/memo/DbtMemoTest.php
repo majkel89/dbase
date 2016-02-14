@@ -8,6 +8,7 @@
 
 namespace org\majkel\dbase\memo;
 
+use org\majkel\dbase\MemoFactory;
 use org\majkel\dbase\Table;
 use org\majkel\dbase\tests\utils\TestBase;
 
@@ -172,5 +173,13 @@ class DbtMemoTest extends TestBase {
             ->getFile($file)
             ->new();
         self::assertSame($expectedEntries, $memo->getEntriesCount());
+    }
+
+    /**
+     * @covers ::getType
+     */
+    public function testGetType() {
+        $memo = $this->mock(self::CLS)->new();
+        self::assertSame(MemoFactory::TYPE_DBT, $memo->getType());
     }
 }

@@ -531,4 +531,6 @@ abstract class Format {
             Format::DBASE3,
         );
     }
+
+    abstract public function getType();
 }

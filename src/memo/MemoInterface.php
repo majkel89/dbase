@@ -38,4 +38,9 @@ interface MemoInterface {
      * @return integer
      */
     public function getEntriesCount();
+
+    /**
+     * @return string
+     */
+    public function getType();
 }
