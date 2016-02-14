@@ -34,26 +34,26 @@ class NumericFieldTest extends AbstractFieldTest {
      * {@inheritdoc}
      */
     public function dataFromData() {
-        return [
-            ['1234', 123],
-            ['123', 123],
-            [123, 123],
-            [' 2', 2],
-            [null, 0],
-        ];
+        return array(
+            array('1234', 123),
+            array('123', 123),
+            array(123, 123),
+            array(' 2', 2),
+            array(null, 0),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataToData() {
-        return [
-            [123456, '123'],
-            [1,      '1'],
-            [null,   '0'],
-            [false,  '0'],
-            ['',     '0'],
-        ];
+        return array(
+            array(123456, '123'),
+            array(1,      '1'),
+            array(null,   '0'),
+            array(false,  '0'),
+            array('',     '0'),
+        );
     }
 
 }

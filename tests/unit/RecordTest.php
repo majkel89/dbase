@@ -37,6 +37,7 @@ class RecordTest extends TestBase {
      * @covers ::__construct
      * @covers ::setDeleted
      * @covers ::isDeleted
+     * @covers ::getFlagsField
      */
     public function testSetDeleted() {
         $this->boolGetterSetterTest(new Record(), 'isDeleted', 'setDeleted');
@@ -50,10 +51,10 @@ class RecordTest extends TestBase {
         $record = new Record();
         $record->a = 1;
         $record['b'] = 2;
-        self::assertSame([
+        self::assertSame(array(
             'a' => 1,
             'b' => 2,
-        ], $record->toArray());
+        ), $record->toArray());
     }
 
     /**

@@ -38,15 +38,17 @@ class TableTest extends TestBase {
 
     /**
      * @param string $methodName
+     * @param null   $result
+     * @param array  $additionalData
      */
-    protected function formatProxyTest($methodName, $result = null, $additionalData = []) {
+    protected function formatProxyTest($methodName, $result = null, $additionalData = array()) {
         $format = $this->getFormatMock()
             ->$methodName($additionalData, $result, self::once())
             ->new();
         $table = $this->mock(self::CLS)
             ->getFormat($format)
             ->new();
-        self::assertSame($result, call_user_func_array([$table, $methodName], $additionalData));
+        self::assertSame($result, call_user_func_array(array($table, $methodName), $additionalData));
     }
 
     /**
@@ -57,7 +59,7 @@ class TableTest extends TestBase {
         $format = new stdClass;
 
         $formatFactory = $this->mock(self::CLS_FORMAT_FACTORY)
-            ->getFormat(['FORMAT', 'FILE', 'MODE'], $format, self::once())
+            ->getFormat(array('FORMAT', 'FILE', 'MODE'), $format, self::once())
             ->new();
 
         FormatFactory::setInstance($formatFactory);
@@ -90,7 +92,7 @@ class TableTest extends TestBase {
             ->getName('F3')
             ->new();
         return $this->mock(self::CLS)
-            ->getFields([$f1, $f2, $f3])
+            ->getFields(array($f1, $f2, $f3))
             ->new();
     }
 
@@ -100,19 +102,19 @@ class TableTest extends TestBase {
      */
     public function testSetColumns() {
         $table = $this->getTableWithColumns(true, false, true, 1);
-        $this->reflect($table)->buffer = [1, 2, 3];
-        self::assertSame($table, $table->setColumns(['F1', 'F2', 'F3', 'F?']));
+        $this->reflect($table)->buffer = array(1, 2, 3);
+        self::assertSame($table, $table->setColumns(array('F1', 'F2', 'F3', 'F?')));
         self::assertEmpty($this->reflect($table)->buffer);
-        self::assertSame(['F1', 'F2', 'F3', 'F?'], $table->getColumns());
+        self::assertSame(array('F1', 'F2', 'F3', 'F?'), $table->getColumns());
     }
 
     /**
      * @return array
      */
     public function dataSetColumnsEmptyArguments() {
-        return [
-            [null], [false], ['INVALID'], [[]], [new \stdClass()]
-        ];
+        return array(
+            array(null), array(false), array('INVALID'), array(array()), array(new \stdClass())
+        );
     }
 
     /**
@@ -122,8 +124,8 @@ class TableTest extends TestBase {
      */
     public function testSetColumnsEmptyArguments($columns) {
         $table = $this->getTableWithColumns(true, true, true, 2);
-        $table->setColumns(['F1', 'F2', 'F3']);
-        $this->reflect($table)->buffer = [1, 2];
+        $table->setColumns(array('F1', 'F2', 'F3'));
+        $this->reflect($table)->buffer = array(1, 2);
         /* @var $table \org\majkel\dbase\Table */
         self::assertSame($table, $table->setColumns($columns));
         self::assertNull($table->getColumns());
@@ -218,7 +220,7 @@ class TableTest extends TestBase {
      */
     public function testGetField() {
         $header = $this->getHeaderMock()
-            ->getField(['COLUMN'], 'NAME', self::once())
+            ->getField(array('COLUMN'), 'NAME', self::once())
             ->new();
         $table = $this->mock(self::CLS)
             ->getHeader($header)
@@ -280,7 +282,7 @@ class TableTest extends TestBase {
     public function testGetRecordInvalidOffset() {
         $table = $this->mock(self::CLS)
             ->isValid(true, self::once())
-            ->offsetExists([123], false, self::once())
+            ->offsetExists(array(123), false, self::once())
             ->new();
         $table->getRecord(123);
     }
@@ -290,7 +292,7 @@ class TableTest extends TestBase {
      */
     public function testGetRecord() {
         $format = $this->getFormatMock()
-            ->getRecords([123, 321], [123 => 'VALUE'], self::once())
+            ->getRecords(array(123, 321), array(123 => 'VALUE'), self::once())
             ->new();
         $table = $this->mock(self::CLS)
             ->isValid(true, self::exactly(2))
@@ -311,11 +313,11 @@ class TableTest extends TestBase {
      */
     public function testTraversable() {
         $table = $this->mock(self::CLS)
-            ->offsetExists([0], true, self::at(0))
-            ->getRecord([0], 'R1', self::at(1))
-            ->offsetExists([1], true, self::at(2))
-            ->getRecord([1], 'R2', self::at(3))
-            ->offsetExists([2], false, self::at(4))
+            ->offsetExists(array(0), true, self::at(0))
+            ->getRecord(array(0), 'R1', self::at(1))
+            ->offsetExists(array(1), true, self::at(2))
+            ->getRecord(array(1), 'R2', self::at(3))
+            ->offsetExists(array(2), false, self::at(4))
             ->new();
         foreach ($table as $index => $value) {
             $results[$index] = $value;
@@ -323,7 +325,7 @@ class TableTest extends TestBase {
         foreach ($table as $index => $value) {
             $results[$index] = $value;
         }
-        self::assertSame(['R1', 'R2'], $results);
+        self::assertSame(array('R1', 'R2'), $results);
     }
 
     /**
@@ -340,11 +342,11 @@ class TableTest extends TestBase {
      * @return array
      */
     public function dataOffsetExists() {
-        return [
-            [-1, false],
-            [ 5, true],
-            [15, false]
-        ];
+        return array(
+            array(-1, false),
+            array( 5, true),
+            array(15, false),
+        );
     }
 
     /**
@@ -363,7 +365,7 @@ class TableTest extends TestBase {
      */
     public function testOffsetGet() {
         $table = $this->mock(self::CLS)
-            ->getRecord([333], 'VALUE', self::exactly(2))
+            ->getRecord(array(333), 'VALUE', self::exactly(2))
             ->new();
         self::assertSame('VALUE', $table->offsetGet(333));
         self::assertSame('VALUE', $table[333]);
@@ -416,7 +418,7 @@ class TableTest extends TestBase {
         $record->setDeleted(true);
 
         $format = $this->getFormatMock()
-            ->insert([self::anything()], true, self::once())
+            ->insert(array(self::anything()), true, self::once())
             ->new();
 
         $table = $this->mock(self::CLS)
@@ -432,10 +434,10 @@ class TableTest extends TestBase {
      * @covers ::insert
      */
     public function testInsertArray() {
-        $record = [];
+        $record = array();
 
         $format = $this->getFormatMock()
-            ->insert([self::anything()], true, self::once())
+            ->insert(array(self::anything()), true, self::once())
             ->new();
 
         $table = $this->mock(self::CLS)
@@ -456,15 +458,15 @@ class TableTest extends TestBase {
         $newRecord->x = 2;
 
         $format = $this->getFormatMock()
-            ->getRecords([22, 1], [22 => $originalField], self::once())
-            ->update([22, $newRecord], null, self::once())
-            ->update([22, ['x' => 3]], null, self::once())
+            ->getRecords(array(22, 1), array(22 => $originalField), self::once())
+            ->update(array(22, $newRecord), null, self::once())
+            ->update(array(22, array('x' => 3)), null, self::once())
             ->new();
 
         $table = $this->mock(self::CLS)
             ->getFormat($format)
             ->isValid(true)
-            ->offsetExists([22], true)
+            ->offsetExists(array(22), true)
             ->getBufferSize(1)
             ->new();
 
@@ -473,7 +475,7 @@ class TableTest extends TestBase {
 
         self::assertSame($newRecord, $table->getRecord(22));
 
-        $table->update(22, ['x' => 3]);
+        $table->update(22, array('x' => 3));
         self::assertNotSame($newRecord, $table->getRecord(22));
         self::assertSame(3, $table->getRecord(22)->x);
     }
@@ -483,7 +485,7 @@ class TableTest extends TestBase {
      */
     public function testDelete() {
         $format = $this->mock(self::CLS)
-            ->markDeleted([1, true], self::once())
+            ->markDeleted(array(1, true), self::once())
             ->new();
         $format->delete(1);
     }
@@ -496,15 +498,15 @@ class TableTest extends TestBase {
         $record->x = 1;
 
         $format = $this->getFormatMock()
-            ->getRecords([22, 1], [22 => $record], self::once())
-            ->markDeleted([22, true], null, self::at(0))
-            ->markDeleted([22, false], null, self::at(1))
+            ->getRecords(array(22, 1), array(22 => $record), self::once())
+            ->markDeleted(array(22, true), null, self::at(0))
+            ->markDeleted(array(22, false), null, self::at(1))
             ->new();
 
         $table = $this->mock(self::CLS)
             ->getFormat($format)
             ->isValid(true)
-            ->offsetExists([22], true)
+            ->offsetExists(array(22), true)
             ->getBufferSize(1)
             ->new();
 

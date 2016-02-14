@@ -34,18 +34,18 @@ class CharacterFieldTest extends AbstractFieldTest {
      * {@inheritdoc}
      */
     public function dataFromData() {
-        return [
-            [" data \0\0\0\0\0", ' data'],
-        ];
+        return array(
+            array(" data \0\0\0\0\0", ' data'),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataToData() {
-        return [
-            ['dataSome', 'data'],
-        ];
+        return array(
+            array('dataSome', 'data'),
+        );
     }
 
 }

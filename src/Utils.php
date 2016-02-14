@@ -36,7 +36,7 @@ final class Utils {
         } else if ($data instanceof \ArrayObject) {
             return $data->getArrayCopy();
         } else if ($data instanceof \Traversable) {
-            $result = [];
+            $result = array();
             foreach ($data as $key => $value) {
                 $result[$key] = $value;
             }

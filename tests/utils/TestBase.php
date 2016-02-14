@@ -11,19 +11,16 @@ namespace org\majkel\dbase\tests\utils;
 use org\majkel\dbase\FormatFactory;
 use org\majkel\dbase\memo\MemoInterface;
 use org\majkel\dbase\MemoFactory;
-use PHPUnit_Framework_TestCase;
 use Xpmock\MockWriter;
-use Xpmock\TestCaseTrait;
 use org\majkel\dbase\Field;
+use \Xpmock\TestCase;
 
 /**
  * Description of TestBase
  *
  * @author majkel
  */
-class TestBase extends PHPUnit_Framework_TestCase {
-
-    use TestCaseTrait;
+class TestBase extends TestCase {
 
     const CLS_FILTER = '\org\majkel\dbase\Filter';
     const CLS_FIELD = '\org\majkel\dbase\Field';
@@ -132,17 +129,17 @@ class TestBase extends PHPUnit_Framework_TestCase {
      */
     public function genSupportsTypeDataSet($supportedTypes) {
         $supportedTypes = array_flip($supportedTypes);
-        $dataSet = [];
+        $dataSet = array();
         foreach (Field::getTypes() as $type) {
-            $dataSet[] = [
+            $dataSet[] = array(
                 $type, isset($supportedTypes[$type])
-            ];
+            );
         }
         return $dataSet;
     }
 
     /**
-     * @return \SplFileObject
+     * @return MockWriter
      */
     protected function getFileMock() {
         return $this->mock(self::CLS_SPLFILEOBJECT);

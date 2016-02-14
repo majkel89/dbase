@@ -32,8 +32,8 @@ class DBase3 extends Format {
      * {@inheritdoc}
      */
     public function supportsType($type) {
-        return in_array($type, [Field::TYPE_CHARACTER, Field::TYPE_DATE,
-            Field::TYPE_LOGICAL, Field::TYPE_MEMO, Field::TYPE_NUMERIC]);
+        return in_array($type, array(Field::TYPE_CHARACTER, Field::TYPE_DATE,
+            Field::TYPE_LOGICAL, Field::TYPE_MEMO, Field::TYPE_NUMERIC));
     }
 
 }

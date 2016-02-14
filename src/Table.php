@@ -63,7 +63,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
             $field->setLoad(is_null($columns)
                 || in_array($field->getName(), $columns));
         }
-        $this->buffer = [];
+        $this->buffer = array();
         return $this;
     }
 

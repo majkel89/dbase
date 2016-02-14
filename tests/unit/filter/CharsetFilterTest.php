@@ -31,28 +31,28 @@ class CharsetFilterTest extends AbstractFilterTest {
      * {@inheritdoc}
      */
     public function dataToValue() {
-        return [
-            [' € ', ' EUR '],
-        ];
+        return array(
+            array(' € ', ' EUR '),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataFromValue() {
-        return [
-            [' EUR ', ' EUR '],
-        ];
+        return array(
+            array(' EUR ', ' EUR '),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function getSupportedTypes() {
-        return [
+        return array(
             Field::TYPE_CHARACTER,
             Field::TYPE_MEMO,
-        ];
+        );
     }
 
     /**

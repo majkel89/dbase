@@ -71,8 +71,8 @@ class FptMemoTest extends TestBase {
     public function testGetEntry($entryId, $expected) {
         $mockedFile = $this->getFileMock()
                 ->getSize(2048)
-                ->fread([8], "\x0\x0\x0\x0\x1\x2\x3\x4", self::at(1))
-                ->fread([(1 << 24) + (2 << 16) + (3 << 8) + 4], "DATA", self::at(2))
+                ->fread(array(8), "\x0\x0\x0\x0\x1\x2\x3\x4", self::at(1))
+                ->fread(array((1 << 24) + (2 << 16) + (3 << 8) + 4), "DATA", self::at(2))
                 ->new();
         $mock = $this->mock(self::CLS)
                 ->getFile($mockedFile)
@@ -149,8 +149,8 @@ class FptMemoTest extends TestBase {
      */
     public function testGetBlockSize() {
         $mockedFile = $this->getFileMock()
-                ->fseek([6], null, self::once())
-                ->fread([2], "\x2\x1", self::once())
+                ->fseek(array(6), null, self::once())
+                ->fread(array(2), "\x2\x1", self::once())
                 ->new();
         $mock = $this->mock(self::CLS)
                 ->getFile($mockedFile)
@@ -166,7 +166,7 @@ class FptMemoTest extends TestBase {
      */
     public function testSetEntryNew() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'getSize', 'fwrite'])
+            ->setMethods(array('fseek', 'getSize', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::once())->method('fseek')->with(0, SEEK_END);
@@ -210,7 +210,7 @@ class FptMemoTest extends TestBase {
      */
     public function testSetEntryOverlapping() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->setMethods(array('fseek', 'getSize', 'fwrite', 'fread'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::at(0))->method('getSize')->willReturn(3 * 16);
@@ -239,7 +239,7 @@ class FptMemoTest extends TestBase {
      */
     public function testSetEntryOverlappingLast() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->setMethods(array('fseek', 'getSize', 'fwrite', 'fread'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::at(0))->method('getSize')->willReturn(3 * 16);
@@ -268,7 +268,7 @@ class FptMemoTest extends TestBase {
      */
     public function testSetEntry() {
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'getSize', 'fwrite', 'fread'])
+            ->setMethods(array('fseek', 'getSize', 'fwrite', 'fread'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::at(0))->method('getSize')->willReturn(2 * 16);

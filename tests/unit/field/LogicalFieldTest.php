@@ -27,30 +27,30 @@ class LogicalFieldTest extends AbstractFieldTest {
      * {@inheritdoc}
      */
     public function dataFromData() {
-        return [
-            ['T', true],
-            ['F', false],
-            ['Y', true],
-            ['N', false],
-            ['?', null],
-            ['X', null],
-            [  1, null],
-        ];
+        return array(
+            array('T', true),
+            array('F', false),
+            array('Y', true),
+            array('N', false),
+            array('?', null),
+            array('X', null),
+            array(  1, null),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataToData() {
-        return [
-            [true,  'T'],
-            [false, 'F'],
-            [null,  '?'],
-            [0,     'F'],
-            ['',    'F'],
-            [[],    'F'],
-            [123,   'T'],
-        ];
+        return array(
+            array(true,    'T'),
+            array(false,   'F'),
+            array(null,    '?'),
+            array(0,       'F'),
+            array('',      'F'),
+            array(array(), 'F'),
+            array(123,     'T'),
+        );
     }
 
 }

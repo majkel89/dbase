@@ -50,7 +50,7 @@ class FptMemo extends AbstractMemo {
         if ($filteredEntryId < 0 || $entryOffset + self::BH_SZ > $file->getSize()) {
             throw new Exception("Unable to move to block `$entryId`");
         } else if ($filteredEntryId === 0) {
-            return [false, 0];
+            return array(false, 0);
         }
         $file->fseek($entryOffset);
 
@@ -60,10 +60,10 @@ class FptMemo extends AbstractMemo {
         if ($len < 0 || (0xFFFFFFFF !== -1 && $len >= 0xFFFFFFFF)) {
             throw new Exception("Invalid block length (negative size)");
         } else if ($len === 0) {
-            return [false, 0];
+            return array(false, 0);
         }
 
-        return [$filteredEntryId, $len];
+        return array($filteredEntryId, $len);
     }
 
     /**

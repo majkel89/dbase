@@ -40,7 +40,7 @@ class FormatFactory {
         if (!is_callable($formats[$name])) {
             throw new Exception("Cannot generate format `$name`");
         }
-        $format = $formats[$name]($filePath, $mode);
+        $format = call_user_func($formats[$name], $filePath, $mode);
         if (!$format instanceof Format) {
             throw new Exception("Cannot generate format `$name`");
         }
@@ -61,7 +61,7 @@ class FormatFactory {
      * @param callable $generator
      * @return \org\majkel\dbase\FormatFactory
      */
-    public function registerFormat($name, callable $generator) {
+    public function registerFormat($name, $generator) {
         $this->formats[$name] = $generator;
         return $this;
     }
@@ -82,16 +82,17 @@ class FormatFactory {
      */
     public function initializeFormats() {
         if (is_null($this->formats)) {
+            $self = $this;
             $this->registerFormat(Format::DBASE3, function ($filePath, $mode) {
                 return new format\DBase3($filePath, $mode);
             });
-            $this->registerFormat(Format::AUTO, function ($filePath, $mode) {
-                foreach ($this->formats as $name => $generator) {
+            $this->registerFormat(Format::AUTO, function ($filePath, $mode) use (&$self) {
+                foreach ($self->getFormats() as $name => $generator) {
                     try {
                         if ($name === Format::AUTO) {
                             continue;
                         }
-                        $format = $generator($filePath, $mode);
+                        $format = call_user_func($generator, $filePath, $mode);
                         if (!$format instanceof Format) {
                             throw new Exception('Invalid format returned from generator (' . Utils::getType($format) . ')');
                         }

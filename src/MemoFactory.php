@@ -16,7 +16,7 @@ namespace org\majkel\dbase;
 class MemoFactory {
 
     /** @var string[] [ext => memo class name, ...] */
-    private $formats = [];
+    private $formats = array();
 
     /** @var \org\majkel\dbase\MemoFactory */
     private static $instance;
@@ -87,7 +87,8 @@ class MemoFactory {
      */
     public function getMemo($path, $mode, $ext = null) {
         if (is_null($ext)) {
-            $ext = strtolower((new \SplFileInfo($path))->getExtension());
+            $fileInfo = new \SplFileInfo($path);
+            $ext = strtolower($fileInfo->getExtension());
         }
         $formats = $this->getFormats();
         if (isset($formats[$ext])) {
@@ -100,7 +101,7 @@ class MemoFactory {
      * @return void
      */
     public function initializeFormats() {
-        $this->formats = [];
+        $this->formats = array();
         $this->registerFormat('dbt', '\org\majkel\dbase\memo\DbtMemo');
         $this->registerFormat('fpt', '\org\majkel\dbase\memo\FptMemo');
     }

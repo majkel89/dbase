@@ -78,7 +78,7 @@ class DBase3Test extends TestBase {
      * @coversNothing
      */
     public function testReadLongFile() {
-        $results = [];
+        $results = array();
         $dbf = new Table('tests/fixtures/producents.dbf');
         foreach ($dbf as $index => $record) {
             $results[$index] = $record->SL_PROD;

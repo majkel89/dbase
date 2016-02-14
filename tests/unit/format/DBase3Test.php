@@ -33,10 +33,10 @@ class DBase3Test extends AbstractFormatTest {
      * {@inheritdoc}
      */
     protected function getSupportedTypes() {
-        return [
+        return array(
             Field::TYPE_CHARACTER, Field::TYPE_DATE, Field::TYPE_LOGICAL,
             Field::TYPE_MEMO, Field::TYPE_NUMERIC
-        ];
+        );
     }
 
     /**
@@ -44,9 +44,9 @@ class DBase3Test extends AbstractFormatTest {
      */
     public function testCreateHeader() {
         $format = $this->getFormatObject();
-        $header = $this->reflect($format)->createHeader($this->getHeaderData([
+        $header = $this->reflect($format)->createHeader($this->getHeaderData(array(
             'v' => 3,
-        ]));
+        )));
         self::assertTrue($header->isValid());
     }
 
@@ -55,9 +55,9 @@ class DBase3Test extends AbstractFormatTest {
      */
     public function testCreateHeaderUnknownFormat() {
         $format = $this->getFormatObject();
-        $header = $this->reflect($format)->createHeader($this->getHeaderData([
+        $header = $this->reflect($format)->createHeader($this->getHeaderData(array(
             'v' => 666,
-        ]));
+        )));
         self::assertTrue($header->isValid());
     }
 

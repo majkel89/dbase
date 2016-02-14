@@ -23,16 +23,19 @@ class FileTest extends TestBase {
      * @return array
      */
     public function dataFread() {
-        return [
-            [-1, false],
-            [0,  false],
-            [17, "F1\x00\x00\x00\x00\x00\x00\x00\x00\x00C\x00\x00\x00\x00\x0A"],
-        ];
+        return array(
+            array(-1, false),
+            array(0,  false),
+            array(17, "F1\x00\x00\x00\x00\x00\x00\x00\x00\x00C\x00\x00\x00\x00\x0A"),
+        );
     }
 
     /**
      * @covers ::fread
      * @dataProvider dataFread
+     *
+     * @param $length
+     * @param $expected
      */
     public function testFread($length, $expected) {
         $file = new File('tests/fixtures/simple3.dbf', 'r');

@@ -101,7 +101,7 @@ class FormatTest extends TestBase {
      */
     public function testGetRecord() {
         $format = $this->getFormatMock()
-            ->getRecords(['INDEX', 1], [2 => 'RECORD'], self::once())
+            ->getRecords(array('INDEX', 1), array(2 => 'RECORD'), self::once())
             ->new();
         self::assertSame('RECORD', $format->getRecord('INDEX'));
     }
@@ -110,16 +110,22 @@ class FormatTest extends TestBase {
      * @return array
      */
     public function dataGetReadBoundaries() {
-        return [
-            [ 0,  1, 10, 0, 1],
-            [-1,  1, 10, 0, 1],
-            [ 5, 20, 10, 5, 10],
-        ];
+        return array(
+            array( 0,  1, 10, 0, 1),
+            array(-1,  1, 10, 0, 1),
+            array( 5, 20, 10, 5, 10),
+        );
     }
 
     /**
      * @covers ::getReadBoundaries
      * @dataProvider dataGetReadBoundaries
+     *
+     * @param $index
+     * @param $length
+     * @param $records
+     * @param $expectedStart
+     * @param $expectedStop
      */
     public function testGetReadBoundaries($index, $length, $records, $expectedStart, $expectedStop) {
         $header = $this->getHeaderMock()
@@ -137,16 +143,20 @@ class FormatTest extends TestBase {
      * @return array
      */
     public function dataGetReadBoundariesException() {
-        return [
-            [0, 1, 0],
-            [1, 1, 1],
-        ];
+        return array(
+            array(0, 1, 0),
+            array(1, 1, 1),
+        );
     }
 
     /**
      * @covers ::getReadBoundaries
      * @expectedException \org\majkel\dbase\Exception
      * @dataProvider dataGetReadBoundariesException
+     *
+     * @param $index
+     * @param $length
+     * @param $records
      */
     public function testGetReadBoundariesException($index, $length, $records) {
         $header = $this->getHeaderMock()
@@ -163,21 +173,21 @@ class FormatTest extends TestBase {
      */
     public function testGetRecords() {
         $file = $this->getFileMock()
-            ->fseek([12 + 7 * 2], null, self::once())
-            ->fread([2 * 7], "DATA1\0\0DATA2\0\0", self::once())
+            ->fseek(array(12 + 7 * 2), null, self::once())
+            ->fread(array(2 * 7), "DATA1\0\0DATA2\0\0", self::once())
             ->new();
         $header = $this->getHeaderMock()
             ->getRecordSize(7, self::once())
             ->getHeaderSize(12, self::once())
             ->new();
         $format = $this->getFormatMock()
-            ->getReadBoundaries([2, 2], [2, 4], self::once())
+            ->getReadBoundaries(array(2, 2), array(2, 4), self::once())
             ->getFile($file, self::once())
             ->getRecordFormat('a7x', self::once())
             ->getHeader($header)
-            ->createRecord([self::anything()], 'R')
+            ->createRecord(array(self::anything()), 'R')
             ->new();
-        self::assertSame([2 => 'R', 3 => 'R'], $format->getRecords(2, 2));
+        self::assertSame(array(2 => 'R', 3 => 'R'), $format->getRecords(2, 2));
     }
 
     /**
@@ -188,7 +198,7 @@ class FormatTest extends TestBase {
         $format = $this->getFormatMock()->new();
         $memo = $this->getMemoObject();
         $memoFactory = $this->mock(self::CLS_MEMO_FACTORY)
-            ->getMemoForDbf([$format], $memo, self::once())
+            ->getMemoForDbf(array($format), $memo, self::once())
             ->new();
         MemoFactory::setInstance($memoFactory);
         self::assertSame($memo, $format->getMemo());
@@ -211,12 +221,12 @@ class FormatTest extends TestBase {
      */
     public function testCreateFieldUnsupported() {
         $format = $this->mock(self::CLS_FORMAT)
-            ->supportsType([Field::TYPE_CHARACTER], false, self::once())
+            ->supportsType(array(Field::TYPE_CHARACTER), false, self::once())
             ->getName('FoRmAt', self::once())
             ->new();
-        $this->reflect($format)->createField([
+        $this->reflect($format)->createField(array(
             't' => Field::TYPE_CHARACTER,
-        ]);
+        ));
     }
 
     /**
@@ -230,7 +240,7 @@ class FormatTest extends TestBase {
             ->getLength(5)
             ->new();
         $header = $this->getHeaderMock()
-            ->getFields([], [$f1, $f2], self::once())
+            ->getFields(array(), array($f1, $f2), self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
@@ -244,7 +254,7 @@ class FormatTest extends TestBase {
      */
     public function testReadMemoEntry() {
         $memo = $this->getHeaderMock()
-            ->getEntry([2], 'DAT', self::once())
+            ->getEntry(array(2), 'DAT', self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getMemo($memo)
@@ -258,8 +268,8 @@ class FormatTest extends TestBase {
      */
     public function testGetSupportedFormats() {
         $reflection = new ReflectionClass(self::CLS_FORMAT);
-        $types = [];
-        $excludes = ['AUTO', 'FIELD_', 'HEADER_', 'NAME', 'RECORD_'];
+        $types = array();
+        $excludes = array('AUTO', 'FIELD_', 'HEADER_', 'NAME', 'RECORD_');
         foreach ($reflection->getConstants() as $typeName => $typeValue) {
             $found = false;
             foreach ($excludes as $exclude) {
@@ -291,20 +301,20 @@ class FormatTest extends TestBase {
             ->unserialize('field2')
             ->new();
         $header = $this->getHeaderMock()
-            ->getFields([], ['FF1' => $f1, 'FF2' => $f2], self::once())
+            ->getFields(array(), array('FF1' => $f1, 'FF2' => $f2), self::once())
             ->new();
         $format = $this->getFormatMock()
             ->getHeader($header)
-            ->readMemoEntry(['123'], 'field1')
+            ->readMemoEntry(array('123'), 'field1')
             ->new();
-        $record = $this->reflect($format)->createRecord([
+        $record = $this->reflect($format)->createRecord(array(
             'd' => 1,
             'fFF1' => '123',
             'fFF2' => 'field2',
-        ]);
+        ));
         self::assertTrue($record instanceof Record);
         self::assertTrue($record->isDeleted());
-        self::assertSame(['FF1' => 'field1'], $record->toArray());
+        self::assertSame(array('FF1' => 'field1'), $record->toArray());
         self::assertSame(123, $record->getMemoEntryId('FF1'));
     }
 
@@ -333,7 +343,7 @@ class FormatTest extends TestBase {
             . "\x00\x00\x00\x00";                                    // reserved
 
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite'])
+            ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::once())->method('fseek')->with(0);
@@ -371,8 +381,8 @@ class FormatTest extends TestBase {
      */
     public function testReadHeaderInvalid() {
         $file = $this->getFileMock()
-            ->fseek([0], self::once())
-            ->fread([32], $this->getValidHeader(), self::once()) // header
+            ->fseek(array(0), self::once())
+            ->fread(array(32), $this->getValidHeader(), self::once()) // header
             ->getSize(50)
             ->new();
         $format = $this->getFormatMock()
@@ -420,10 +430,10 @@ class FormatTest extends TestBase {
      */
     public function testReadHeader() {
         $file = $this->getFileMock()
-            ->fseek([0], self::once())
-            ->fread([32], $this->getValidHeader(), self::at(1)) // header
+            ->fseek(array(0), self::once())
+            ->fread(array(32), $this->getValidHeader(), self::at(1)) // header
             ->getSize(32 * 3 + 1 + 0x1020304 * 32)
-            ->fread([64], $this->getValidFields(), self::at(3)) // fields
+            ->fread(array(64), $this->getValidFields(), self::at(3)) // fields
             ->new();
         $format = $this->getFormatMock()
             ->getFile($file)
@@ -446,13 +456,13 @@ class FormatTest extends TestBase {
      */
     public function testsTransaction() {
         $file = $this->getFileMock()
-            ->flock([LOCK_SH], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_SH), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
             ->getFile($file)
-            ->checkIfTransaction([], true, self::once())
+            ->checkIfTransaction(array(), true, self::once())
             ->new();
 
         self::assertTrue($format->isTransaction());
@@ -465,8 +475,8 @@ class FormatTest extends TestBase {
      */
     public function testsTransactionException() {
         $file = $this->getFileMock()
-            ->flock([LOCK_SH], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_SH), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
@@ -482,7 +492,7 @@ class FormatTest extends TestBase {
      */
     public function testIsTransactionLockFail() {
         $file = $this->getFileMock()
-            ->flock([LOCK_SH], false, self::once())
+            ->flock(array(LOCK_SH), false, self::once())
             ->new();
 
         $format = $this->getFormatMock()
@@ -528,7 +538,7 @@ class FormatTest extends TestBase {
 
         $format = $this->getFormatMock()
             ->getHeader($header)
-            ->writeHeader([], null, self::once())
+            ->writeHeader(array(), null, self::once())
             ->new();
 
         $this->reflect($format)->setTransactionStatus(true);
@@ -542,14 +552,14 @@ class FormatTest extends TestBase {
      */
     public function testBeginTransaction() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_EX), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
             ->getFile($file)
             ->checkIfTransaction(false)
-            ->setTransactionStatus([true], null, self::once())
+            ->setTransactionStatus(array(true), null, self::once())
             ->new();
 
         $format->beginTransaction();
@@ -563,8 +573,8 @@ class FormatTest extends TestBase {
      */
     public function testBeginTransactionAlreadyInTransaction() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_EX), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
@@ -582,7 +592,7 @@ class FormatTest extends TestBase {
      */
     public function testBeginTransactionLockFail() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], false, self::once())
+            ->flock(array(LOCK_EX), false, self::once())
             ->new();
 
         $format = $this->getFormatMock()
@@ -599,15 +609,15 @@ class FormatTest extends TestBase {
      */
     public function testBeginTransactionCalledTwice() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_EX), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
             ->getHeader(new Header())
             ->getFile($file)
             ->checkIfTransaction(false)
-            ->writeHeader([], null, self::once())
+            ->writeHeader(array(), null, self::once())
             ->new();
 
         $format->beginTransaction();
@@ -619,14 +629,14 @@ class FormatTest extends TestBase {
      */
     public function testEndTransaction() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_EX), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
             ->getFile($file)
             ->checkIfTransaction(false)
-            ->setTransactionStatus([false], null, self::once())
+            ->setTransactionStatus(array(false), null, self::once())
             ->new();
         $this->reflect($format)->transaction = true;
 
@@ -651,7 +661,7 @@ class FormatTest extends TestBase {
      */
     public function testEndTransactionLockFailed() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], false, self::once())
+            ->flock(array(LOCK_EX), false, self::once())
             ->new();
 
         $format = $this->getFormatMock()
@@ -670,8 +680,8 @@ class FormatTest extends TestBase {
      */
     public function testEndTransactionNotStartedFile() {
         $file = $this->getFileMock()
-            ->flock([LOCK_EX], true, self::at(0))
-            ->flock([LOCK_UN], true, self::at(1))
+            ->flock(array(LOCK_EX), true, self::at(0))
+            ->flock(array(LOCK_UN), true, self::at(1))
             ->new();
 
         $format = $this->getFormatMock()
@@ -687,10 +697,10 @@ class FormatTest extends TestBase {
      * @return array
      */
     public function dataMarkDeleted() {
-        return [
-            [true, "\x2A"],
-            [false, "\x20"],
-        ];
+        return array(
+            array(true, "\x2A"),
+            array(false, "\x20"),
+        );
     }
 
     /**
@@ -704,7 +714,7 @@ class FormatTest extends TestBase {
         $header->setRecordsCount(3);
 
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite'])
+            ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::once())->method('fseek')->with(32 + 2 * 10);
@@ -712,7 +722,7 @@ class FormatTest extends TestBase {
 
         $format = $this->getFormatMock()
             ->getHeader($header)
-            ->writeHeader([], self::once())
+            ->writeHeader(array(), self::once())
             ->getFile($file)
             ->new();
 
@@ -725,7 +735,7 @@ class FormatTest extends TestBase {
     public function testMarkDeletedTransaction() {
         $format = $this->getFormatMock()
             ->getHeader(new Header())
-            ->writeHeader([], self::never())
+            ->writeHeader(array(), self::never())
             ->getFile($this->getFileMock())
             ->getReadBoundaries(0)
             ->new();
@@ -765,11 +775,11 @@ class FormatTest extends TestBase {
             ->getHeader($header)
             ->new();
 
-        $record = new Record([
+        $record = new Record(array(
             'f1' => true,
             'f2' => 'ab',
             'f3' => 'x234',
-        ]);
+        ));
         $record->setDeleted(true);
 
         $actual = $this->reflect($format)->serializeRecord($record);
@@ -791,7 +801,7 @@ class FormatTest extends TestBase {
         $memoFile = $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
-            ->setEntry([123, "Some text\x1A\x1A"], 124, self::once())
+            ->setEntry(array(123, "Some text\x1A\x1A"), 124, self::once())
             ->new();
 
         $format = $this->getFormatMock()
@@ -815,14 +825,14 @@ class FormatTest extends TestBase {
         $header = new Header();
         $header->setRecordsCount(3);
 
-        $record = new Record([
+        $record = new Record(array(
             'f1' => 'T',
             'f2' => '123',
             'f3' => 'ala ma kota'
-        ]);
+        ));
 
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite'])
+            ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::once())->method('fseek')->with(-1, SEEK_END);
@@ -830,8 +840,8 @@ class FormatTest extends TestBase {
 
         $format = $this->getFormatMock()
             ->getHeader($header)
-            ->writeHeader([], self::once())
-            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->writeHeader(array(), self::once())
+            ->serializeRecord(array($record), '<RECORD>', self::once())
             ->getFile($file)
             ->new();
 
@@ -847,7 +857,7 @@ class FormatTest extends TestBase {
     public function testInsertTransaction() {
         $format = $this->getFormatMock()
             ->getHeader(new Header())
-            ->writeHeader([], self::never())
+            ->writeHeader(array(), self::never())
             ->serializeRecord()
             ->getFile($this->getFileMock()->new())
             ->new();
@@ -864,14 +874,14 @@ class FormatTest extends TestBase {
         $header->setHeaderSize(23);
         $header->setRecordsCount(3);
 
-        $record = new Record([
+        $record = new Record(array(
             'f1' => 'T',
             'f2' => '123',
             'f3' => 'ala ma kota'
-        ]);
+        ));
 
         $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
-            ->setMethods(['fseek', 'fwrite'])
+            ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
         $file->expects(self::once())->method('fseek')->with(23 + 2 * 12);
@@ -879,8 +889,8 @@ class FormatTest extends TestBase {
 
         $format = $this->getFormatMock()
             ->getHeader($header)
-            ->writeHeader([], self::once())
-            ->serializeRecord([$record], '<RECORD>', self::once())
+            ->writeHeader(array(), self::once())
+            ->serializeRecord(array($record), '<RECORD>', self::once())
             ->getFile($file)
             ->new();
 
@@ -893,16 +903,16 @@ class FormatTest extends TestBase {
     public function testUpdateTransaction() {
         $format = $this->getFormatMock()
             ->getHeader(new Header())
-            ->writeHeader([], self::never())
+            ->writeHeader(array(), self::never())
             ->serializeRecord('<RECORD>')
             ->getFile($this->getFileMock())
             ->getReadBoundaries(0)
             ->new();
         $this->reflect($format)->transaction = true;
-        $format->update(2, new Record([
+        $format->update(2, new Record(array(
             'f1' => 'T',
             'f2' => '123',
             'f3' => 'ala ma kota'
-        ]));
+        )));
     }
 }

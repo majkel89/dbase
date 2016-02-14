@@ -31,14 +31,15 @@ class DateFieldTest extends AbstractFieldTest {
         $data = new DateTime();
         $data->setDate(2015, 06, 12);
         $data->setTime(0, 0, 0);
-        return [
-            ['20150612', $data],
-            ['invalid', (new DateTime)->setTimestamp(0)],
-        ];
+        $now = new DateTime();
+        return array(
+            array('20150612', $data),
+            array('invalid', $now->setTimestamp(0)),
+        );
     }
 
     /**
-     * @param mixzed $data
+     * @param mixed $data
      * @param DateTime $expected
      * @dataProvider dataFromData
      */
@@ -53,11 +54,11 @@ class DateFieldTest extends AbstractFieldTest {
     public function dataToData() {
         $date = new DateTime();
         $date->setDate(2015, 06, 12);
-        return [
-            [$date, '20150612'],
-            ['2015-06-12 12:11:13', '20150612'],
-            [$date->getTimestamp(), '20150612'],
-        ];
+        return array(
+            array($date, '20150612'),
+            array('2015-06-12 12:11:13', '20150612'),
+            array($date->getTimestamp(), '20150612'),
+        );
     }
 
 }

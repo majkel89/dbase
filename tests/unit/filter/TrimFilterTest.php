@@ -31,42 +31,42 @@ class TrimFilterTest extends AbstractFilterTest {
      * {@inheritdoc}
      */
     public function dataToValue() {
-        return [
-            [' some text ', 'some text'],
-            ['some text', 'some text'],
-            [false, ''],
-            [123, '123'],
-            [null, ''],
-        ];
+        return array(
+            array(' some text ', 'some text'),
+            array('some text', 'some text'),
+            array(false, ''),
+            array(123, '123'),
+            array(null, ''),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function dataFromValue() {
-        return [
-            [' some text ', 'some text'],
-            ['some text', 'some text'],
-            [false, ''],
-            [123, '123'],
-            [null, ''],
-        ];
+        return array(
+            array(' some text ', 'some text'),
+            array('some text', 'some text'),
+            array(false, ''),
+            array(123, '123'),
+            array(null, ''),
+        );
     }
 
     /**
      * {@inheritdoc}
      */
     public function getSupportedTypes() {
-        return [
+        return array(
             Field::TYPE_CHARACTER,
             Field::TYPE_MEMO,
-        ];
+        );
     }
 
     /**
      * @covers ::setFilterInput
      * @covers ::isFilterInput
-     * @covers ::__construct
+     * @covers ::getFlags
      */
     public function testSetFilterInput() {
         $this->boolGetterSetterTest($this->getFilterObject(),
@@ -76,7 +76,7 @@ class TrimFilterTest extends AbstractFilterTest {
     /**
      * @covers ::setFilterOutput
      * @covers ::isFilterOutput
-     * @covers ::__construct
+     * @covers ::getFlags
      */
     public function testSetFilterOutput() {
         $this->boolGetterSetterTest($this->getFilterObject(),
