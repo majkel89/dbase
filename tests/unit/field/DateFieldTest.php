@@ -61,4 +61,10 @@ class DateFieldTest extends AbstractFieldTest {
         );
     }
 
+    /**
+     * @return integer
+     */
+    public function getDefaultLength() {
+        return 8;
+    }
 }
