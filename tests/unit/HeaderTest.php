@@ -141,6 +141,7 @@ class HeaderTest extends TestBase {
     /**
      * @covers ::setPendingTransaction
      * @covers ::isPendingTransaction
+     * @covers ::getFlags
      */
     public function testSetPendingTransaction() {
         $this->boolGetterSetterTest($this->getHeaderStub(),
@@ -180,6 +181,7 @@ class HeaderTest extends TestBase {
     /**
      * @covers ::setValid
      * @covers ::isValid
+     * @covers ::getFlags
      */
     public function testSetValid() {
         $this->boolGetterSetterTest($this->getHeaderStub(),

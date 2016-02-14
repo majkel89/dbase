@@ -37,6 +37,7 @@ class RecordTest extends TestBase {
      * @covers ::__construct
      * @covers ::setDeleted
      * @covers ::isDeleted
+     * @covers ::getFlagsField
      */
     public function testSetDeleted() {
         $this->boolGetterSetterTest(new Record(), 'isDeleted', 'setDeleted');

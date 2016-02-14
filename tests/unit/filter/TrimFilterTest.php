@@ -66,7 +66,7 @@ class TrimFilterTest extends AbstractFilterTest {
     /**
      * @covers ::setFilterInput
      * @covers ::isFilterInput
-     * @covers ::__construct
+     * @covers ::getFlags
      */
     public function testSetFilterInput() {
         $this->boolGetterSetterTest($this->getFilterObject(),
@@ -76,7 +76,7 @@ class TrimFilterTest extends AbstractFilterTest {
     /**
      * @covers ::setFilterOutput
      * @covers ::isFilterOutput
-     * @covers ::__construct
+     * @covers ::getFlags
      */
     public function testSetFilterOutput() {
         $this->boolGetterSetterTest($this->getFilterObject(),

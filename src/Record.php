@@ -17,12 +17,22 @@ use ArrayObject;
  */
 class Record extends ArrayObject {
 
-    use Flags;
-
     const FLAG_DELETED = 1;
 
     /** @var integer[] [$fieldName => $entryId] */
     private $memoEntries;
+    /** @var Flags */
+    private $flags;
+
+    /**
+     * @return \org\majkel\dbase\Flags
+     */
+    protected function getFlagsField() {
+        if (is_null($this->flags)) {
+            $this->flags = new Flags();
+        }
+        return $this->flags;
+    }
 
     /**
      * @param array $array
@@ -36,7 +46,7 @@ class Record extends ArrayObject {
      * @return boolean;
      */
     public function isDeleted() {
-        return $this->flagEnabled(self::FLAG_DELETED);
+        return $this->getFlagsField()->flagEnabled(self::FLAG_DELETED);
     }
 
     /**
@@ -44,7 +54,8 @@ class Record extends ArrayObject {
      * @return \org\majkel\dbase\Record
      */
     public function setDeleted($deleted) {
-        return $this->enableFlag(self::FLAG_DELETED, $deleted);
+        $this->getFlagsField()->enableFlag(self::FLAG_DELETED, $deleted);
+        return $this;
     }
 
     /**

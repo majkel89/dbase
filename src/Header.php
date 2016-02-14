@@ -20,8 +20,6 @@ use DateTime;
  */
 class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
 
-    use Flags;
-
     const FLAG_VALID = 1;
     const FLAG_TRANSACTION = 2;
 
@@ -39,6 +37,18 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
     protected $headerSize;
     /** @var boolean */
     protected $fieldsLocked;
+    /** @var Flags */
+    private $flags;
+
+    /**
+     * @return \org\majkel\dbase\Flags
+     */
+    protected function getFlags() {
+        if (is_null($this->flags)) {
+            $this->flags = new Flags();
+        }
+        return $this->flags;
+    }
 
     /**
      * {@inheritdoc}
@@ -138,7 +148,7 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
      * {@inheritdoc}
      */
     public function isPendingTransaction() {
-        return $this->flagEnabled(self::FLAG_TRANSACTION);
+        return $this->getFlags()->flagEnabled(self::FLAG_TRANSACTION);
     }
 
     /**
@@ -146,7 +156,8 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
      * @return \org\majkel\dbase\Header
      */
     public function setPendingTransaction($isPendingTransaction) {
-        return $this->enableFlag(self::FLAG_TRANSACTION, $isPendingTransaction);
+        $this->getFlags()->enableFlag(self::FLAG_TRANSACTION, $isPendingTransaction);
+        return $this;
     }
 
     /**
@@ -202,7 +213,7 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
      * @return boolean
      */
     public function isValid() {
-        return $this->flagEnabled(self::FLAG_VALID);
+        return $this->getFlags()->flagEnabled(self::FLAG_VALID);
     }
 
     /**
@@ -210,7 +221,8 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
      * @return \org\majkel\dbase\Header
      */
     public function setValid($valid) {
-        return $this->enableFlag(self::FLAG_VALID, $valid);
+        $this->getFlags()->enableFlag(self::FLAG_VALID, $valid);
+        return $this;
     }
 
     /**

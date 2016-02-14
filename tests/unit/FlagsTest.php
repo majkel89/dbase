@@ -24,16 +24,16 @@ class FlagsTest extends TestBase {
     /**
      * @covers ::flagEnabled
      * @covers ::enableFlag
+     * @covers ::__construct
      */
-    public function testEnableDisableFalg() {
-        $flags = $this->getObjectForTrait(self::CLS);
-        $flagsReflect = $this->reflect($flags);
+    public function testEnableDisableFlag() {
+        $flags = new Flags(2);
         /* @var $flags \org\majkel\dbase\Flags */
-        self::assertFalse($flagsReflect->flagEnabled(1));
-        self::assertSame($flags, $flagsReflect->enableFlag(1, true));
-        self::assertTrue($flagsReflect->flagEnabled(1));
-        self::assertSame($flags, $flagsReflect->enableFlag(1, false));
-        self::assertFalse($flagsReflect->flagEnabled(1));
+        self::assertTrue($flags->flagEnabled(2));
+        $flags->enableFlag(1, true);
+        self::assertTrue($flags->flagEnabled(1));
+        $flags->enableFlag(1, false);
+        self::assertFalse($flags->flagEnabled(1));
     }
 
 }

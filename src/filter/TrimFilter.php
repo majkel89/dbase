@@ -19,20 +19,27 @@ use org\majkel\dbase\Flags;
  */
 class TrimFilter extends Filter {
 
-    use Flags;
+    /** @var Flags */
+    private $flags;
 
     const FILTER_INPUT = 1;
     const FILTER_OUTPUT = 2;
 
-    public function __construct() {
-        $this->flags = self::FILTER_INPUT | self::FILTER_OUTPUT;
+    /**
+     * @return \org\majkel\dbase\Flags
+     */
+    protected function getFlags() {
+        if (is_null($this->flags)) {
+            $this->flags = new Flags(self::FILTER_INPUT | self::FILTER_OUTPUT);
+        }
+        return $this->flags;
     }
 
     /**
      * @return boolean
      */
     public function isFilterInput() {
-        return $this->flagEnabled(self::FILTER_INPUT);
+        return $this->getFlags()->flagEnabled(self::FILTER_INPUT);
     }
 
     /**
@@ -40,14 +47,15 @@ class TrimFilter extends Filter {
      * @return \org\majkel\dbase\filter\TrimFilter
      */
     public function setFilterInput($filter) {
-        return $this->enableFlag(self::FILTER_INPUT, $filter);
+        $this->getFlags()->enableFlag(self::FILTER_INPUT, $filter);
+        return $this;
     }
 
     /**
      * @return boolean
      */
     public function isFilterOutput() {
-        return $this->flagEnabled(self::FILTER_OUTPUT);
+        return $this->getFlags()->flagEnabled(self::FILTER_OUTPUT);
     }
 
     /**
@@ -55,7 +63,8 @@ class TrimFilter extends Filter {
      * @return \org\majkel\dbase\filter\TrimFilter
      */
     public function setFilterOutput($filter) {
-        return $this->enableFlag(self::FILTER_OUTPUT, $filter);
+        $this->getFlags()->enableFlag(self::FILTER_OUTPUT, $filter);
+        return $this;
     }
 
     /**

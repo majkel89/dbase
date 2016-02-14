@@ -13,24 +13,31 @@ namespace org\majkel\dbase;
  *
  * @author majkel
  */
-trait Flags {
+class Flags {
 
     /** @var integer */
-    protected $flags = 0;
+    private $flags = 0;
+
+    /**
+     * Flags constructor.
+     *
+     * @param integer $flags
+     */
+    public function __construct($flags = 0) {
+        $this->flags = (integer) $flags;
+    }
 
     /**
      * @param integer $flag
      * @param integer $enable
-     * @return \org\majkel\dbase\Flags
+     * @return void
      */
-    protected function enableFlag($flag, $enable) {
+    public function enableFlag($flag, $enable) {
         if ($enable) {
             $this->flags |= $flag;
-        }
-        else {
+        } else {
             $this->flags &= (~$flag);
         }
-        return $this;
     }
 
     /**
