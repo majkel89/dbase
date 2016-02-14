@@ -6,7 +6,7 @@ dbase
 [![Latest Stable Version](https://poser.pugx.org/org.majkel/dbase/v/stable)](https://packagist.org/packages/org.majkel/dbase)
 [![Total Downloads](https://poser.pugx.org/org.majkel/dbase/downloads)](https://packagist.org/packages/org.majkel/dbase)
 [![Latest Unstable Version](https://poser.pugx.org/org.majkel/dbase/v/unstable)](https://packagist.org/packages/org.majkel/dbase)
-![PHP Version](https://img.shields.io/badge/version-PHP%205.4%2B-lightgrey.svg)
+![PHP Version](https://img.shields.io/badge/version-PHP%205.3%2B-lightgrey.svg)
 [![License](https://poser.pugx.org/org.majkel/dbase/license)](https://packagist.org/packages/org.majkel/dbase)
 
 
