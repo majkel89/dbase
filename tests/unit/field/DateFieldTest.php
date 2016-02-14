@@ -39,7 +39,7 @@ class DateFieldTest extends AbstractFieldTest {
     }
 
     /**
-     * @param mixzed $data
+     * @param mixed $data
      * @param DateTime $expected
      * @dataProvider dataFromData
      */

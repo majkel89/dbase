@@ -38,6 +38,8 @@ class DbtMemoTest extends TestBase {
      * @covers ::gotoEntry
      * @dataProvider dataGetEntryInvalidEntryId
      * @expectedException \org\majkel\dbase\Exception
+     *
+     * @param $entryId
      */
     public function testGetEntryInvalidEntryId($entryId) {
         $mockedFile = $this->getFileMock()

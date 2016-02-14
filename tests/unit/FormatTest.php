@@ -120,6 +120,12 @@ class FormatTest extends TestBase {
     /**
      * @covers ::getReadBoundaries
      * @dataProvider dataGetReadBoundaries
+     *
+     * @param $index
+     * @param $length
+     * @param $records
+     * @param $expectedStart
+     * @param $expectedStop
      */
     public function testGetReadBoundaries($index, $length, $records, $expectedStart, $expectedStop) {
         $header = $this->getHeaderMock()
@@ -147,6 +153,10 @@ class FormatTest extends TestBase {
      * @covers ::getReadBoundaries
      * @expectedException \org\majkel\dbase\Exception
      * @dataProvider dataGetReadBoundariesException
+     *
+     * @param $index
+     * @param $length
+     * @param $records
      */
     public function testGetReadBoundariesException($index, $length, $records) {
         $header = $this->getHeaderMock()

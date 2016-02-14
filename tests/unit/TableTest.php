@@ -38,6 +38,8 @@ class TableTest extends TestBase {
 
     /**
      * @param string $methodName
+     * @param null   $result
+     * @param array  $additionalData
      */
     protected function formatProxyTest($methodName, $result = null, $additionalData = array()) {
         $format = $this->getFormatMock()

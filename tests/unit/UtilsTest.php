@@ -39,6 +39,9 @@ class UtilsTest extends TestBase {
 
     /**
      * @dataProvider dataGetType
+     *
+     * @param $variable
+     * @param $excepted
      */
     public function testGetType($variable, $excepted) {
         self::assertSame($excepted, Utils::getType($variable));
@@ -70,6 +73,11 @@ class UtilsTest extends TestBase {
 
     /**
      * @dataProvider dataToArray
+     *
+     * @param $data
+     * @param $excepted
+     *
+     * @throws \org\majkel\dbase\Exception
      */
     public function testToArray($data, $excepted) {
         self::assertSame($excepted, Utils::toArray($data));
@@ -91,6 +99,10 @@ class UtilsTest extends TestBase {
     /**
      * @dataProvider dataToArrayInvalid
      * @expectedException \org\majkel\dbase\Exception
+     *
+     * @param $data
+     *
+     * @throws \org\majkel\dbase\Exception
      */
     public function testToArrayInvalid($data) {
         Utils::toArray($data);

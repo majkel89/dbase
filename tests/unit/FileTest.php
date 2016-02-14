@@ -33,6 +33,9 @@ class FileTest extends TestBase {
     /**
      * @covers ::fread
      * @dataProvider dataFread
+     *
+     * @param $length
+     * @param $expected
      */
     public function testFread($length, $expected) {
         $file = new File('tests/fixtures/simple3.dbf', 'r');

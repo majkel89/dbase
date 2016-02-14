@@ -142,7 +142,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @return \SplFileObject
+     * @return MockWriter
      */
     protected function getFileMock() {
         return $this->mock(self::CLS_SPLFILEOBJECT);
