@@ -87,7 +87,8 @@ class MemoFactory {
      */
     public function getMemo($path, $mode, $ext = null) {
         if (is_null($ext)) {
-            $ext = strtolower((new \SplFileInfo($path))->getExtension());
+            $fileInfo = new \SplFileInfo($path);
+            $ext = strtolower($fileInfo->getExtension());
         }
         $formats = $this->getFormats();
         if (isset($formats[$ext])) {

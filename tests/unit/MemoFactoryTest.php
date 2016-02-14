@@ -10,8 +10,6 @@ namespace org\majkel\dbase;
 
 use org\majkel\dbase\tests\utils\TestBase;
 
-use Exception as StdException;
-
 /**
  * Memo factory tests
  *

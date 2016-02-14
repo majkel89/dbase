@@ -223,7 +223,7 @@ class SplFileObjectMock implements RecursiveIterator, SeekableIterator {
 
     }
 
-    public function openFile($open_mode = 'r', $use_include_path = false, resource $context = null) {
+    public function openFile($open_mode = 'r', $use_include_path = false, $context = null) {
 
     }
 
