@@ -61,7 +61,7 @@ class FormatFactory {
      * @param callable $generator
      * @return \org\majkel\dbase\FormatFactory
      */
-    public function registerFormat($name, callable $generator) {
+    public function registerFormat($name, $generator) {
         $this->formats[$name] = $generator;
         return $this;
     }
