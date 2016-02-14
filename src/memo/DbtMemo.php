@@ -52,7 +52,7 @@ class DbtMemo extends AbstractMemo {
         $file = $this->getFile();
         if (is_null($entryId)) {
             $file->fseek(0, SEEK_END);
-            $entryId = $file->getSize() / self::B_SZ;
+            $entryId = $this->getEntriesCount();
         } else {
             $entryId = $this->gotoEntry($entryId);
         }

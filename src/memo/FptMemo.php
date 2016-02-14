@@ -87,13 +87,6 @@ class FptMemo extends AbstractMemo {
     }
 
     /**
-     * @return integer
-     */
-    private function getEntitiesCount() {
-        return (integer) floor(($this->getFile()->getSize()) / $this->getBlockSize());
-    }
-
-    /**
      * @param integer|null $entryId
      * @param string       $data
      * @return integer
@@ -104,10 +97,10 @@ class FptMemo extends AbstractMemo {
         $dataLen = strlen($data);
         if (is_null($entryId)) {
             $file->fseek(0, SEEK_END);
-            $entryId = $this->getEntitiesCount();
+            $entryId = $this->getEntriesCount();
         } else {
             list($entryId, $len) = $this->gotoEntry($entryId);
-            $total = $this->getEntitiesCount();
+            $total = $this->getEntriesCount();
             if ($this->lenPaddedBlockSize($len) < $dataLen + self::BH_SZ && $entryId < $total - 1) {
                 $file->fseek(0, SEEK_END);
                 $entryId = $total;
