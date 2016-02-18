@@ -19,16 +19,14 @@ use ReflectionClass;
 class File extends SplFileObject {
 
     /**
-     * @param integer $length
-     * @return string|false
+     * @return integer
      */
-    public function fread($length) {
-        $result = false;
-        while (!$this->eof() && $length > 0) {
-            $result .= $this->fgetc();
-            $length--;
-        }
-        return $result;
+    public function getSize() {
+        $currentPos = $this->ftell();
+        $this->fseek(0, SEEK_END);
+        $fileSize = $this->ftell();
+        $this->fseek($currentPos, SEEK_SET);
+        return $fileSize;
     }
 
     /**
@@ -37,12 +35,12 @@ class File extends SplFileObject {
      * @param string $class
      * @return \SplFileObject
      */
-    public static function getObject($path, $mode, $class = '\SplFileObject') {
+    public static function getObject($path, $mode, $class = '\org\majkel\dbase\File') {
         $reflection = new ReflectionClass($class);
         if ($reflection->hasMethod('fread')) {
             $fileObject = $reflection->newInstance($path, $mode);
         } else {
-            $fileObject = new self($path, $mode);
+            $fileObject = new FileFixed($path, $mode);
         }
         return $fileObject;
     }

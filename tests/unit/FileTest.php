@@ -31,14 +31,14 @@ class FileTest extends TestBase {
     }
 
     /**
-     * @covers ::fread
+     * @covers \org\majkel\dbase\FileFixed::fread
      * @dataProvider dataFread
      *
      * @param $length
      * @param $expected
      */
     public function testFread($length, $expected) {
-        $file = new File('tests/fixtures/simple3.dbf', 'r');
+        $file = new FileFixed('tests/fixtures/simple3.dbf', 'r');
         $file->fseek(32);
         self::assertSame($expected, $file->fread($length));
     }
@@ -56,7 +56,17 @@ class FileTest extends TestBase {
      */
     public function testGetObjectHasNoFread() {
         $file = File::getObject(__FILE__, 'r', '\stdClass');
-        self::assertTrue($file instanceof File);
+        self::assertTrue($file instanceof FileFixed);
+    }
+
+    /**
+     * @covers ::getSize
+     */
+    public function testGetSize() {
+        $file = new File('tests/fixtures/file.copy', 'w+');
+        self::assertSame(0, $file->getSize());
+        $file->fwrite('123');
+        self::assertSame(3, $file->getSize());
     }
 
 }
