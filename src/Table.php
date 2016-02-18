@@ -52,6 +52,17 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     }
 
     /**
+     * @param \org\majkel\dbase\Format $format
+     * @return \org\majkel\dbase\Format
+     */
+    public static function fromFormat(Format $format) {
+        $tableReflection = new \ReflectionClass(__CLASS__);
+        $table = $tableReflection->newInstanceWithoutConstructor();
+        $table->format = $format;
+        return $table;
+    }
+
+    /**
      * @param string[] $columns
      * @return \org\majkel\dbase\Table
      */

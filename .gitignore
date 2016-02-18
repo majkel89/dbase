@@ -1,4 +1,4 @@
 /vendor/
 *.zip
 *.tar
-*.copy
+*.copy*

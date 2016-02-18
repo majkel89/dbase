@@ -54,10 +54,7 @@ class DBase3Test extends TestBase {
 
         $destination->endTransaction();
 
-        self::assertSame(
-            2 * $source->getRecordsCount(),
-            $destination->getRecordsCount()
-        );
+        self::assertSame(2 * $source->getRecordsCount(), $destination->getRecordsCount());
 
         $destination = null;
 
