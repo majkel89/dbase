@@ -56,4 +56,12 @@ abstract class AbstractMemo implements MemoInterface {
         }
     }
 
+    /**
+     * @return $this
+     */
+    public function create() {
+        $this->getFile()->ftruncate(0);
+        return $this;
+    }
+
 }

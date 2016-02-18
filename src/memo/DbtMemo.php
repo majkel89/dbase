@@ -75,4 +75,13 @@ class DbtMemo extends AbstractMemo {
     public function getType() {
         return MemoFactory::TYPE_DBT;
     }
+
+    /**
+     * @return $this
+     */
+    public function create() {
+        parent::create();
+        $this->setEntry(null, '');
+        return $this;
+    }
 }

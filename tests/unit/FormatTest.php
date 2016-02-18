@@ -807,6 +807,7 @@ class FormatTest extends TestBase {
             ->getEntry()
             ->getType()
             ->getEntriesCount()
+            ->create()
             ->setEntry(array(123, "Some text\x1A\x1A"), 124, self::once())
             ->new();
 

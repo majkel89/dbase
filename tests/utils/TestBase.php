@@ -153,6 +153,7 @@ class TestBase extends TestCase {
         return $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
+            ->create()
             ->setEntry()
             ->getEntriesCount();
     }
@@ -163,6 +164,7 @@ class TestBase extends TestCase {
     protected function getMemoObject() {
         return $this->getMemoMock()
             ->getType()
+            ->create()
             ->new();
     }
 

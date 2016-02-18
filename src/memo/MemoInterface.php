@@ -43,4 +43,9 @@ interface MemoInterface {
      * @return string
      */
     public function getType();
+
+    /**
+     * @return \org\majkel\dbase\memo\MemoInterface
+     */
+    public function create();
 }

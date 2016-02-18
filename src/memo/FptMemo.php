@@ -127,4 +127,17 @@ class FptMemo extends AbstractMemo {
     public function getType() {
         return MemoFactory::TYPE_FPT;
     }
+
+    /**
+     * @return \org\majkel\dbase\memo\MemoInterface
+     */
+    public function create() {
+        parent::create();
+        $this->blockSize = 512;
+        $this->getFile()->fseek(0);
+        $data = pack('Vvn@' . $this->getBlockSize(), 0, 0, $this->getBlockSize());
+        $this->getFile()->fwrite($data);
+        $this->setEntry(null, '');
+        return $this;
+    }
 }
