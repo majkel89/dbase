@@ -25,7 +25,7 @@ class DBase3 extends Format {
      */
     protected function createHeader($data) {
         $header = parent::createHeader($data);
-        return $header->setValid($header->getVersion() & 3);
+        return $header->setValid($header->getVersion() & $this->getVersion());
     }
 
     /**
@@ -41,5 +41,12 @@ class DBase3 extends Format {
      */
     public function getType() {
         return Format::DBASE3;
+    }
+
+    /**
+     * @return integer
+     */
+    protected function getVersion() {
+        return 3;
     }
 }

@@ -536,6 +536,7 @@ class TableTest extends TestBase {
         $format = $this->mock(self::CLS_FORMAT)
             ->getType('TYPE')
             ->supportsType(true)
+            ->getVersion()
             ->new();
         $table = $this->mock(self::CLS)->getFormat($format)->new();
         self::assertSame('TYPE', $table->getFormatType());

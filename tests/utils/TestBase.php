@@ -100,6 +100,7 @@ class TestBase extends TestCase {
     protected function getFormatMock() {
         return $this->mock(self::CLS_FORMAT)
             ->getType()
+            ->getVersion()
             ->supportsType(true);
     }
 

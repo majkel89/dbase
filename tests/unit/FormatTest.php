@@ -224,6 +224,7 @@ class FormatTest extends TestBase {
             ->supportsType(array(Field::TYPE_CHARACTER), false, self::once())
             ->getName('FoRmAt', self::once())
             ->getType()
+            ->getVersion()
             ->new();
         $this->reflect($format)->createField(array(
             't' => Field::TYPE_CHARACTER,
