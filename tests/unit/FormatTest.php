@@ -826,10 +826,13 @@ class FormatTest extends TestBase {
 
     /**
      * @covers ::insert
+     * @covers ::getRecordOffset
      */
     public function testInsert() {
         $header = new Header();
         $header->setRecordsCount(3);
+        $header->setHeaderSize(11);
+        $header->setRecordSize(7);
 
         $record = new Record(array(
             'f1' => 'T',
@@ -841,7 +844,7 @@ class FormatTest extends TestBase {
             ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
-        $file->expects(self::once())->method('fseek')->with(-1, SEEK_END);
+        $file->expects(self::once())->method('fseek')->with(11 + 3 * 7);
         $file->expects(self::once())->method('fwrite')->with("<RECORD>\x1A");
 
         $format = $this->getFormatMock()

@@ -347,6 +347,14 @@ abstract class Format {
     }
 
     /**
+     * @param integer $index
+     * @return integer
+     */
+    private function getRecordOffset($index) {
+        return $index * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize();
+    }
+
+    /**
      * @param \org\majkel\dbase\Record $data
      * @return integer
      */
@@ -359,7 +367,9 @@ abstract class Format {
         }
 
         $file = $this->getFile();
-        $file->fseek(-1, SEEK_END);
+
+        $file->fseek($this->getRecordOffset($newIndex));
+
         $data->setDeleted(false);
         $file->fwrite($this->serializeRecord($data) . self::RECORD_END);
         return $newIndex;
@@ -378,7 +388,7 @@ abstract class Format {
         }
 
         $file = $this->getFile();
-        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+        $file->fseek($this->getRecordOffset($offset));
 
         $data = $this->serializeRecord($data);
         $file->fwrite($data);
