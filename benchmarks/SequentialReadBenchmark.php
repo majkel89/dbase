@@ -27,10 +27,10 @@ class SequentialReadBenchmark extends AthleticEvent {
      */
     public function classSetUp() {
         $sourceTableFilePath    = 'tests/fixtures/producents.dbf';
-        $this->notBufferedTable = new Table($sourceTableFilePath, Table::MODE_READ);
-        $this->buffered200Table = new Table($sourceTableFilePath, Table::MODE_READ);
-        $this->buffered100Table = new Table($sourceTableFilePath, Table::MODE_READ);
-        $this->buffered500Table = new Table($sourceTableFilePath, Table::MODE_READ);
+        $this->notBufferedTable = Table::fromFile($sourceTableFilePath, Table::MODE_READ);
+        $this->buffered200Table = Table::fromFile($sourceTableFilePath, Table::MODE_READ);
+        $this->buffered100Table = Table::fromFile($sourceTableFilePath, Table::MODE_READ);
+        $this->buffered500Table = Table::fromFile($sourceTableFilePath, Table::MODE_READ);
     }
 
     /**
