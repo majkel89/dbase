@@ -22,6 +22,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     const MODE_READ = 'rb';
     const MODE_WRITE = self::MODE_READWRITE;
     const MODE_READWRITE = 'rb+';
+    const MODE_CREATE = 'wb+';
 
     const BUFFER_BYTES = 0;
     const BUFFER_RECORDS = 1;

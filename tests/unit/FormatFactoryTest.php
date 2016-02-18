@@ -107,8 +107,8 @@ class FormatFactoryTest extends TestBase {
     public function dataGetMode() {
         return array(
             array(Table::MODE_READ, 'rb'),
-            array(Table::MODE_WRITE, 'rb+'),
             array(Table::MODE_READWRITE, 'rb+'),
+            array(Table::MODE_CREATE, 'wb+'),
             array('UNKNOWN', 'rb'),
         );
     }
