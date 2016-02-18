@@ -22,7 +22,7 @@ class DBase3Test extends TestBase {
      * @coversNothing
      */
     public function testReadDbase3() {
-        $dbf = new Table('tests/fixtures/dBase3.dbf');
+        $dbf = Table::fromFile('tests/fixtures/dBase3.dbf');
         self::assertSame($dbf->getRecordsCount(), 6);
         $record = $dbf->getRecord(0);
         self::assertSame('4', $record->SL_CHPODPL);
@@ -43,8 +43,8 @@ class DBase3Test extends TestBase {
 
         copy($sourceFile, $destinationFile);
 
-        $source = new Table($sourceFile);
-        $destination = new Table($destinationFile, Table::MODE_READWRITE);
+        $source = Table::fromFile($sourceFile);
+        $destination = Table::fromFile($destinationFile, Table::MODE_READWRITE);
 
         $destination->beginTransaction();
 
@@ -60,7 +60,7 @@ class DBase3Test extends TestBase {
 
         $destinationFile2 = 'tests/fixtures/simple3.dbf.2.copy';
         copy($destinationFile, $destinationFile2);
-        $final = new Table($destinationFile2);
+        $final = Table::fromFile($destinationFile2);
         $records = 0;
         foreach ($final as $record) {
             self::assertFalse(empty($record->F1));
@@ -76,7 +76,7 @@ class DBase3Test extends TestBase {
      */
     public function testReadLongFile() {
         $results = array();
-        $dbf = new Table('tests/fixtures/producents.dbf');
+        $dbf = Table::fromFile('tests/fixtures/producents.dbf');
         foreach ($dbf as $index => $record) {
             $results[$index] = $record->SL_PROD;
         }

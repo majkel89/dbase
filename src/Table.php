@@ -43,23 +43,23 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     protected $transaction = false;
 
     /**
-     * @param string $filePath
-     * @param string $mode
-     * @param string $format
+     * @param \org\majkel\dbase\Format $format
      */
-    public function __construct($filePath, $mode = self::MODE_READ, $format = Format::AUTO) {
-        $this->format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
+    public function __construct(Format $format) {
+        $this->format = $format;
     }
 
     /**
-     * @param \org\majkel\dbase\Format $format
-     * @return \org\majkel\dbase\Format
+     * @param string $filePath
+     * @param string $mode
+     * @param string $format
+     *
+     * @return static
+     * @throws \org\majkel\dbase\Exception
      */
-    public static function fromFormat(Format $format) {
-        $tableReflection = new \ReflectionClass(__CLASS__);
-        $table = $tableReflection->newInstanceWithoutConstructor();
-        $table->format = $format;
-        return $table;
+    public static function fromFile($filePath,$mode = self::MODE_READ, $format = Format::AUTO) {
+        $format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
+        return new static($format);
     }
 
     /**

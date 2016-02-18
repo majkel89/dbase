@@ -85,7 +85,7 @@ class Builder {
      * @return \org\majkel\dbase\Builder
      */
     public static function fromFile($filePath) {
-        return self::fromTable(new Table($filePath, Table::MODE_READ));
+        return self::fromTable(Table::fromFile($filePath, Table::MODE_READ));
     }
 
     /**
@@ -135,8 +135,7 @@ class Builder {
             $memo = $memoFactory->getMemo($memoPath, Table::MODE_CREATE, $memoType)->create();
             $format->setMemo($memo);
         }
-        $table = Table::fromFormat($format);
-        return $table;
+        return new Table($format);
     }
 
     /**

@@ -52,11 +52,11 @@ class TableTest extends TestBase {
     }
 
     /**
-     * @covers ::__construct
+     * @covers ::fromFile
      * @covers ::getFormat
      */
-    public function testConstruct() {
-        $format = new stdClass;
+    public function testFromFile() {
+        $format = $this->getFormatStub();
 
         $formatFactory = $this->mock(self::CLS_FORMAT_FACTORY)
             ->getFormat(array('FORMAT', 'FILE', 'MODE'), $format, self::once())
@@ -64,10 +64,7 @@ class TableTest extends TestBase {
 
         FormatFactory::setInstance($formatFactory);
 
-        $table = $this->mock(self::CLS)->new();
-        /* @var $table \org\majkel\dbase\Table */
-
-        $table->__construct('FILE', 'MODE', 'FORMAT');
+        $table = Table::fromFile('FILE', 'MODE', 'FORMAT');
 
         self::assertNull($table->getColumns());
         self::assertSame(512, $table->getBufferSize());

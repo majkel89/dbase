@@ -8,9 +8,6 @@
 
 namespace org\majkel\dbase;
 
-use SplFileObject;
-use ReflectionClass;
-
 /**
  * Description of SplFileObject
  *

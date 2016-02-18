@@ -54,7 +54,7 @@ class BuilderIntegrationTest extends TestBase {
         }
         $table = null;
 
-        $table = new Table($destinationPath);
+        $table = Table::fromFile($destinationPath);
         self::assertTrue($table->isValid());
         self::assertSame(3, $table->getRecordsCount());
         foreach ($table as $record) {
@@ -88,7 +88,7 @@ class BuilderIntegrationTest extends TestBase {
         $table->insert($recordData);
         $table = null;
 
-        $table = new Table($filePath);
+        $table = Table::fromFile($filePath);
         self::assertTrue($table->isValid());
         self::assertSame(3, $table->getRecordsCount());
         self::assertSame($recordData, $table->getRecord(0)->toArray());
