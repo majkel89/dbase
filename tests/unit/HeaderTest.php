@@ -240,4 +240,15 @@ class HeaderTest extends TestBase {
         $header = $this->getHeaderStub();
         $header->offsetSet(0, new \stdClass());
     }
+
+    /**
+     * @test
+     * @covers ::__clone
+     */
+    public function testClone() {
+        $header = new Header();
+        $header->lockFields();
+        $clonedHeader = clone $header;
+        self::assertFalse($clonedHeader->isFieldsLocked());
+    }
 }

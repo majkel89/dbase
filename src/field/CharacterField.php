@@ -18,6 +18,13 @@ use \org\majkel\dbase\Field;
 class CharacterField extends Field {
 
     /**
+     * CharacterField constructor.
+     */
+    public function __construct() {
+        $this->length = 1;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toData($value) {

@@ -61,4 +61,18 @@ abstract class AbstractFieldTest extends TestBase {
         self::assertSame($expected, $this->getFieldObject()->fromData($data));
     }
 
+    /**
+     * @return integer
+     */
+    abstract public function getDefaultLength();
+
+    /**
+     * @test
+     * @covers ::__construct
+     */
+    public function testDefaultLength() {
+        $className = static::CLS;
+        $filed = new $className;
+        self::assertSame($this->getDefaultLength(), $filed->getLength());
+    }
 }

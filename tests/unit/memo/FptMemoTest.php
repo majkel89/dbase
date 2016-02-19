@@ -9,6 +9,7 @@
 namespace org\majkel\dbase\memo;
 
 use org\majkel\dbase\Exception;
+use org\majkel\dbase\MemoFactory;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
@@ -39,6 +40,8 @@ class FptMemoTest extends TestBase {
      * @covers ::gotoEntry
      * @dataProvider dataGetEntryInvalidEntryId
      * @expectedException \org\majkel\dbase\Exception
+     *
+     * @param $entryId
      */
     public function testGetEntryInvalidEntryId($entryId) {
         $mockedFile = $this->getFileMock()
@@ -67,6 +70,9 @@ class FptMemoTest extends TestBase {
      * @covers ::getEntry
      * @covers ::gotoEntry
      * @dataProvider dataGetEntry
+     *
+     * @param $entryId
+     * @param $expected
      */
     public function testGetEntry($entryId, $expected) {
         $mockedFile = $this->getFileMock()
@@ -96,6 +102,8 @@ class FptMemoTest extends TestBase {
      * @covers ::getEntry
      * @covers ::gotoEntry
      * @dataProvider dataGetEntryZero
+     *
+     * @param $entryId
      */
     public function testGetEntryZero($entryId) {
         $mockedFile = $this->getFileMock()
@@ -161,7 +169,6 @@ class FptMemoTest extends TestBase {
     /**
      * Adds new entry
      * @covers ::setEntry
-     * @covers ::getEntitiesCount
      * @covers ::lenPaddedBlockSize
      */
     public function testSetEntryNew() {
@@ -180,6 +187,7 @@ class FptMemoTest extends TestBase {
         $memo = $this->mock(self::CLS)
             ->getFile($file)
             ->getBlockSize(16)
+            ->getType()
             ->new();
 
         self::assertSame(3, $memo->setEntry(null, 'data'));
@@ -288,5 +296,45 @@ class FptMemoTest extends TestBase {
             ->new();
 
         self::assertSame(1, $memo->setEntry(1, str_repeat('a', 8)));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataGetEntriesCount() {
+        return array(
+            array(                      0,     10, 0),
+            array(FptMemo::BH_SZ + 1 * 10,     10, 1),
+            array(FptMemo::BH_SZ + 5 * 10,     10, 5),
+            array(FptMemo::BH_SZ + 5 * 10 + 5, 10, 6),
+        );
+    }
+
+    /**
+     * @param $fileSize
+     * @param $blockSize
+     * @param $expectedEntries
+     * @dataProvider dataGetEntriesCount
+     * @covers ::getEntriesCount
+     */
+    public function testGetEntriesCount($fileSize, $blockSize, $expectedEntries) {
+        $file = $this->getMockBuilder(self::CLS_SPLFILEOBJECT)
+            ->setMethods(array('getSize'))
+            ->disableOriginalConstructor()
+            ->getMock();
+        $file->expects(self::any())->method('getSize')->willReturn($fileSize);
+        $memo = $this->mock(self::CLS)
+            ->getFile($file)
+            ->getBlockSize($blockSize)
+            ->new();
+        self::assertSame($expectedEntries, $memo->getEntriesCount());
+    }
+
+    /**
+     * @covers ::getType
+     */
+    public function testGetType() {
+        $memo = $this->mock(self::CLS)->new();
+        self::assertSame(MemoFactory::TYPE_FPT, $memo->getType());
     }
 }

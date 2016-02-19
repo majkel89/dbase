@@ -53,4 +53,10 @@ class LogicalFieldTest extends AbstractFieldTest {
         );
     }
 
+    /**
+     * @return integer
+     */
+    public function getDefaultLength() {
+        return 1;
+    }
 }

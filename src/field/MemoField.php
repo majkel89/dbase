@@ -20,6 +20,13 @@ class MemoField extends Field {
     const CHAR_MASK = "\x00\x\x1A\x04\x02";
 
     /**
+     * CharacterField constructor.
+     */
+    public function __construct() {
+        $this->length = 10;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toData($value) {

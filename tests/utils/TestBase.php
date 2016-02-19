@@ -99,6 +99,8 @@ class TestBase extends TestCase {
      */
     protected function getFormatMock() {
         return $this->mock(self::CLS_FORMAT)
+            ->getType()
+            ->getVersion()
             ->supportsType(true);
     }
 
@@ -152,14 +154,19 @@ class TestBase extends TestCase {
         return $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
-            ->setEntry();
+            ->create()
+            ->setEntry()
+            ->getEntriesCount();
     }
 
     /**
      * @return MemoInterface
      */
     protected function getMemoObject() {
-        return $this->getMemoMock()->new();
+        return $this->getMemoMock()
+            ->getType()
+            ->create()
+            ->new();
     }
 
 }

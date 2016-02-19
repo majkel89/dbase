@@ -22,6 +22,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     const MODE_READ = 'rb';
     const MODE_WRITE = self::MODE_READWRITE;
     const MODE_READWRITE = 'rb+';
+    const MODE_CREATE = 'wb+';
 
     const BUFFER_BYTES = 0;
     const BUFFER_RECORDS = 1;
@@ -42,12 +43,23 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     protected $transaction = false;
 
     /**
+     * @param \org\majkel\dbase\Format $format
+     */
+    public function __construct(Format $format) {
+        $this->format = $format;
+    }
+
+    /**
      * @param string $filePath
      * @param string $mode
      * @param string $format
+     *
+     * @return static
+     * @throws \org\majkel\dbase\Exception
      */
-    public function __construct($filePath, $mode = self::MODE_READ, $format = Format::AUTO) {
-        $this->format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
+    public static function fromFile($filePath,$mode = self::MODE_READ, $format = Format::AUTO) {
+        $format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
+        return new static($format);
     }
 
     /**
@@ -375,5 +387,23 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      */
     protected function getFormat() {
         return $this->format;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormatType() {
+        return $this->getFormat()->getType();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMemoType() {
+        try {
+            return $this->getFormat()->getMemo()->getType();
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }

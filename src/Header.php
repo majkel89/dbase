@@ -312,4 +312,10 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
         throw new Exception("Field `$name` does not exists");
     }
 
+    /**
+     * @return void
+     */
+    public function __clone() {
+        $this->fieldsLocked = false;
+    }
 }

@@ -52,11 +52,11 @@ class TableTest extends TestBase {
     }
 
     /**
-     * @covers ::__construct
+     * @covers ::fromFile
      * @covers ::getFormat
      */
-    public function testConstruct() {
-        $format = new stdClass;
+    public function testFromFile() {
+        $format = $this->getFormatStub();
 
         $formatFactory = $this->mock(self::CLS_FORMAT_FACTORY)
             ->getFormat(array('FORMAT', 'FILE', 'MODE'), $format, self::once())
@@ -64,10 +64,7 @@ class TableTest extends TestBase {
 
         FormatFactory::setInstance($formatFactory);
 
-        $table = $this->mock(self::CLS)->new();
-        /* @var $table \org\majkel\dbase\Table */
-
-        $table->__construct('FILE', 'MODE', 'FORMAT');
+        $table = Table::fromFile('FILE', 'MODE', 'FORMAT');
 
         self::assertNull($table->getColumns());
         self::assertSame(512, $table->getBufferSize());
@@ -76,6 +73,11 @@ class TableTest extends TestBase {
     }
 
     /**
+     * @param $F1
+     * @param $F2
+     * @param $F3
+     * @param $times
+     *
      * @return \org\majkel\dbase\Table
      */
     protected function getTableWithColumns($F1, $F2, $F3, $times) {
@@ -121,6 +123,8 @@ class TableTest extends TestBase {
      * @covers ::setColumns
      * @covers ::getColumns
      * @dataProvider dataSetColumnsEmptyArguments
+     *
+     * @param $columns
      */
     public function testSetColumnsEmptyArguments($columns) {
         $table = $this->getTableWithColumns(true, true, true, 2);
@@ -352,6 +356,9 @@ class TableTest extends TestBase {
     /**
      * @covers ::offsetExists
      * @dataProvider dataOffsetExists
+     *
+     * @param $index
+     * @param $excepted
      */
     public function testOffsetExists($index, $excepted) {
         $table = $this->mock(self::CLS)
@@ -519,4 +526,34 @@ class TableTest extends TestBase {
         self::assertFalse($table->getRecord(22)->isDeleted());
     }
 
+    /**
+     * @covers ::getFormatType
+     */
+    public function testGetFormatType() {
+        $format = $this->mock(self::CLS_FORMAT)
+            ->getType('TYPE')
+            ->supportsType(true)
+            ->getVersion()
+            ->new();
+        $table = $this->mock(self::CLS)->getFormat($format)->new();
+        self::assertSame('TYPE', $table->getFormatType());
+    }
+
+    /**
+     * @covers ::getMemoType
+     */
+    public function testGetMemoType() {
+        $memo = $this->getMemoMock()->getType('TYPE')->new();
+        $format = $this->getFormatMock()->getType()->getMemo($memo)->new();
+        $table = $this->mock(self::CLS)->getFormat($format)->new();
+        self::assertSame('TYPE', $table->getMemoType());
+    }
+
+    /**
+     * @covers ::getMemoType
+     */
+    public function testGetMemoTypeException() {
+        $table = $this->mock(self::CLS)->getFormat(new Exception('Some exception'))->new();
+        self::assertNull($table->getMemoType());
+    }
 }

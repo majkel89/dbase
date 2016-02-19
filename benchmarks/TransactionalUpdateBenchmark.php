@@ -35,12 +35,12 @@ class TransactionalUpdateBenchmark extends AthleticEvent {
         copy($sourceTableFilePath, $transactionalTablePath);
         copy($sourceTableFilePath, $nonTransactionalTablePath);
 
-        $this->sourceTable = new Table($sourceTableFilePath, Table::MODE_READ);
+        $this->sourceTable = Table::fromFile($sourceTableFilePath, Table::MODE_READ);
 
-        $this->transactionalTable = new Table($transactionalTablePath, Table::MODE_READWRITE);
+        $this->transactionalTable = Table::fromFile($transactionalTablePath, Table::MODE_READWRITE);
         $this->transactionalTable->beginTransaction();
 
-        $this->nonTransactionalTable = new Table($nonTransactionalTablePath, Table::MODE_READWRITE);
+        $this->nonTransactionalTable = Table::fromFile($nonTransactionalTablePath, Table::MODE_READWRITE);
     }
 
     /**

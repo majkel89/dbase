@@ -8,6 +8,7 @@
 
 namespace org\majkel\dbase\format;
 
+use org\majkel\dbase\Format;
 use org\majkel\dbase\tests\utils\AbstractFormatTest;
 use org\majkel\dbase\Field;
 
@@ -66,6 +67,13 @@ class DBase3Test extends AbstractFormatTest {
      */
     public function testGetName() {
         self::assertSame('dBASE III PLUS', $this->getFormatObject()->getName());
+    }
+
+    /**
+     * @covers ::getType
+     */
+    public function testGetType() {
+        self::assertSame(Format::DBASE3, $this->getFormatObject()->getType());
     }
 
 }

@@ -347,6 +347,14 @@ abstract class Format {
     }
 
     /**
+     * @param integer $index
+     * @return integer
+     */
+    private function getRecordOffset($index) {
+        return $index * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize();
+    }
+
+    /**
      * @param \org\majkel\dbase\Record $data
      * @return integer
      */
@@ -359,7 +367,9 @@ abstract class Format {
         }
 
         $file = $this->getFile();
-        $file->fseek(-1, SEEK_END);
+
+        $file->fseek($this->getRecordOffset($newIndex));
+
         $data->setDeleted(false);
         $file->fwrite($this->serializeRecord($data) . self::RECORD_END);
         return $newIndex;
@@ -378,7 +388,7 @@ abstract class Format {
         }
 
         $file = $this->getFile();
-        $file->fseek($offset * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize());
+        $file->fseek($this->getRecordOffset($offset));
 
         $data = $this->serializeRecord($data);
         $file->fwrite($data);
@@ -515,7 +525,7 @@ abstract class Format {
                 $value = $data['f'.$name];
                 if ($field->isMemoEntry()) {
                     $record->setMemoEntryId($name, $value);
-                    $value = $this->readMemoEntry($value);
+                    $value = $this->readMemoEntry($record->getMemoEntryId($name));
                 }
                 $record[$name] = $field->unserialize($value);
             }
@@ -531,4 +541,73 @@ abstract class Format {
             Format::DBASE3,
         );
     }
+
+    abstract public function getType();
+
+    /**
+     * @param \org\majkel\dbase\Header $header
+     * @return $this
+     */
+    public function create(Header $header) {
+        $this->getFile()->ftruncate(0);
+
+        $header = clone $header;
+        $header->setValid(true);
+        $this->header = $header;
+
+        $header->setVersion($this->getVersion());
+        $header->setRecordsCount(0);
+        $header->setRecordSize($this->calculateRecordSize()); // record size
+        $header->setHeaderSize($this->calculateHeaderSize()); // header size
+
+        $this->writeHeader();
+        $this->writeRecords();
+        $this->getFile()->fwrite(self::RECORD_END);
+        return $this;
+    }
+
+    /**
+     * @return integer
+     */
+    protected function calculateRecordSize() {
+        $result = 1;
+        foreach ($this->getHeader()->getFields() as $field) {
+            $result += $field->getLength();
+        }
+        return $result;
+    }
+
+    /**
+     * @return integer
+     */
+    protected function calculateHeaderSize() {
+        $result = self::HEADER_SIZE + $this->getHeader()->getFieldsCount() * self::FIELD_SIZE + 2;
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWriteFieldFormat() {
+        return 'a11a1VC@32';
+    }
+
+    /**
+     * @return void
+     */
+    protected function writeRecords() {
+        $file = $this->getFile();
+        $file->fseek(self::HEADER_SIZE);
+        $data = '';
+        foreach ($this->getHeader()->getFields() as $field) {
+            $data .= pack($this->getWriteFieldFormat(), $field->getName(), $field->getType(), 0, $field->getLength());
+        }
+        $data .= "\x0D\x00";
+        $file->fwrite($data);
+    }
+
+    /**
+     * @return integer
+     */
+    abstract protected function getVersion();
 }

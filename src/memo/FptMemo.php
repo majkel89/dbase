@@ -9,6 +9,7 @@
 namespace org\majkel\dbase\memo;
 
 use org\majkel\dbase\Exception;
+use org\majkel\dbase\MemoFactory;
 
 /**
  * Description of FptMemo
@@ -87,13 +88,6 @@ class FptMemo extends AbstractMemo {
     }
 
     /**
-     * @return integer
-     */
-    private function getEntitiesCount() {
-        return (integer) floor(($this->getFile()->getSize()) / $this->getBlockSize());
-    }
-
-    /**
      * @param integer|null $entryId
      * @param string       $data
      * @return integer
@@ -104,10 +98,10 @@ class FptMemo extends AbstractMemo {
         $dataLen = strlen($data);
         if (is_null($entryId)) {
             $file->fseek(0, SEEK_END);
-            $entryId = $this->getEntitiesCount();
+            $entryId = $this->getEntriesCount();
         } else {
             list($entryId, $len) = $this->gotoEntry($entryId);
-            $total = $this->getEntitiesCount();
+            $total = $this->getEntriesCount();
             if ($this->lenPaddedBlockSize($len) < $dataLen + self::BH_SZ && $entryId < $total - 1) {
                 $file->fseek(0, SEEK_END);
                 $entryId = $total;
@@ -117,5 +111,33 @@ class FptMemo extends AbstractMemo {
         }
         $file->fwrite(pack('NNa' . $dataLen . '@' . $this->lenPaddedBlockSize($dataLen), 1, $dataLen, $data));
         return $entryId;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getEntriesCount() {
+        $dataSize = max(0, $this->getFile()->getSize());
+        return (integer) floor($dataSize / $this->getBlockSize());
+    }
+
+    /**
+     * @return string
+     */
+    public function getType() {
+        return MemoFactory::TYPE_FPT;
+    }
+
+    /**
+     * @return \org\majkel\dbase\memo\MemoInterface
+     */
+    public function create() {
+        parent::create();
+        $this->blockSize = 512;
+        $this->getFile()->fseek(0);
+        $data = pack('Vvn@' . $this->getBlockSize(), 0, 0, $this->getBlockSize());
+        $this->getFile()->fwrite($data);
+        $this->setEntry(null, '');
+        return $this;
     }
 }

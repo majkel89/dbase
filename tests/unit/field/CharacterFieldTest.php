@@ -48,4 +48,10 @@ class CharacterFieldTest extends AbstractFieldTest {
         );
     }
 
+    /**
+     * @return integer
+     */
+    public function getDefaultLength() {
+        return 1;
+    }
 }

@@ -223,6 +223,8 @@ class FormatTest extends TestBase {
         $format = $this->mock(self::CLS_FORMAT)
             ->supportsType(array(Field::TYPE_CHARACTER), false, self::once())
             ->getName('FoRmAt', self::once())
+            ->getType()
+            ->getVersion()
             ->new();
         $this->reflect($format)->createField(array(
             't' => Field::TYPE_CHARACTER,
@@ -706,6 +708,9 @@ class FormatTest extends TestBase {
     /**
      * @dataProvider dataMarkDeleted
      * @covers ::markDeleted
+     *
+     * @param $deleted
+     * @param $char
      */
     public function testMarkDeleted($deleted, $char) {
         $header = new Header();
@@ -801,6 +806,9 @@ class FormatTest extends TestBase {
         $memoFile = $this->mock(self::CLS_MEMO)
             ->getFileInfo()
             ->getEntry()
+            ->getType()
+            ->getEntriesCount()
+            ->create()
             ->setEntry(array(123, "Some text\x1A\x1A"), 124, self::once())
             ->new();
 
@@ -820,10 +828,13 @@ class FormatTest extends TestBase {
 
     /**
      * @covers ::insert
+     * @covers ::getRecordOffset
      */
     public function testInsert() {
         $header = new Header();
         $header->setRecordsCount(3);
+        $header->setHeaderSize(11);
+        $header->setRecordSize(7);
 
         $record = new Record(array(
             'f1' => 'T',
@@ -835,7 +846,7 @@ class FormatTest extends TestBase {
             ->setMethods(array('fseek', 'fwrite'))
             ->disableOriginalConstructor()
             ->getMock();
-        $file->expects(self::once())->method('fseek')->with(-1, SEEK_END);
+        $file->expects(self::once())->method('fseek')->with(11 + 3 * 7);
         $file->expects(self::once())->method('fwrite')->with("<RECORD>\x1A");
 
         $format = $this->getFormatMock()

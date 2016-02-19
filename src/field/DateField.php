@@ -19,6 +19,13 @@ use DateTime;
 class DateField extends Field {
 
     /**
+     * CharacterField constructor.
+     */
+    public function __construct() {
+        $this->length = 8;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toData($value) {

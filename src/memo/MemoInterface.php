@@ -34,4 +34,18 @@ interface MemoInterface {
      */
     public function setEntry($entryId, $data);
 
+    /**
+     * @return integer
+     */
+    public function getEntriesCount();
+
+    /**
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * @return \org\majkel\dbase\memo\MemoInterface
+     */
+    public function create();
 }

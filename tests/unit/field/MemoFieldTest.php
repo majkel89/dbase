@@ -43,4 +43,10 @@ class MemoFieldTest extends AbstractFieldTest {
         );
     }
 
+    /**
+     * @return integer
+     */
+    public function getDefaultLength() {
+        return 10;
+    }
 }
