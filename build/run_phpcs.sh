@@ -8,6 +8,7 @@ vendor/bin/phpcs -p \
     -d memory_limit=256M \
     --ignore=tests/report \
     src/ \
+    benchmarks/ \
     tests/
 
 vendor/bin/phpcbf -p \
@@ -15,5 +16,5 @@ vendor/bin/phpcbf -p \
     -d memory_limit=256M \
     --ignore=tests/report \
     src/ \
+    benchmarks/ \
     tests/
-

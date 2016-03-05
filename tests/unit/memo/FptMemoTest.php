@@ -8,7 +8,6 @@
 
 namespace org\majkel\dbase\memo;
 
-use org\majkel\dbase\Exception;
 use org\majkel\dbase\MemoFactory;
 use org\majkel\dbase\tests\utils\TestBase;
 
@@ -196,7 +195,7 @@ class FptMemoTest extends TestBase {
     /**
      * Tries to modify non existing entry
      * @covers ::setEntry
-     * @expectedException Exception
+     * @expectedException \org\majkel\dbase\Exception
      * @expectedExceptionMessage Unable to move to block `333`
      */
     public function testSetEntryInvalid() {
