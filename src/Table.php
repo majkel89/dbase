@@ -57,7 +57,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      * @return static
      * @throws \org\majkel\dbase\Exception
      */
-    public static function fromFile($filePath,$mode = self::MODE_READ, $format = Format::AUTO) {
+    public static function fromFile($filePath, $mode = self::MODE_READ, $format = Format::AUTO) {
         $format = FormatFactory::getInstance()->getFormat($format, $filePath, $mode);
         return new static($format);
     }
