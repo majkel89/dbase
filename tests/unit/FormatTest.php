@@ -8,7 +8,6 @@
 
 namespace org\majkel\dbase;
 
-use org\majkel\dbase\memo\MemoInterface;
 use org\majkel\dbase\tests\utils\TestBase;
 
 use stdClass;

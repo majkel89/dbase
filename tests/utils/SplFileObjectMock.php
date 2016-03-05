@@ -10,7 +10,6 @@ namespace org\majkel\dbase\tests\utils;
 
 use RecursiveIterator;
 use SeekableIterator;
-use resource;
 
 /**
  * SplFileObject class sceleton used for mocking

@@ -10,8 +10,6 @@ namespace org\majkel\dbase;
 
 use org\majkel\dbase\tests\utils\TestBase;
 
-use ReflectionClass;
-
 /**
  * Builder class tests
  *

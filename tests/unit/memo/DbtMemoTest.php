@@ -9,7 +9,6 @@
 namespace org\majkel\dbase\memo;
 
 use org\majkel\dbase\MemoFactory;
-use org\majkel\dbase\Table;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
