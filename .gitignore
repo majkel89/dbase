@@ -2,3 +2,4 @@
 *.zip
 *.tar
 *.copy*
+/composer.lock

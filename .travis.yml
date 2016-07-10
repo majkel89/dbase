@@ -13,8 +13,7 @@ matrix:
     allow_failures:
         - php: hhvm
         - php: nightly
-        - php: 7.0.0
-        - php: 7.0.1
+        - php: 7.0
 
 install:
     - composer self-update
