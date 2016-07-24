@@ -14,10 +14,22 @@ matrix:
         - php: nightly
         - php: 7.0
 
+before_install:
+    - phpenv config-rm xdebug.ini
+
 install:
     - composer self-update
     - composer install -o --dev
 
+after_install:
+    - phpenv config-add xdebug.ini
+
+before_script:
+    - if [[ $TRAVIS_PHP_VERSION == 7* ]]; then phpenv config-rm xdebug.ini; fi
+
 script:
-    - ./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml
+    - composer test-travis-ci
     - bash build/run_benchmarks.sh
+
+after_script:
+    - if [[ $TRAVIS_PHP_VERSION == 7* ]]; then phpenv config-add xdebug.ini; fi

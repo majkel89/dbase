@@ -31,10 +31,15 @@
         }
     },
     "require-dev": {
+        "ext-iconv": "*",
         "phpunit/phpunit": "4.7.*",
         "ptrofimov/xpmock": "1.*",
         "squizlabs/php_codesniffer": "2.*",
         "symfony/yaml": "~2.1",
         "athletic/athletic": "^0.1.8"
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit",
+        "test-travis-ci": "./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml"
     }
 }
