@@ -40,6 +40,7 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit",
-        "test-travis-ci": "./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml"
+        "test-travis-ci": "./vendor/bin/phpunit --configuration ./build/travis.phpunit.xml",
+        "benchmark": "bash build/run_benchmarks.sh"
     }
 }
