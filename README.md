@@ -14,7 +14,7 @@ Library for processing dbase tables.
 ## Table of Contents
 
 1. [Supported formats](#supported-formats)
-   1. [Supported memo formats](#supported-memo-formats)
+    1. [Supported memo formats](#supported-memo-formats)
 2. [Installation](#installation)
 3. [Documentation](#documentation)
    1. [Reading tables](#reading-tables)
@@ -23,22 +23,22 @@ Library for processing dbase tables.
    4. [Updating tables](#updating-tables)
    5. [Transactions](#transactions)
    5. [Defining tables](#defining-tables)
-      1. [Creating table from another table](#creating-table-from-another-table)
+       1. [Creating table from another table](#creating-table-from-another-table)
    6. [Filters](#filters)
-      1. [Using filters](#using-filters)
-      2. [Writing custom filter](#writing-custom-filter)
+       1. [Using filters](#using-filters)
+       2. [Writing custom filter](#writing-custom-filter)
 
-## <a name="supported-formats" id="supported-formats">Supported formats</a>
+## Supported formats
 
  - dBASE III
  - dBASE III PLUS
  
-##### <a name="supported-memo-formats" id="supported-memo-formats">Supported memo formats</a>
+##### Supported memo formats
 
  - DBT
  - FPT
 
-## <a name="installation" id="installation">Installation</a>
+## Installation
 
 Using composer to install this library is strongly recommended.
 
@@ -46,9 +46,9 @@ Using composer to install this library is strongly recommended.
 composer require org.majkel/dbase
 ````
 
-## <a name="documentation" id="documentation">Documentation</a>
+## Documentation
 
-### <a name="reading-tables" id="reading-tables">Reading tables</a>
+### Reading tables
 
 Table object is both array accessible and traversable.
 You can loop over it as collection or read specific record by it's index.
@@ -65,7 +65,7 @@ foreach ($dbf as $record) {
 echo "Total sum is $totalSum, 5th description: {$record[4]['description']}\n";
 ````
 
-### <a name="inserting-rows" id="inserting-rows">Inserting rows</a>
+### Inserting rows
 
 You can insert records in record object or as an associative array.
 
@@ -89,7 +89,7 @@ $dbf->insert([
 ]);
 ````
 
-### <a name="automatic-type-conversion" id="automatic-type-conversion">Automatic type conversion</a>
+### Automatic type conversion
 
 Dbase and PHP types are automatically converted during fetching and storing of rows.
 
@@ -101,7 +101,7 @@ L          | Logical   | [YTNF?]         | boolean
 M          | Memo      | _any string_    | string
 N          | Numeric   | [0-9]           | int
 
-## <a name="updating-tables" id="updating-tables">Updating tables</a>
+## Updating tables
 
  > Note that update operation is not atomic. Use transactions to achieve integrity
    safety.
@@ -115,7 +115,7 @@ foreach ($dbf as $record) {
 }
 ````
 
-### <a name="transactions" id="transactions">Transactions</a>
+### Transactions
 
 Transactions can prevent two processes from updating the same file.
 
@@ -142,7 +142,7 @@ $dbf->insert($record); // header is not written
 $dbf->endTransaction();
 ````
 
-### <a name="defining-tables" id="defining-tables">Defining tables</a>
+### Defining tables
 
 To construct new table use builder object.
 
@@ -163,7 +163,7 @@ for ($i = 1; $i <= 3; ++$i) {
 }
 ````
 
-#### <a name="creating-table-from-another-table" id="creating-table-from-another-table">Creating table from another table</a>
+#### Creating table from another table
 
 You can create new table form existing table definition.
 
@@ -182,13 +182,13 @@ for ($i = 1; $i <= 3; ++$i) {
 }
 ````
 
-### <a name="filters" id="filters">Filters</a>
+### Filters
 
 Although values are automatically converted based on column type sometimes it is
 required to perform additional processing.
 To achieve that you can add filters on columns. 
 
-#### <a name="using-filters" id="filters">Using filters</a>
+#### Using filters
 
 ````php
 $dbf = Table::fromFile('some/table.dbf');
@@ -204,7 +204,7 @@ foreach ($dbf as $record) {
 Filters are applied during loading in the order they are defined.
 During serialization filters are applied in reversed order.
 
-#### <a name="writing-custom-filter" id="writing-custom-filter">Writing custom filter</a>
+#### Writing custom filter
 
 ````php
 use org\majkel\dbase\FilterInterface;
