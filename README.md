@@ -67,7 +67,7 @@ echo "Total sum is $totalSum, 5th description: {$record[4]['description']}\n";
 
 ### Inserting rows
 
-You can insert records in record object or as an associative array.
+You can insert records as record object or as an associative array.
 
  > Note that insert operation is not atomic. Use transactions to achieve integrity
    safety.
@@ -185,7 +185,7 @@ for ($i = 1; $i <= 3; ++$i) {
 ### Filters
 
 Although values are automatically converted based on column type sometimes it is
-required to perform additional processing.
+necessary to perform additional processing.
 To achieve that you can add filters on columns. 
 
 #### Using filters
@@ -193,7 +193,7 @@ To achieve that you can add filters on columns.
 ````php
 $dbf = Table::fromFile('some/table.dbf');
 $dbf->getHeader()->getField('price')
-    ->addFilter(new TrimFilter());
+    ->addFilter(new TrimFilter())
     ->addFilter(new CurrencyFilter(',', '.'));
 
 foreach ($dbf as $record) {
