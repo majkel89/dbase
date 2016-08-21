@@ -19,7 +19,7 @@ install:
     - composer install -o --dev
 
 before_script:
-    - if [[ $TRAVIS_PHP_VERSION == 7* ]] || [[ $TRAVIS_PHP_VERSION == nightly ]]; then phpenv config-rm xdebug.ini; fi
+    - if [[ $TRAVIS_PHP_VERSION == 7* ]] || [[ $TRAVIS_PHP_VERSION == nightly ]]; then phpenv config-rm xdebug.ini || true; fi
 
 script:
     - composer test-travis-ci
