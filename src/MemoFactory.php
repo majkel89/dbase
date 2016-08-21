@@ -73,7 +73,7 @@ class MemoFactory {
     public function getMemoForDbf(Format $format) {
         foreach ($this->getFormats() as $ext => $generator) {
             $filePath = $this->getMemoPathForDbf($format, $ext);
-            foreach (new ExtCaseInsensitiveGenerator($filePath) as $filePath) {
+            foreach (new ExtCaseInsensitiveGenerator($filePath, Utils::isWindows() ? 1 : 0) as $filePath) {
                 if (is_readable($filePath)) {
                     return $this->getMemo($filePath, $format->getMode(), $ext);
                 }
