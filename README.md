@@ -40,11 +40,30 @@ Library for processing dbase tables.
 
 ## Installation
 
+### Composer
+
 Using composer to install this library is strongly recommended.
 
 ````
 composer require org.majkel/dbase
 ````
+
+Then in your script use this line of code
+
+````php
+require_once 'vendor/autoload.php'
+````
+
+### Old-fashion style
+
+Download library and place it somewhere on disk.
+
+Then in your script use this line of code
+
+````php
+require_once 'DBASE/LIB/DIR/autoloader.php';
+````
+
 
 ## Documentation
 
