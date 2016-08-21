@@ -43,15 +43,19 @@ class Record extends ArrayObject {
     }
 
     /**
-     * @return boolean;
+     * @return boolean
      */
     public function isDeleted() {
         return $this->getFlagsField()->flagEnabled(self::FLAG_DELETED);
     }
 
     /**
+     * Marks record as deleted
+     *
      * @param boolean $deleted
      * @return \org\majkel\dbase\Record
+     *
+     * @internal Use Table::delete or Table::markDeleted instead
      */
     public function setDeleted($deleted) {
         $this->getFlagsField()->enableFlag(self::FLAG_DELETED, $deleted);
@@ -66,16 +70,24 @@ class Record extends ArrayObject {
     }
 
     /**
-     * @param string $name
-     * @return integer|null
+     * Retrieves entity id for memo value
+     *
+     * @param  string $name memo field name
+     * @return integer|null entity id
+     *
+     * @internal
      */
     public function getMemoEntryId($name) {
         return isset($this->memoEntries[$name]) ? $this->memoEntries[$name] : null;
     }
 
     /**
-     * @param string $name
-     * @param integer $entryId
+     * Stores memo field entity id
+     *
+     * @param string  $name    memo field name
+     * @param integer $entryId entity id for field value in memo file
+     *
+     * @internal
      */
     public function setMemoEntryId($name, $entryId) {
         $this->memoEntries[$name] = (integer) $entryId;

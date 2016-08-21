@@ -73,12 +73,19 @@ Table object is both array accessible and traversable.
 You can loop over it as collection or read specific record by it's index.
 
 ````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
 $totalSum = 0;
 
 $dbf = Table::fromFile('some/table.dbf');
 
 foreach ($dbf as $record) {
-    $totalSum += $record->int_val;
+    // returns all records includeing deleted ones
+    if (!$record->isDeleted()) {
+        $totalSum += $record->int_val;
+    }
 }
 
 echo "Total sum is $totalSum, 5th description: {$record[4]['description']}\n";
@@ -92,19 +99,25 @@ You can insert records as record object or as an associative array.
    safety.
 
 ````
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+use org\majkel\dbase\Record;
+
 $dbf = Table::fromFile('some/table.dbf');
 
 $record = new Record();
-$record->fiedBool = true;
-$record->fiedInt = 123;
-$record->fiedChar = 'some text 1';
+$record->fieldBool = true;
+$record->fieldInt  = 123;
+$record->fieldChar = 'some text 1';
+$record->fieldMemo = 'some long text';
 
 $dbf->insert($record);
 
 $dbf->insert([
-    'fiedBool' => false,
-    'fiedInt' => 321,
-    'fiedChar' => 'some text 2',
+    'fieldBool' => false,
+    'fieldInt'  => 321,
+    'fieldChar' => 'some text 2',
 ]);
 ````
 
@@ -120,18 +133,107 @@ L          | Logical   | [YTNF?]         | boolean
 M          | Memo      | _any string_    | string
 N          | Numeric   | [0-9]           | int
 
+### Record object
+
+Record is basically ArrayObject. Object that can be treated as array.
+
+#### Reading data from record
+
+````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
+$dbf = Table::fromFile('some/table.dbf');
+
+// fetch first record
+$record = $dbf[0];
+
+echo "int  field: {$record->number}\n"; // returns integer
+echo "bool field: {$record->boolean}\n"; // returns boolean
+echo "date field: {$record->date->format('Y-m-d')}\n"; // return DateTime object
+echo "text field: {$record->text}\n"; // returns string
+echo "memo field: {$record->memo}\n"; // returns string (not entity id)
+echo "memo field id: {$record->getMemoEntryId('memo')}\n"; // returns entity id for memo field `memo`
+echo "is record deleted: {$record->isDeleted('memo')}\n"; // returns whether record is deleted
+
+// ... or ...
+
+echo "int  field: {$record['number']}\n"; // returns integer
+echo "bool field: {$record['boolean']}\n"; // returns boolean
+echo "date field: {$record['date']->format('Y-m-d')}\n"; // return DateTime object
+echo "text field: {$record['text']}\n"; // returns string
+echo "memo field: {$record['memo']}\n"; // returns string (not entity id)
+echo "memo field id: {$record->getMemoEntryId('memo')}\n"; // returns entity id for memo field `memo`
+echo "is record deleted: {$record->isDeleted('memo')}\n"; // returns whether record is deleted
+
+// you can loop over fields in the record
+foreach ($record as $fieldName => $fieldValue) {
+    echo "$fieldName = $fieldValue\n";
+}
+````
+
+#### Writing data to record
+
+````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
+$dbf = Table::fromFile('some/table.dbf');
+
+// fetch first record
+$record = $dbf[0];
+
+$record->number  = 123;
+$record->boolean = true;
+$record->date    = new DateTime();
+$record->text    = 'some text';
+$record->memo    = 'some longer text';
+
+// ... or ...
+
+$record['number']  = 123;
+$record['boolean'] = true;
+$record['date']    = new DateTime();
+$record['text']    = 'some text';
+$record['memo']    = 'some longer text';
+````
+
 ## Updating tables
 
  > Note that update operation is not atomic. Use transactions to achieve integrity
    safety.
 
 ````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
 $dbf = Table::fromFile('some/table.dbf');
 
 foreach ($dbf as $record) {
     $record->int_val += 10;
     $dbf->update($record); // header is updated everytime
 }
+````
+
+## Deleting records
+
+> Do not use `Record::setDeleted` to delete records
+
+````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
+$dbf = Table::fromFile('some/table.dbf');
+
+// delete 7th record
+$dbf->delete(6);
+
+// undelete 6th record
+$dbf->markDelete(5, false);
 ````
 
 ### Transactions
@@ -144,6 +246,10 @@ Transactions can also save you from unnecessary header updates. Header is update
 of transaction.
 
 ````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Table;
+
 $dbf = Table::fromFile('some/table.dbf');
 
 // header is updated. Transaction flag is set
@@ -166,6 +272,12 @@ $dbf->endTransaction();
 To construct new table use builder object.
 
 ````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Builder;
+use org\majkel\dbase\Format;
+use org\majkel\dbase\Field;
+
 $table = Builder::create()
     ->setFormatType(Format::DBASE3)
     ->addField(Field::create(Field::TYPE_CHARACTER)->setName('str')->setLength(15))
@@ -187,6 +299,12 @@ for ($i = 1; $i <= 3; ++$i) {
 You can create new table form existing table definition.
 
 ````
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Builder;
+use org\majkel\dbase\Format;
+use org\majkel\dbase\Field;
+
 $table = Builder::fromFile('source.dbf')
     ->setFormatType(Format::DBASE3)
     ->addField(Field::create(Field::TYPE_NUMERIC)->setName('newField1'))
@@ -210,6 +328,12 @@ To achieve that you can add filters on columns.
 #### Using filters
 
 ````php
+require_once 'vendor/autoload.php'
+
+use org\majkel\dbase\Builder;
+use org\majkel\dbase\filter\TrimFilter;
+use your\CurrencyFilter;
+
 $dbf = Table::fromFile('some/table.dbf');
 $dbf->getHeader()->getField('price')
     ->addFilter(new TrimFilter())
@@ -226,6 +350,8 @@ During serialization filters are applied in reversed order.
 #### Writing custom filter
 
 ````php
+require_once 'vendor/autoload.php'
+
 use org\majkel\dbase\FilterInterface;
 use org\majkel\dbase\Field;
 
