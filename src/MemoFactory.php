@@ -55,15 +55,14 @@ class MemoFactory {
      */
     public function getMemoPathForDbf(Format $format, $ext) {
         $fileInfo =  $format->getFileInfo();
-        $path = $fileInfo->getPath() . '/';
+        $path = $fileInfo->getPath() . DIRECTORY_SEPARATOR;
         $basename = $fileInfo->getBasename();
-        $index = stripos($basename, '.dbf');
-        if (strlen($basename) - 4 === $index) {
-            $path .= substr($basename, 0, $index);
+        if (preg_match('#^(.*)\.dbf$#i', $basename, $m)) {
+            $path .= $m[1];
         } else {
             $path .= $basename;
         }
-        return $path . '.' . $ext;
+        return "$path.$ext";
     }
 
     /**
@@ -74,8 +73,10 @@ class MemoFactory {
     public function getMemoForDbf(Format $format) {
         foreach ($this->getFormats() as $ext => $generator) {
             $filePath = $this->getMemoPathForDbf($format, $ext);
-            if (is_readable($filePath)) {
-                return $this->getMemo($filePath, $format->getMode(), $ext);
+            foreach (new ExtCaseInsensitiveGenerator($filePath) as $filePath) {
+                if (is_readable($filePath)) {
+                    return $this->getMemo($filePath, $format->getMode(), $ext);
+                }
             }
         }
         throw new Exception("Unable to open memo file");
