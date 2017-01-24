@@ -5,6 +5,7 @@ php:
     - 5.4
     - 5.3
     - 7.0
+    - 7.1
     - hhvm
     - nightly
 
@@ -12,14 +13,10 @@ matrix:
     allow_failures:
         - php: hhvm
         - php: nightly
-        - php: 7.0
 
 install:
     - composer self-update
     - composer install -o --dev
-
-before_script:
-    - if [[ $TRAVIS_PHP_VERSION == 7* ]] || [[ $TRAVIS_PHP_VERSION == nightly ]]; then phpenv config-rm xdebug.ini || true; fi
 
 script:
     - composer test-travis-ci

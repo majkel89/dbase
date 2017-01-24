@@ -21,6 +21,7 @@ abstract class Format {
 
     const AUTO = 'auto';
     const DBASE3 = 'dbase3';
+    const FOXPRO = 'foxpro';
 
     const NAME = 'Abstract DBase Format';
 
@@ -445,12 +446,15 @@ abstract class Format {
 
         $fieldsSz = $headerSize - $hSz - 1;
         $allFields = $file->fread($fieldsSz);
-        $fieldsCount = floor($fieldsSz / $hSz);
 
         $fSz = static::FIELD_SIZE;
         $format = static::FIELD_FORMAT;
-        for ($index = 0; $index < $fieldsCount; ++$index) {
-            $data = unpack($format, substr($allFields, $index * $fSz, $fSz));
+        for ($offset = 0; $offset < $fieldsSz; $offset += $hSz) {
+            $fieldData = substr($allFields, $offset, $fSz);
+            if ($fieldData[0] === "\r") {
+                break;
+            }
+            $data = unpack($format, $fieldData);
             $col = strpos($data['n'], "\0");
             if ($col !== false) {
                 $data['n'] = substr($data['n'], 0, $col);
@@ -539,6 +543,7 @@ abstract class Format {
     public static function getSupportedFormats() {
         return array(
             Format::DBASE3,
+            Format::FOXPRO,
         );
     }
 

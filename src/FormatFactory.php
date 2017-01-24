@@ -86,6 +86,9 @@ class FormatFactory {
             $this->registerFormat(Format::DBASE3, function ($filePath, $mode) {
                 return new format\DBase3($filePath, $mode);
             });
+            $this->registerFormat(Format::FOXPRO, function ($filePath, $mode) {
+                return new format\FoxPro($filePath, $mode);
+            });
             $this->registerFormat(Format::AUTO, function ($filePath, $mode) use (&$self) {
                 foreach ($self->getFormats() as $name => $generator) {
                     try {
