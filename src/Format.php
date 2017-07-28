@@ -344,6 +344,7 @@ abstract class Format {
                 $params[$name] = $field->serialize($record->$name);
             }
         }
+
         return call_user_func_array('pack', $params);
     }
 
@@ -567,6 +568,7 @@ abstract class Format {
 
         $this->writeHeader();
         $this->writeRecords();
+
         $this->getFile()->fwrite(self::RECORD_END);
         return $this;
     }
@@ -594,7 +596,7 @@ abstract class Format {
      * @return string
      */
     protected function getWriteFieldFormat() {
-        return 'a11a1VC@32';
+        return 'a11a1VCC@32';
     }
 
     /**
@@ -605,8 +607,9 @@ abstract class Format {
         $file->fseek(self::HEADER_SIZE);
         $data = '';
         foreach ($this->getHeader()->getFields() as $field) {
-            $data .= pack($this->getWriteFieldFormat(), $field->getName(), $field->getType(), 0, $field->getLength());
+            $data .= pack($this->getWriteFieldFormat(), $field->getName(), $field->getType(), 0, $field->getLength(), $field->getDecimalCount());
         }
+
         $data .= "\x0D\x00";
         $file->fwrite($data);
     }

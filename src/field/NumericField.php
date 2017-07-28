@@ -22,20 +22,21 @@ class NumericField extends Field {
      */
     public function __construct() {
         $this->length = 10;
+        $this->decimalCount = 0;
     }
 
     /**
      * {@inheritdoc}
      */
     public function toData($value) {
-        return substr(strval((integer)$value), 0, $this->getLength());
+        return substr(strval((float)number_format($value, $this->getDecimalCount())), 0, $this->getLength());
     }
 
     /**
      * {@inheritdoc}
      */
     public function fromData($data) {
-        return (integer)substr($data, 0, $this->getLength());
+        return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount());
     }
 
     /**
