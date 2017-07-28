@@ -27,7 +27,7 @@ class NumericFieldTest extends AbstractFieldTest {
      * @return \org\majkel\dbase\Field
      */
     protected function getFieldObject() {
-        return parent::getFieldObject()->setLength(3);
+        return parent::getFieldObject()->setLength(3)->setDecimalCount(0);
     }
 
     /**

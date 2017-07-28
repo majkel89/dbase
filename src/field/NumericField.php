@@ -36,7 +36,11 @@ class NumericField extends Field {
      * {@inheritdoc}
      */
     public function fromData($data) {
-        return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount());
+        if (!$this->getDecimalCount()) {
+            return (integer)substr($data, 0, $this->getLength());
+        } else {
+            return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount());
+        }
     }
 
     /**
