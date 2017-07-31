@@ -29,7 +29,11 @@ class NumericField extends Field {
      * {@inheritdoc}
      */
     public function toData($value) {
-        return substr(strval((float)number_format($value, $this->getDecimalCount())), 0, $this->getLength());
+        if (is_null($value)) {
+            return "";
+        } else {
+            return substr(strval((float)number_format($value, $this->getDecimalCount())), 0, $this->getLength());
+        }
     }
 
     /**

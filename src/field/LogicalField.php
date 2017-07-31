@@ -29,7 +29,7 @@ class LogicalField extends Field {
      */
     public function toData($value) {
         if (is_null($value)) {
-            return '?';
+            return '';
         } else {
             return $value ? 'T' : 'F';
         }
