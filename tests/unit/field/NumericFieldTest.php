@@ -50,7 +50,7 @@ class NumericFieldTest extends AbstractFieldTest {
         return array(
             array(123456, '123'),
             array(1,      '1'),
-            array(null,   '0'),
+            array(null,   ''),
             array(false,  '0'),
             array('',     '0'),
         );

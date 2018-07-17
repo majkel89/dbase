@@ -45,7 +45,8 @@ abstract class AbstractFieldTest extends TestBase {
      * @dataProvider dataToData
      */
     public function testToData($input, $expected) {
-        self::assertSame($expected, $this->getFieldObject()->toData($input));
+        $actual = $this->getFieldObject()->toData($input);
+        self::assertSame($expected, $actual);
     }
 
     abstract public function dataFromData();
