@@ -1,5 +1,5 @@
 {
-    "name": "naril/dbase",
+    "name": "majkel89/dbase",
     "description": "Library to access dbase / xbase / dbf database files",
     "type": "library",
     "keywords": ["dbase", "xbase", "dbf"],
@@ -10,6 +10,11 @@
             "name": "majkel",
             "email": "maf.michal@gmail.com",
             "homepage": "https://github.com/majkel89",
+            "role": "Developer"
+        },
+        {
+            "name": "Tomáš Prokop",
+            "homepage": "https://github.com/naril",
             "role": "Developer"
         }
     ],
