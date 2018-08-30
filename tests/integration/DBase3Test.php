@@ -20,6 +20,7 @@ class DBase3Test extends TestBase {
     /**
      * @medium
      * @coversNothing
+     * @throws Exception
      */
     public function testReadDbase3() {
         $dbf = Table::fromFile('tests/fixtures/dBase3.dbf');
@@ -36,6 +37,7 @@ class DBase3Test extends TestBase {
     /**
      * @medium
      * @coversNothing
+     * @throws Exception
      */
     public function testCopyRecords() {
         $sourceFile = 'tests/fixtures/simple3.dbf';
@@ -73,6 +75,7 @@ class DBase3Test extends TestBase {
     /**
      * @medium
      * @coversNothing
+     * @throws Exception
      */
     public function testReadLongFile() {
         $results = array();

@@ -37,6 +37,7 @@ class DbtMemo extends AbstractMemo {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getEntry($entryId) {
         $this->gotoEntry($entryId);
@@ -78,6 +79,7 @@ class DbtMemo extends AbstractMemo {
 
     /**
      * @return $this
+     * @throws Exception
      */
     public function create() {
         parent::create();

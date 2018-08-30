@@ -33,6 +33,7 @@ class BuilderIntegrationTest extends TestBase {
      * @param string $destinationPath
      * @param string $memoType
      * @dataProvider dataDuplicateProducentBuilder
+     * @throws Exception
      */
     public function testDuplicateProducentBuilder($destinationPath, $memoType) {
         $sourcePath = 'tests/fixtures/dBase3.dbf';
@@ -58,6 +59,7 @@ class BuilderIntegrationTest extends TestBase {
         self::assertTrue($table->isValid());
         self::assertSame(3, $table->getRecordsCount());
         foreach ($table as $record) {
+            /** @var Record $record */
             $data = $record->toArray();
             $data['DAT'] = $record->DAT->format('Y-m-d');
             self::assertSame($recordData, $data);
@@ -68,6 +70,7 @@ class BuilderIntegrationTest extends TestBase {
      * @test
      * @medium
      * @coversNothing
+     * @throws Exception
      */
     public function testConstructNewFile() {
         $filePath = 'tests/fixtures/build.copy.dbf';

@@ -297,6 +297,7 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
 
     /**
      * @param integer $offset
+     * @throws Exception
      */
     public function offsetUnset($offset) {
         $this->removeField($offset);
@@ -304,6 +305,7 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getField($name) {
         if ($this->offsetExists($name)) {

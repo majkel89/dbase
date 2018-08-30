@@ -34,6 +34,7 @@ class File extends SplFileObject {
      * @param string $mode
      * @param string $class
      * @return \SplFileObject
+     * @throws \ReflectionException
      */
     public static function getObject($path, $mode, $class = '\org\majkel\dbase\File') {
         $reflection = new ReflectionClass($class);

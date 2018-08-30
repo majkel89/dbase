@@ -83,6 +83,7 @@ class Builder {
     /**
      * @param string $filePath
      * @return \org\majkel\dbase\Builder
+     * @throws Exception
      */
     public static function fromFile($filePath) {
         return self::fromTable(Table::fromFile($filePath, Table::MODE_READ));
@@ -120,6 +121,7 @@ class Builder {
     /**
      * @param string $filePath
      * @return Table
+     * @throws Exception
      */
     public function build($filePath) {
         $header = $this->getHeader();

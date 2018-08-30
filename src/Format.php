@@ -37,7 +37,7 @@ abstract class Format {
 
     /** @var \SplFileObject File handle */
     protected $file;
-    /** @var \SplFileObject File handle */
+    /** @var \org\majkel\dbase\memo\MemoInterface File handle */
     protected $memoFile;
     /** @var \org\majkel\dbase\Header */
     protected $header;
@@ -53,6 +53,7 @@ abstract class Format {
     /**
      * @param string $filePath
      * @param string $mode
+     * @throws \ReflectionException
      */
     public function __construct($filePath, $mode) {
         $this->mode = $mode;
@@ -61,6 +62,7 @@ abstract class Format {
 
     /**
      * @return \org\majkel\dbase\Header
+     * @throws Exception
      */
     public function getHeader() {
         if (is_null($this->header)) {
@@ -71,6 +73,7 @@ abstract class Format {
 
     /**
      * @return boolean
+     * @throws Exception
      */
     public function isValid() {
         return $this->getHeader()->isValid();
@@ -85,6 +88,7 @@ abstract class Format {
 
     /**
      * @return \SplFileInfo
+     * @throws Exception
      */
     public function getMemoFileInfo() {
         return $this->getMemo()->getFileInfo();
@@ -100,6 +104,7 @@ abstract class Format {
     /**
      * @param integer $index
      * @return Record
+     * @throws Exception
      */
     public function getRecord($index) {
         $records = $this->getRecords($index, 1);
@@ -117,13 +122,18 @@ abstract class Format {
         list($start, $stop) = $this->getReadBoundaries($index, $length);
         $file = $this->getFile();
         $rSz = $this->getHeader()->getRecordSize();
-        $file->fseek($this->getHeader()->getHeaderSize() + $start * $rSz);
+        $offset = $this->getHeader()->getHeaderSize() + $start * $rSz;
+        $file->fseek($offset);
         $format = $this->getRecordFormat();
         $allData = $file->fread($rSz * $length);
         $records = array();
         for ($i = 0; $start < $stop; ++$start, ++$i) {
-            $data = unpack($format, strlen($allData) === $rSz
-                ? $allData : substr($allData, $i * $rSz, $rSz));
+            if (strlen($allData) === $rSz) {
+                $recordData = $allData;
+            } else {
+                $recordData = substr($allData, $i * $rSz, $rSz);
+            }
+            $data = unpack($format, $recordData);
             $records[$start] = $this->createRecord($data);
         }
         return $records;
@@ -227,8 +237,8 @@ abstract class Format {
     }
 
     /**
-     * @return HeaderInterface
      * @return boolean
+     * @throws Exception
      */
     protected function checkIfTransaction() {
         $currentHeader = $this->readHeader();
@@ -241,6 +251,7 @@ abstract class Format {
 
     /**
      * @param boolean $enabled
+     * @throws Exception
      */
     protected function setTransactionStatus($enabled) {
         $enabled = (boolean) $enabled;
@@ -312,6 +323,7 @@ abstract class Format {
 
     /**
      * @return string
+     * @throws Exception
      */
     protected function getWriteRecordFormat() {
         if (is_null($this->writeRecordFormat)) {
@@ -350,6 +362,7 @@ abstract class Format {
     /**
      * @param integer $index
      * @return integer
+     * @throws Exception
      */
     private function getRecordOffset($index) {
         return $index * $this->getHeader()->getRecordSize() + $this->getHeader()->getHeaderSize();
@@ -358,6 +371,7 @@ abstract class Format {
     /**
      * @param \org\majkel\dbase\Record $data
      * @return integer
+     * @throws Exception
      */
     public function insert(Record $data) {
         $header = $this->getHeader();
@@ -377,9 +391,10 @@ abstract class Format {
     }
 
     /**
-     * @param integer $index
+     * @param integer                  $index
      * @param \org\majkel\dbase\Record $data
      * @return void
+     * @throws Exception
      */
     public function update($index, Record $data) {
         list($offset) = $this->getReadBoundaries($index, 0);
@@ -404,6 +419,7 @@ abstract class Format {
 
     /**
      * @return void
+     * @throws Exception
      */
     protected function writeHeader() {
         $file = $this->getFile();
@@ -426,6 +442,7 @@ abstract class Format {
 
     /**
      * @return Header
+     * @throws Exception
      */
     protected function readHeader() {
         $file = $this->getFile();
@@ -496,6 +513,7 @@ abstract class Format {
 
     /**
      * @return string
+     * @throws Exception
      */
     protected function getRecordFormat() {
         if (is_null($this->recordFormat)) {
@@ -511,6 +529,7 @@ abstract class Format {
     /**
      * @param integer $index
      * @return string
+     * @throws Exception
      */
     protected function readMemoEntry($index) {
         return $this->getMemo()->getEntry($index);
@@ -519,6 +538,7 @@ abstract class Format {
     /**
      * @param array $data
      * @return \org\majkel\dbase\Record
+     * @throws Exception
      */
     protected function createRecord($data) {
         $record = new Record;
@@ -552,6 +572,7 @@ abstract class Format {
     /**
      * @param \org\majkel\dbase\Header $header
      * @return $this
+     * @throws Exception
      */
     public function create(Header $header) {
         $this->getFile()->ftruncate(0);
@@ -573,6 +594,7 @@ abstract class Format {
 
     /**
      * @return integer
+     * @throws Exception
      */
     protected function calculateRecordSize() {
         $result = 1;
@@ -584,6 +606,7 @@ abstract class Format {
 
     /**
      * @return integer
+     * @throws Exception
      */
     protected function calculateHeaderSize() {
         $result = self::HEADER_SIZE + $this->getHeader()->getFieldsCount() * self::FIELD_SIZE + 2;
@@ -599,6 +622,7 @@ abstract class Format {
 
     /**
      * @return void
+     * @throws Exception
      */
     protected function writeRecords() {
         $file = $this->getFile();

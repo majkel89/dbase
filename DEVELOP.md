@@ -41,3 +41,5 @@ http://www.clicketyclick.dk/databases/xbase/format/dbf.html#DBF_STRUCT
 http://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
 
 http://www.digitalpreservation.gov/formats/fdd/fdd000325.shtml
+
+http://web.tiscali.it/SilvioPitti/

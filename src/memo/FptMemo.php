@@ -41,7 +41,7 @@ class FptMemo extends AbstractMemo {
 
     /**
      * @param mixed $entryId
-     * @return integer
+     * @return array
      * @throws \org\majkel\dbase\Exception
      */
     private function gotoEntry($entryId) {
@@ -69,6 +69,7 @@ class FptMemo extends AbstractMemo {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getEntry($entryId) {
         list($entryId, $len) = $this->gotoEntry($entryId);
@@ -130,6 +131,7 @@ class FptMemo extends AbstractMemo {
 
     /**
      * @return \org\majkel\dbase\memo\MemoInterface
+     * @throws Exception
      */
     public function create() {
         parent::create();
