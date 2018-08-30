@@ -10,11 +10,7 @@ namespace org\majkel\dbase;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
- * Class Issue6Test
- *
- * @author Michał Kowalik <maf.michal@gmail.com>
- *
- * @coversDefaultClass \org\majkel\dbase\format\FoxPro
+ * @coversNothing
  */
 class Issue6Test extends TestBase
 {
