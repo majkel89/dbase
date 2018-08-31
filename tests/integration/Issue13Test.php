@@ -51,7 +51,7 @@ final class Issue13Test extends TestBase
     }
 
     /**
-     * @before testWriteFoxProFile
+     * @after testWriteFoxProFile
      * @medium
      * @throws \org\majkel\dbase\Exception
      */
