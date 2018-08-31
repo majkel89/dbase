@@ -59,6 +59,24 @@ class FoxPro extends Format {
 
     /**
      * @return string
+     * @throws \org\majkel\dbase\Exception
+     */
+    protected function getWriteRecordFormat() {
+        if (is_null($this->writeRecordFormat)) {
+            $this->writeRecordFormat = 'a';
+            foreach ($this->getHeader()->getFields() as $i => $field) {
+                if ($field instanceof MemoField) {
+                    $this->writeRecordFormat .= 'V';
+                } else {
+                    $this->writeRecordFormat .= 'A' . $field->getLength();
+                }
+            }
+        }
+        return $this->writeRecordFormat;
+    }
+
+    /**
+     * @return string
      */
     public function getType() {
         return Format::FOXPRO;

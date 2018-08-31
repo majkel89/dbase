@@ -8,34 +8,64 @@
 
 namespace org\majkel\dbase\tests\integration;
 
+use org\majkel\dbase\Builder;
 use org\majkel\dbase\Record;
 use org\majkel\dbase\Table;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
- * @xcoversDefaultClass \org\majkel\dbase\format\FoxPro
- * @coversNothing
+ * @coversDefaultClass \org\majkel\dbase\format\FoxPro
  */
 final class Issue13Test extends TestBase
 {
+    const ORIGINAL_TABLE = 'tests/fixtures/materie.dbf';
+    const COPIED_TABLE = 'tests/fixtures/materie-2.dbf';
+
     /**
      * @medium
      * @throws \org\majkel\dbase\Exception
      */
-    public function testOutOfMemoryBugReadFoxProMemoFieldCorrectly()
+    public function testWriteFoxProFile()
     {
-        $table = Table::fromFile("tests/fixtures/issue-13-example-file.dbf");
-        self::assertSame(2707, $table->getRecordsCount());
-        self::assertSame(1102, $table->getRecordSize());
-        self::assertSame(2792, $table->getHeaderSize());
-        self::assertSame(78, $table->getFieldsCount());
-        foreach ($table as $index => $row) {
+        $originalTable = Table::fromFile(self::ORIGINAL_TABLE);
+        self::assertSame(2707, $originalTable->getRecordsCount());
+        self::assertSame(1102, $originalTable->getRecordSize());
+        self::assertSame(2792, $originalTable->getHeaderSize());
+        self::assertSame(78, $originalTable->getFieldsCount());
+
+        if (file_exists(self::COPIED_TABLE)) {
+            unlink(self::COPIED_TABLE);
+        }
+
+        $copiedTable = Builder::fromTable($originalTable)->build(self::COPIED_TABLE);
+
+        foreach ($originalTable as $index => $row) {
             /** @var Record $row */
             self::assertNotEmpty($row->toArray());
             self::assertNotContains("\0", $row->DESCRIERE);
-            if ($index > 100) {
+            $copiedTable->insert($row->toArray());
+            if ($index > 50) {
                 break;
             }
+        }
+    }
+
+    /**
+     * @before testWriteFoxProFile
+     * @medium
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function testVerifyFoxPro()
+    {
+        $originalTable = Table::fromFile(self::ORIGINAL_TABLE);
+        $copiedTable = Table::fromFile(self::COPIED_TABLE);
+
+        foreach ($copiedTable as $index => $row) {
+            /** @var Record $row */
+            /** @var Record $originalRow */
+            $originalRow = $originalTable[$index];
+
+            self::assertSame($originalRow->toArray(), $row->toArray());
         }
     }
 }

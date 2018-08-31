@@ -3,3 +3,4 @@
 *.tar
 *.copy*
 /composer.lock
+/tests/fixtures/materie-2.*
