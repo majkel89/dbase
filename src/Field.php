@@ -29,6 +29,8 @@ abstract class Field {
     protected $name;
     /** @var integer */
     protected $length;
+    /** @var integer */
+    protected $decimalCount;
     /** @var boolean */
     protected $load = true;
     /** @var \org\majkel\dbase\FilterInterface[] */
@@ -136,6 +138,24 @@ abstract class Field {
      */
     public function setLength($length) {
         $this->length = (integer)$length;
+        return $this;
+    }
+
+    /**
+     * Returns filed decimalCount
+     * @return integer
+     */
+    public function getDecimalCount() {
+        return $this->decimalCount;
+    }
+
+    /**
+     * Sets filed decimalCount
+     * @param integer $decimalCount
+     * @return \org\majkel\dbase\Field
+     */
+    public function setDecimalCount($decimalCount) {
+        $this->decimalCount = (integer)$decimalCount;
         return $this;
     }
 
