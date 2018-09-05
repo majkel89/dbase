@@ -1,5 +1,5 @@
 {
-    "name": "majkel89/dbase",
+    "name": "org.majkel/dbase",
     "description": "Library to access dbase / xbase / dbf database files",
     "type": "library",
     "keywords": ["dbase", "xbase", "dbf"],
