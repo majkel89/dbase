@@ -32,7 +32,7 @@ class NumericField extends Field {
         if (is_null($value)) {
             return "";
         } else {
-            $value = number_format((float) $value, $this->getDecimalCount(), '.','');
+            $value = number_format((float) $value, $this->getDecimalCount(), '.', '');
             return substr(strval($value), 0, $this->getLength());
         }
     }
@@ -44,7 +44,7 @@ class NumericField extends Field {
         if (!$this->getDecimalCount()) {
             return (integer)substr($data, 0, $this->getLength());
         } else {
-            return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount(), '.','');
+            return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount(), '.', '');
         }
     }
 

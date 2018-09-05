@@ -136,7 +136,7 @@ C          | Character | _any string_    | string
 D          | Date      | DDMMYY          | DateTime
 L          | Logical   | [YTNF?]         | boolean
 M          | Memo      | _any string_    | string
-N          | Numeric   | [0-9]           | int
+N          | Numeric   | [-0-9.]         | int / float
 
 ### Record object
 
