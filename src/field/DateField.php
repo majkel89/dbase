@@ -29,7 +29,9 @@ class DateField extends Field {
      * {@inheritdoc}
      */
     public function toData($value) {
-        if ($value instanceof DateTime) {
+        if (is_null($value)) {
+            return "";
+        } else if ($value instanceof DateTime) {
             return $value->format('Ymd');
         } else if (is_string($value)) {
             return date('Ymd', strtotime($value));

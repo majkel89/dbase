@@ -11,6 +11,11 @@
             "email": "maf.michal@gmail.com",
             "homepage": "https://github.com/majkel89",
             "role": "Developer"
+        },
+        {
+            "name": "Tomáš Prokop",
+            "homepage": "https://github.com/naril",
+            "role": "Developer"
         }
     ],
     "minimum-stability": "stable",

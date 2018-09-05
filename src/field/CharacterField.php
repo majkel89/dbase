@@ -28,7 +28,11 @@ class CharacterField extends Field {
      * {@inheritdoc}
      */
     public function toData($value) {
-        return substr($value, 0, $this->getLength());
+        if (is_null($value)) {
+            return "";
+        } else {
+            return substr($value, 0, $this->getLength());
+        }
     }
 
     /**

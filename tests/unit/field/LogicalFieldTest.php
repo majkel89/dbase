@@ -33,6 +33,7 @@ class LogicalFieldTest extends AbstractFieldTest {
             array('Y', true),
             array('N', false),
             array('?', null),
+            array(' ', null),
             array('X', null),
             array(  1, null),
         );
@@ -45,7 +46,7 @@ class LogicalFieldTest extends AbstractFieldTest {
         return array(
             array(true,    'T'),
             array(false,   'F'),
-            array(null,    '?'),
+            array(null,    ''),
             array(0,       'F'),
             array('',      'F'),
             array(array(), 'F'),
