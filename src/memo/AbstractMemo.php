@@ -31,6 +31,7 @@ abstract class AbstractMemo implements MemoInterface {
      *
      * @param string $path
      * @param string $mode
+     * @throws \ReflectionException
      */
     public function __construct($path, $mode = 'r') {
         $this->file = File::getObject($path, $mode);

@@ -8,6 +8,7 @@
 namespace org\majkel\dbase\format;
 
 use org\majkel\dbase\Field;
+use org\majkel\dbase\field\MemoField;
 use org\majkel\dbase\Format;
 
 /**
@@ -35,6 +36,43 @@ class FoxPro extends Format {
     public function supportsType($type) {
         return in_array($type, array(Field::TYPE_CHARACTER, Field::TYPE_DATE,
                                      Field::TYPE_LOGICAL, Field::TYPE_MEMO, Field::TYPE_NUMERIC));
+    }
+
+    /**
+     * @return string
+     * @throws \org\majkel\dbase\Exception
+     */
+    protected function getRecordFormat() {
+        if (is_null($this->recordFormat)) {
+            $format = array('a1d');
+            foreach ($this->getHeader()->getFields() as $i => $field) {
+                if ($field instanceof MemoField) {
+                    $format[] = 'V'  . 'f' . $i;
+                } else {
+                    $format[] = 'a' . $field->getLength() . 'f' . $i;
+                }
+            }
+            $this->recordFormat = implode('/', $format);
+        }
+        return $this->recordFormat;
+    }
+
+    /**
+     * @return string
+     * @throws \org\majkel\dbase\Exception
+     */
+    protected function getWriteRecordFormat() {
+        if (is_null($this->writeRecordFormat)) {
+            $this->writeRecordFormat = 'a';
+            foreach ($this->getHeader()->getFields() as $i => $field) {
+                if ($field instanceof MemoField) {
+                    $this->writeRecordFormat .= 'V';
+                } else {
+                    $this->writeRecordFormat .= 'A' . $field->getLength();
+                }
+            }
+        }
+        return $this->writeRecordFormat;
     }
 
     /**

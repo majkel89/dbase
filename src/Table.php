@@ -65,6 +65,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * @param string[] $columns
      * @return \org\majkel\dbase\Table
+     * @throws Exception
      */
     public function setColumns($columns) {
         if (empty($columns) || !is_array($columns)) {
@@ -88,6 +89,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return boolean
+     * @throws Exception
      */
     public function isValid() {
         return $this->getHeader()->isValid();
@@ -95,6 +97,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return \org\majkel\dbase\Header
+     * @throws Exception
      */
     public function getHeader() {
         return $this->getFormat()->getHeader();
@@ -102,9 +105,10 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * Stores record in database
-     * @param integer $index
+     * @param integer                                     $index
      * @param \org\majkel\dbase\Record|\Traversable|array $data
      * @return void
+     * @throws Exception
      */
     public function update($index, $data) {
         if (!$data instanceof Record) {
@@ -121,6 +125,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      * Adds new record to database
      * @param \org\majkel\dbase\Record|\Traversable|array $data
      * @return integer index of new record
+     * @throws Exception
      */
     public function insert($data) {
         if ($data instanceof Record) {
@@ -134,6 +139,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * @param integer $index
      * @param boolean $deleted
+     * @throws Exception
      */
     public function markDeleted($index, $deleted) {
         $this->getFormat()->markDeleted($index, $deleted);
@@ -146,6 +152,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      * Marks record as deleted
      * @param integer $index
      * @return void
+     * @throws Exception
      */
     public function delete($index) {
         $this->markDeleted($index, true);
@@ -153,6 +160,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return boolean
+     * @throws \Exception
      */
     public function isTransaction() {
         return $this->getFormat()->isTransaction();
@@ -200,6 +208,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getVersion() {
         return $this->getHeader()->getVersion();
@@ -207,6 +216,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function isPendingTransaction() {
         return $this->getHeader()->isPendingTransaction();
@@ -214,6 +224,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getLastUpdate() {
         return $this->getHeader()->getLastUpdate();
@@ -221,6 +232,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getFields() {
         return $this->getHeader()->getFields();
@@ -228,6 +240,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getFieldsNames() {
         return $this->getHeader()->getFieldsNames();
@@ -235,6 +248,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getFieldsCount() {
         return $this->getHeader()->getFieldsCount();
@@ -242,6 +256,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getRecordsCount() {
         return $this->getHeader()->getRecordsCount();
@@ -249,6 +264,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getRecordSize() {
         return $this->getHeader()->getRecordSize();
@@ -256,6 +272,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getHeaderSize() {
         return $this->getHeader()->getHeaderSize();
@@ -263,6 +280,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function getField($indexOrName) {
         return $this->getHeader()->getField($indexOrName);
@@ -274,6 +292,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return \org\majkel\dbase\Record
+     * @throws Exception
      */
     public function current() {
         return $this->getRecord($this->index);
@@ -302,6 +321,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return boolean
+     * @throws Exception
      */
     public function valid() {
         return $this->offsetExists($this->index);
@@ -313,6 +333,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
 
     /**
      * @return integer
+     * @throws Exception
      */
     public function count() {
         return $this->getRecordsCount();
@@ -325,6 +346,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * @param integer $offset
      * @return boolean
+     * @throws Exception
      */
     public function offsetExists($offset) {
         return $offset >= 0 && $offset < $this->getRecordsCount();
@@ -333,6 +355,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
     /**
      * @param integer $offset
      * @return \org\majkel\dbase\Record
+     * @throws Exception
      */
     public function offsetGet($offset) {
         return $this->getRecord($offset);
@@ -368,6 +391,7 @@ class Table implements Iterator, Countable, ArrayAccess, HeaderInterface {
      * @param integer $size
      * @param integer $type
      * @return \org\majkel\dbase\Table
+     * @throws Exception
      */
     public function setBufferSize($size, $type = self::BUFFER_RECORDS) {
         if ($type === self::BUFFER_RECORDS) {
