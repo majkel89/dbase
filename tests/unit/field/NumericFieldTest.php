@@ -38,7 +38,8 @@ class NumericFieldTest extends AbstractFieldTest {
             array('1234', 123),
             array('123', 123),
             array(123, 123),
-            array(' 2', 2),
+            array('  2', 2),
+            array('2', 2),
             array(null, 0),
         );
     }
@@ -49,10 +50,10 @@ class NumericFieldTest extends AbstractFieldTest {
     public function dataToData() {
         return array(
             array(123456, '123'),
-            array(1,      '1'),
-            array(null,   ''),
-            array(false,  '0'),
-            array('',     '0'),
+            array(1,      '  1'),
+            array(null,   '   '),
+            array(false,  '  0'),
+            array('',     '  0'),
         );
     }
 
