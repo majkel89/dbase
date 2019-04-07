@@ -103,7 +103,7 @@ You can insert records as record object or as an associative array.
  > Note that insert operation is not atomic. Use transactions to achieve integrity
    safety.
 
-````
+````php
 require_once 'vendor/autoload.php'
 
 use org\majkel\dbase\Table;
@@ -303,7 +303,7 @@ for ($i = 1; $i <= 3; ++$i) {
 
 You can create new table form existing table definition.
 
-````
+````php
 require_once 'vendor/autoload.php'
 
 use org\majkel\dbase\Builder;
