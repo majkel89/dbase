@@ -30,10 +30,10 @@ class NumericField extends Field {
      */
     public function toData($value) {
         if (is_null($value)) {
-            return "";
+            return sprintf('%'. $this->getLength().'s', '');
         } else {
             $value = number_format((float) $value, $this->getDecimalCount(), '.', '');
-            return substr(strval($value), 0, $this->getLength());
+            return str_pad(substr(strval($value), 0, $this->getLength()), $this->length, ' ', STR_PAD_LEFT);
         }
     }
 

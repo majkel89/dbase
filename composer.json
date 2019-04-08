@@ -16,6 +16,11 @@
             "name": "Tomáš Prokop",
             "homepage": "https://github.com/naril",
             "role": "Developer"
+        },
+        {
+            "name": "Király Bálint",
+            "homepage": "https://github.com/kiralybalint",
+            "role": "Developer"
         }
     ],
     "minimum-stability": "stable",
