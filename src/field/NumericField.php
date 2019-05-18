@@ -18,7 +18,7 @@ use \org\majkel\dbase\Field;
 class NumericField extends Field {
 
     /**
-     * CharacterField constructor.
+     * NumericField constructor.
      */
     public function __construct() {
         $this->length = 10;

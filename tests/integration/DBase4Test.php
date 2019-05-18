@@ -11,36 +11,19 @@ namespace org\majkel\dbase;
 use org\majkel\dbase\tests\utils\TestBase;
 
 /**
- * Integration tests of dBase III Format
+ * Integration tests of dBase IV Format
  *
- * @author majkel
+ * @author stokescomp
  */
-class DBase3Test extends TestBase {
+class DBase4Test extends TestBase {
 
     /**
      * @medium
      * @coversNothing
      * @throws Exception
      */
-    public function testReadDbase3() {
-        $dbf = Table::fromFile('tests/fixtures/dBase3.dbf');
-        self::assertSame($dbf->getRecordsCount(), 6);
-        $record = $dbf->getRecord(0);
-        self::assertSame('4', $record->SL_CHPODPL);
-        self::assertSame('Bezp', $record->CHP_ODPLAT);
-        self::assertSame(22, $record->NUM);
-        self::assertSame('2015-06-26', $record->DAT->format('Y-m-d'));
-        self::assertSame(true, $record['LOGIC']);
-        self::assertSame('memo1', $record->MEMO);
-    }
-
-    /**
-     * @medium
-     * @coversNothing
-     * @throws Exception
-     */
-    public function testReadVisualFoxpro() {
-        $dbf = Table::fromFile('tests/fixtures/visualFoxpro.dbf');
+    public function testReadDbase4() {
+        $dbf = Table::fromFile('tests/fixtures/dBase4.dbf');
         self::assertSame($dbf->getRecordsCount(), 6);
         $record = $dbf->getRecord(0);
         self::assertSame('4', $record->SL_CHPODPL);
@@ -58,8 +41,8 @@ class DBase3Test extends TestBase {
      * @throws Exception
      */
     public function testCopyRecords() {
-        $sourceFile = 'tests/fixtures/simple3.dbf';
-        $destinationFile = 'tests/fixtures/simple3.dbf.copy';
+        $sourceFile = 'tests/fixtures/simple4.dbf';
+        $destinationFile = 'tests/fixtures/simple4.dbf.copy';
 
         copy($sourceFile, $destinationFile);
 
@@ -78,7 +61,7 @@ class DBase3Test extends TestBase {
 
         $destination = null;
 
-        $destinationFile2 = 'tests/fixtures/simple3.dbf.2.copy';
+        $destinationFile2 = 'tests/fixtures/simple4.dbf.2.copy';
         copy($destinationFile, $destinationFile2);
         $final = Table::fromFile($destinationFile2);
         $records = 0;

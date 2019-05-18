@@ -22,6 +22,7 @@ abstract class Field {
     const TYPE_DATE = 'D';
     const TYPE_NUMERIC = 'N';
     const TYPE_MEMO = 'M';
+    const TYPE_FLOAT = 'F';
 
     const MAX_NAME_LENGTH = 10;
 
@@ -108,7 +109,7 @@ abstract class Field {
     }
 
     /**
-     * Sets filed name
+     * Sets field name
      *
      * @param string $name
      *
@@ -124,7 +125,7 @@ abstract class Field {
     }
 
     /**
-     * Returns filed length
+     * Returns field length
      * @return integer
      */
     public function getLength() {
@@ -132,7 +133,7 @@ abstract class Field {
     }
 
     /**
-     * Sets filed length
+     * Sets field length
      * @param integer $length
      * @return \org\majkel\dbase\Field
      */
@@ -142,7 +143,7 @@ abstract class Field {
     }
 
     /**
-     * Returns filed decimalCount
+     * Returns field decimalCount
      * @return integer
      */
     public function getDecimalCount() {
@@ -150,7 +151,7 @@ abstract class Field {
     }
 
     /**
-     * Sets filed decimalCount
+     * Sets field decimalCount
      * @param integer $decimalCount
      * @return \org\majkel\dbase\Field
      */
@@ -170,7 +171,7 @@ abstract class Field {
     }
 
     /**
-     * Determines whether to load filed value
+     * Determines whether to load field value
      * @return boolean;
      */
     public function isLoad() {
@@ -232,7 +233,7 @@ abstract class Field {
     }
 
     /**
-     * Constructs Filed based on type
+     * Constructs field based on type
      * @param string $type
      * @return \org\majkel\dbase\Field
      * @throws Exception
@@ -249,6 +250,8 @@ abstract class Field {
                 return new field\MemoField;
             case Field::TYPE_NUMERIC:
                 return new field\NumericField;
+            case Field::TYPE_FLOAT:
+                return new field\FloatField;
             default:
                 throw new Exception("Unsupported field `$type`");
         }
@@ -262,9 +265,10 @@ abstract class Field {
         return array(
             self::TYPE_CHARACTER,
             self::TYPE_LOGICAL,
-            self::TYPE_DATE ,
+            self::TYPE_DATE,
             self::TYPE_NUMERIC,
             self::TYPE_MEMO,
+            self::TYPE_FLOAT,
         );
     }
 }

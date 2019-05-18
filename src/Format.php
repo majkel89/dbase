@@ -21,6 +21,7 @@ abstract class Format {
 
     const AUTO = 'auto';
     const DBASE3 = 'dbase3';
+    const DBASE4 = 'dbase4';
     const FOXPRO = 'foxpro';
 
     const NAME = 'Abstract DBase Format';
@@ -490,9 +491,9 @@ abstract class Format {
      * @param integer $day
      * @return DateTime
      */
-    protected function getLastDate($year, $moth, $day) {
+    protected function getLastDate($year, $month, $day) {
         $date = new DateTime;
-        $date->setDate($year + 1900, $moth, $day);
+        $date->setDate($year + 1900, $month, $day);
         $date->setTime(0, 0, 0);
         return $date;
     }
@@ -564,6 +565,7 @@ abstract class Format {
     public static function getSupportedFormats() {
         return array(
             Format::DBASE3,
+            Format::DBASE4,
             Format::FOXPRO,
         );
     }

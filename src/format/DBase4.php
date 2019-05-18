@@ -12,13 +12,13 @@ use \org\majkel\dbase\Format;
 use org\majkel\dbase\Field;
 
 /**
- * Description of dBase3Plus
+ * Description of dBase4
  *
- * @author majkel
+ * @author stokescomp
  */
-class DBase3 extends Format {
+class DBase4 extends Format {
 
-    const NAME = 'dBASE III PLUS';
+    const NAME = 'dBASE IV';
 
     /**
      * {@inheritdoc}
@@ -40,13 +40,13 @@ class DBase3 extends Format {
      * @return string
      */
     public function getType() {
-        return Format::DBASE3;
+        return Format::DBASE4;
     }
 
     /**
      * @return integer
      */
     protected function getVersion() {
-        return 3;
+        return 4;
     }
 }

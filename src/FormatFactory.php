@@ -86,6 +86,9 @@ class FormatFactory {
             $this->registerFormat(Format::DBASE3, function ($filePath, $mode) {
                 return new format\DBase3($filePath, $mode);
             });
+            $this->registerFormat(Format::DBASE4, function ($filePath, $mode) {
+                return new format\DBase4($filePath, $mode);
+            });
             $this->registerFormat(Format::FOXPRO, function ($filePath, $mode) {
                 return new format\FoxPro($filePath, $mode);
             });

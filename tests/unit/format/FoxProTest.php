@@ -36,7 +36,7 @@ class FoxProTest extends AbstractFormatTest {
     protected function getSupportedTypes() {
         return array(
             Field::TYPE_CHARACTER, Field::TYPE_DATE, Field::TYPE_LOGICAL,
-            Field::TYPE_MEMO, Field::TYPE_NUMERIC
+            Field::TYPE_MEMO, Field::TYPE_NUMERIC, Field::TYPE_FLOAT
         );
     }
 
