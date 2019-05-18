@@ -90,11 +90,11 @@ class MemoFactoryTest extends TestBase {
      */
     public function dataGetMemoPathForDbf() {
         return array(
-            array('some/file.txt', 'some/file.txt.dbt', 'dbt'),
-            array('some/file', 'some/file.dbt', 'dbt'),
-            array('some/file.dbf', 'some/file.dbt', 'dbt'),
-            array('some/file.dBf', 'some/file.dbt', 'dbt'),
-            array('some/file.DBF', 'some/file.xxx', 'xxx'),
+            array('some'.DIRECTORY_SEPARATOR.'file.txt', 'some'.DIRECTORY_SEPARATOR.'file.txt.dbt', 'dbt'),
+            array('some'.DIRECTORY_SEPARATOR.'file', 'some'.DIRECTORY_SEPARATOR.'file.dbt', 'dbt'),
+            array('some'.DIRECTORY_SEPARATOR.'file.dbf', 'some'.DIRECTORY_SEPARATOR.'file.dbt', 'dbt'),
+            array('some'.DIRECTORY_SEPARATOR.'file.dBf', 'some'.DIRECTORY_SEPARATOR.'file.dbt', 'dbt'),
+            array('some'.DIRECTORY_SEPARATOR.'file.DBF', 'some'.DIRECTORY_SEPARATOR.'file.xxx', 'xxx'),
         );
     }
 
