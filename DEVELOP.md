@@ -43,3 +43,5 @@ http://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
 http://www.digitalpreservation.gov/formats/fdd/fdd000325.shtml
 
 http://web.tiscali.it/SilvioPitti/
+
+https://www.clicketyclick.dk/databases/xbase/index.shtml.en

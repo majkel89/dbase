@@ -1,0 +1,15 @@
+
+Page #    1
+
+Structure for database: E:\DBASE\IV\T6.DBF
+Number of data records:       0
+Date of last update   : 12/06/00
+Field  Field Name  Type       Width    Dec    Index
+    1  CHARACTER   Character     10               Y
+    2  NUMERICAL   Numeric       20     18        Y
+    3  DATE        Date           8               Y
+    4  LOGICAL     Logical        1               N
+    5  FLOAT       Float         20     18        Y
+    6  MEMO        Memo          10               N
+** Total **                      70
+

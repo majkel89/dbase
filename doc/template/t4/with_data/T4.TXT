@@ -1,0 +1,14 @@
+
+Page #    1
+
+Structure for database: E:\DBASE\IV\T4.DBF
+Number of data records:      11
+Date of last update   : 12/06/00
+Field  Field Name  Type       Width    Dec    Index
+    1  A           Character     10               N
+    2  B           Character     20               N
+    3  C           Character      9               N
+    4  D           Character      1               N
+    5  E           Character     20               N
+** Total **                      61
+
