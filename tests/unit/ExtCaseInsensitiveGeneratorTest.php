@@ -26,7 +26,7 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
     public function testGenerator()
     {
         $extensions = array();
-        $generator = new ExtCaseInsensitiveGenerator('some'.DIRECTORY_SEPARATOR.'FILE.php');
+        $generator = new ExtCaseInsensitiveGenerator('some/FILE.php');
         foreach ($generator as $ext => $filePath) {
             if (!isset($extensions[$ext])) {
                 $extensions[$ext] = 0;
@@ -44,11 +44,11 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
      */
     public function testGeneratorNoExtension()
     {
-        $generator = new ExtCaseInsensitiveGenerator('some'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'no-ext');
+        $generator = new ExtCaseInsensitiveGenerator('some/file/no-ext');
         $generator->rewind();
         self::assertTrue($generator->valid());
         self::assertSame('', $generator->key());
-        self::assertSame('some'.DIRECTORY_SEPARATOR.'file'.DIRECTORY_SEPARATOR.'no-ext', $generator->current());
+        self::assertSame('some/file/no-ext', $generator->current());
         $generator->next();
         self::assertFalse($generator->valid());
     }
@@ -59,7 +59,7 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
     public function testGeneratorExtension4()
     {
         $extensions = array();
-        foreach (new ExtCaseInsensitiveGenerator('some'.DIRECTORY_SEPARATOR.'file.abcd') as $ext => $filePath) {
+        foreach (new ExtCaseInsensitiveGenerator('some/file.abcd') as $ext => $filePath) {
             $extensions[$ext] = true;
         }
         self::assertSame(16, count($extensions));
@@ -71,7 +71,7 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
     public function testGeneratorExtension2()
     {
         $extensions = array();
-        foreach (new ExtCaseInsensitiveGenerator('some'.DIRECTORY_SEPARATOR.'file.A') as $ext => $filePath) {
+        foreach (new ExtCaseInsensitiveGenerator('some/file.A') as $ext => $filePath) {
             $extensions[$ext] = true;
         }
         self::assertSame(array('a' => true, 'A' => true), $extensions);
@@ -83,7 +83,7 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
     public function testGeneratorLimit3()
     {
         $extensions = array();
-        foreach (new ExtCaseInsensitiveGenerator('some'.DIRECTORY_SEPARATOR.'file.abcd', 3) as $ext => $filePath) {
+        foreach (new ExtCaseInsensitiveGenerator('some/file.abcd', 3) as $ext => $filePath) {
             $extensions[$ext] = true;
         }
         self::assertSame(array(
