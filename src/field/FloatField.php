@@ -13,15 +13,16 @@ use \org\majkel\dbase\Field;
 /**
  * Description of Field
  *
- * @author majkel
+ * @author stokescomp
  */
-class LogicalField extends Field {
+class FloatField extends Field {
 
     /**
-     * LogicalField constructor.
+     * FloatField constructor.
      */
     public function __construct() {
-        $this->length = 1;
+        $this->length = 16;
+        $this->decimalCount = 14;
     }
 
     /**
@@ -29,9 +30,10 @@ class LogicalField extends Field {
      */
     public function toData($value) {
         if (is_null($value)) {
-            return '';
+            return "";
         } else {
-            return $value ? 'T' : 'F';
+            $value = number_format((float) $value, $this->getDecimalCount(), '.', '');
+            return substr(strval($value), 0, $this->getLength());
         }
     }
 
@@ -39,21 +41,18 @@ class LogicalField extends Field {
      * {@inheritdoc}
      */
     public function fromData($data) {
-        if (in_array($data, array('T', 'Y'))) {
-            $value = true;
-        } else if (in_array($data, array('F', 'N'))) {
-            $value = false;
+        if (!$this->getDecimalCount()) {
+            return (integer)substr($data, 0, $this->getLength());
         } else {
-            $value = null;
+            return (float)number_format(substr($data, 0, $this->getLength()), $this->getDecimalCount(), '.', '');
         }
-        return $value;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getType() {
-        return Field::TYPE_LOGICAL;
+        return Field::TYPE_FLOAT;
     }
 
 }

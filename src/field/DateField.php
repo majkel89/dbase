@@ -19,7 +19,7 @@ use DateTime;
 class DateField extends Field {
 
     /**
-     * CharacterField constructor.
+     * DateField constructor.
      */
     public function __construct() {
         $this->length = 8;

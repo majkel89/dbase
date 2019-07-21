@@ -19,9 +19,9 @@ use org\majkel\dbase\Field;
  *
  * @coversDefaultClass \org\majkel\dbase\format\DBase3
  */
-class DBase3Test extends AbstractFormatTest {
+class DBase4Test extends AbstractFormatTest {
 
-    const CLS = '\org\majkel\dbase\format\DBase3';
+    const CLS = '\org\majkel\dbase\format\DBase4';
 
     /**
      * {@inheritdoc}
@@ -46,9 +46,8 @@ class DBase3Test extends AbstractFormatTest {
     public function testCreateHeader() {
         $format = $this->getFormatObject();
         $header = $this->reflect($format)->createHeader($this->getHeaderData(array(
-            'v' => 3,
+            'v' => 4,
         )));
-        
         self::assertTrue($header->isValid());
     }
 
@@ -67,14 +66,14 @@ class DBase3Test extends AbstractFormatTest {
      * @covers ::getName
      */
     public function testGetName() {
-        self::assertSame('dBASE III PLUS', $this->getFormatObject()->getName());
+        self::assertSame('dBASE IV', $this->getFormatObject()->getName());
     }
 
     /**
      * @covers ::getType
      */
     public function testGetType() {
-        self::assertSame(Format::DBASE3, $this->getFormatObject()->getType());
+        self::assertSame(Format::DBASE4, $this->getFormatObject()->getType());
     }
 
 }

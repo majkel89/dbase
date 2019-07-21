@@ -69,6 +69,20 @@ class Header implements HeaderInterface, Iterator, Countable, ArrayAccess {
         $this->fields[$field->getName()] = $field;
         return $this;
     }
+    
+    /**
+     * @param \org\majkel\dbase\Field $field
+     * @param \org\majkel\dbase\$newName
+     * @return \org\majkel\dbase\Header
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function renameField($fieldName, $newFieldName) {
+        if ($this->isFieldsLocked()) {
+            throw new Exception("Header is locked. Use TableBuilder to construct new table with new definition.");
+        }
+        $this->fields[$fieldName]->setName($newFieldName);
+        return $this;
+    }
 
     /**
      * @param string $name

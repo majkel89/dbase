@@ -32,7 +32,7 @@ class ExtCaseInsensitiveGeneratorTest extends TestBase
                 $extensions[$ext] = 0;
             }
             $extensions[$ext]++;
-            self::assertSame("some/FILE.$ext", $filePath);
+            self::assertSame("some".DIRECTORY_SEPARATOR."FILE.$ext", $filePath);
         }
         self::assertSame(array(
             'php' => 1, 'PHP' => 1, 'pHP' => 1, 'PhP' => 1, 'phP' => 1, 'PHp' => 1, 'pHp' => 1, 'Php' => 1,
