@@ -50,7 +50,7 @@ class Builder {
 
     /**
      * @param \org\majkel\dbase\Field $field
-     * @return $this
+     * @return \org\majkel\dbase\Builder
      * @throws \org\majkel\dbase\Exception
      */
     public function addField(Field $field) {
@@ -60,7 +60,18 @@ class Builder {
 
     /**
      * @param $fieldName
-     * @return $this
+     * @param $newFieldName
+     * @return \org\majkel\dbase\Builder
+     * @throws \org\majkel\dbase\Exception
+     */
+    public function renameField($fieldName, $newFieldName) {
+        $this->getHeader()->renameField($fieldName, $newFieldName);
+        return $this;
+    }
+
+    /**
+     * @param $fieldName
+     * @return \org\majkel\dbase\Builder
      * @throws \org\majkel\dbase\Exception
      */
     public function removeField($fieldName) {
@@ -83,7 +94,7 @@ class Builder {
     /**
      * @param string $filePath
      * @return \org\majkel\dbase\Builder
-     * @throws Exception
+     * @throws \org\majkel\dbase\Exception
      */
     public static function fromFile($filePath) {
         return self::fromTable(Table::fromFile($filePath, Table::MODE_READ));
@@ -111,7 +122,7 @@ class Builder {
 
     /**
      * @param string $memoType
-     * @return Builder
+     * @return \org\majkel\dbase\Builder
      */
     public function setMemoType($memoType) {
         $this->memoType = $memoType;
@@ -120,8 +131,8 @@ class Builder {
 
     /**
      * @param string $filePath
-     * @return Table
-     * @throws Exception
+     * @return \org\majkel\dbase\Table
+     * @throws \org\majkel\dbase\Exception
      */
     public function build($filePath) {
         $header = $this->getHeader();
