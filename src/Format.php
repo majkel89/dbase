@@ -509,8 +509,8 @@ abstract class Format {
         $field = Field::create($data['t']);
         $field->setName(rtrim($data['n']));
         $field->setLength($data['ll']);
-        if ($data['t'] == Field::TYPE_NUMERIC && isset($data['dd'])) {
-            $field->setDecimalCount(2);
+        if ($data['t'] === Field::TYPE_NUMERIC && isset($data['dd'])) {
+            $field->setDecimalCount($data['dd']);
         }
         return $field;
     }
